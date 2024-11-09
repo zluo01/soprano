@@ -117,3 +117,4 @@ $RECYCLE.BIN/
 *.lnk
 .DS_Store
 *.sqlite
+/dependency-reduced-pom.xml

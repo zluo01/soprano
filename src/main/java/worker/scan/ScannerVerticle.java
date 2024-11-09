@@ -18,8 +18,8 @@ import static enums.WorkerAction.OPTIMIZE_IMAGE;
 import static enums.WorkerAction.SCAN_DIRECTORY;
 import static worker.scan.AlbumScanner.constructSourceMap;
 
-public final class ParserVerticle extends AbstractVerticle {
-    private static final Logger LOGGER = LogManager.getLogger(ParserVerticle.class);
+public final class ScannerVerticle extends AbstractVerticle {
+    private static final Logger LOGGER = LogManager.getLogger(ScannerVerticle.class);
 
     private DatabaseService databaseService;
 

@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import server.WebServerVerticle;
 import worker.image.ImageOptimizerVerticle;
-import worker.scan.ParserVerticle;
+import worker.scan.ScannerVerticle;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -32,7 +32,9 @@ public final class MainVerticle extends AbstractVerticle {
     }
 
     public static void main(final String[] args) {
-        final Vertx vertx = Vertx.vertx(new VertxOptions().setPreferNativeTransport(true));
+        final Vertx vertx = Vertx.vertx(new VertxOptions().setMaxWorkerExecuteTimeUnit(TimeUnit.HOURS)
+                                                          .setMaxWorkerExecuteTime(1)
+                                                          .setPreferNativeTransport(true));
 
         vertx.exceptionHandler(throwable -> LOGGER.fatal("Unhandled exception", throwable));
         vertx.deployVerticle(new MainVerticle())
@@ -50,11 +52,8 @@ public final class MainVerticle extends AbstractVerticle {
                        .compose(ServerConfig::verifyAndSetupConfig)
                        .compose(config -> deployEventLoopVertical(DatabaseVerticle.class, config)
                                .compose(__ -> Future.all(deployEventLoopVertical(WebServerVerticle.class, config),
-                                                         deployVerticle(ParserVerticle.class, new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                                                                     .setMaxWorkerExecuteTime(1)
-                                                                                                                     .setMaxWorkerExecuteTimeUnit(TimeUnit.HOURS)
-                                                                                                                     .setConfig(config)),
-                                                         deployVirtualThreadVertical(ImageOptimizerVerticle.class, config))))
+                                                         deployWorkerVertical(ScannerVerticle.class, ThreadingModel.WORKER, config),
+                                                         deployWorkerVertical(ImageOptimizerVerticle.class, ThreadingModel.VIRTUAL_THREAD, config))))
                        .onSuccess(compositeFuture -> promise.complete())
                        .onFailure(promise::fail);
 
@@ -67,8 +66,10 @@ public final class MainVerticle extends AbstractVerticle {
         return deployVerticle(verticleClass, new DeploymentOptions().setConfig(config));
     }
 
-    private Future<Void> deployVirtualThreadVertical(final Class<?> verticleClass, final JsonObject config) {
-        return deployVerticle(verticleClass, new DeploymentOptions().setThreadingModel(ThreadingModel.VIRTUAL_THREAD).setConfig(config));
+    private Future<Void> deployWorkerVertical(final Class<?> verticleClass,
+                                              final ThreadingModel threadingModel,
+                                              final JsonObject config) {
+        return deployVerticle(verticleClass, new DeploymentOptions().setThreadingModel(threadingModel).setConfig(config));
     }
 
     private Future<Void> deployVerticle(final Class<?> verticleClass,

@@ -4,7 +4,7 @@ create table if not exists genres
     album INTEGER not null
         constraint genres_albums_id_fk
             references albums,
-    id    integer not null,
+    id    INTEGER not null,
     constraint genres_pk
         unique (id, album)
 );

@@ -70,7 +70,7 @@ public class DatabaseServiceImpl implements DatabaseService {
                                                 .date(row.getString("album_date"))
                                                 .addTime(row.getLong("album_add_time"))
                                                 .modifiedTime(row.getLong("album_modified_time"))
-                                                .totalDuration(row.getInteger(("album_total_duration")))
+                                                .totalDuration(row.getInteger("album_total_duration"))
                                                 .build();
                                }
                                final var song = Song.builder()
@@ -198,7 +198,7 @@ public class DatabaseServiceImpl implements DatabaseService {
             for (final SongData song : album.songs()) {
                 songQueryInput.add(Tuple.of(song.title(),
                                             song.artist(),
-                                            song.album(),
+                                            id,
                                             song.path(),
                                             song.date(),
                                             song.genre(),

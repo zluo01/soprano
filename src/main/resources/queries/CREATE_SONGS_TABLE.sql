@@ -2,7 +2,7 @@ create table if not exists songs
 (
     name          TEXT    not null,
     artists       TEXT,
-    album         integer not null
+    album         INTEGER not null
         constraint songs_albums_id_fk
             references albums
             on delete cascade,

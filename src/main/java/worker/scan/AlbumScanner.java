@@ -1,6 +1,5 @@
 package worker.scan;
 
-import io.vertx.core.eventbus.EventBus;
 import models.AlbumData;
 import models.SongData;
 import org.apache.commons.io.FilenameUtils;
@@ -8,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.SupportedFileFormat;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
@@ -22,21 +22,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class AlbumScanner {
     private static final Logger LOGGER = LogManager.getLogger(AlbumScanner.class);
 
-    private static final Set<String> ALLOWED_EXT = Set.of("mp3", "wav", "flac", "ape", "m4a", "wma", "dsf");
+    private static final Set<String> ALLOWED_EXT = Arrays.stream(SupportedFileFormat.values())
+                                                         .map(SupportedFileFormat::getFilesuffix)
+                                                         .collect(Collectors.toSet());
 
     private AlbumScanner() {
     }
 
-    static ScanResponse constructSourceMap(final String root, final EventBus eventBus) throws IOException {
+    static ScanResponse constructSourceMap(final String root) throws IOException {
         final Map<Integer, AlbumData> sourceMap = new ConcurrentHashMap<>();
         final Map<Integer, Artwork> visitedAlbum = new ConcurrentHashMap<>();
         LOGGER.info("Start scanning directory: {}", root);

@@ -37,7 +37,7 @@ public final class ParserVerticle extends AbstractVerticle {
     }
 
     private void scanDirectory(final String root) {
-        vertx.executeBlocking(() -> constructSourceMap(root, eventBus))
+        vertx.executeBlocking(() -> constructSourceMap(root))
              .compose(response -> {
                  final List<Future<Void>> imageProcessFuture = response.artworks()
                                                                        .stream()

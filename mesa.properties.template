@@ -6,7 +6,9 @@ server,port=6868
 
 # debug
 debug.switch=false
-debug.level=0
+
+# log level
+log.level=INFO
 
 # cover
 

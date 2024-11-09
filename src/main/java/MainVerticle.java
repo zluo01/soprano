@@ -21,7 +21,7 @@ import worker.scan.ParserVerticle;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import static config.ServerConfig.verifyConfig;
+import static config.ServerConfig.verifyAndSetupConfig;
 
 public final class MainVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(MainVerticle.class);
@@ -47,7 +47,7 @@ public final class MainVerticle extends AbstractVerticle {
     public void start(final Promise<Void> promise) {
         final var configRetriever = configRetriever();
         validateSetup().compose(__ -> configRetriever.getConfig())
-                       .compose(ServerConfig::verifyConfig)
+                       .compose(ServerConfig::verifyAndSetupConfig)
                        .compose(config -> deployEventLoopVertical(DatabaseVerticle.class, config)
                                .compose(__ -> Future.all(deployEventLoopVertical(WebServerVerticle.class, config),
                                                          deployVerticle(ParserVerticle.class, new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
@@ -58,7 +58,7 @@ public final class MainVerticle extends AbstractVerticle {
                        .onSuccess(compositeFuture -> promise.complete())
                        .onFailure(promise::fail);
 
-        configRetriever.listen(change -> verifyConfig(change.getNewConfiguration())
+        configRetriever.listen(change -> verifyAndSetupConfig(change.getNewConfiguration())
                 .onSuccess(newConfig -> config().mergeIn(newConfig))
                 .onFailure(LOGGER::error));
     }

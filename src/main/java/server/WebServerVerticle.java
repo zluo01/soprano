@@ -19,6 +19,7 @@ import io.vertx.ext.web.handler.graphql.GraphiQLHandlerOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static config.ServerConfig.enableGraphQLDebug;
 import static config.ServerConfig.serverPort;
 
 public final class WebServerVerticle extends AbstractVerticle {
@@ -48,6 +49,8 @@ public final class WebServerVerticle extends AbstractVerticle {
     }
 
     private Future<Startup> setupRoutes(final Startup startup) {
+        final boolean enableDebugConsole = enableGraphQLDebug(config());
+
         final GraphQL graphQL = GraphQLInitializer.setup(startup.schema, databaseService, vertx.eventBus());
 
         router.route().handler(BodyHandler.create());
@@ -57,7 +60,7 @@ public final class WebServerVerticle extends AbstractVerticle {
         router.route("/graphql").handler(GraphQLHandler.create(graphQL));
 
         final GraphiQLHandlerOptions options = new GraphiQLHandlerOptions()
-                .setEnabled(true);
+                .setEnabled(enableDebugConsole);
 
         final GraphiQLHandler handler = GraphiQLHandler.create(vertx, options);
 

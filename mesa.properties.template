@@ -1,0 +1,17 @@
+# Directory
+directory.music=
+
+# Server
+server,port=6868
+
+# debug
+debug.switch=false
+debug.level=0
+
+# cover
+
+# dimension to normalize album covers. Default dimension is 800.
+# cover.source=800
+
+# variant cover to generate. Default does not generate variant covers.
+# cover.variant=300,600

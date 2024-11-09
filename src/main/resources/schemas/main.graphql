@@ -1,0 +1,70 @@
+type Song {
+    name: String!
+    artists: String
+    albumId: Int!
+    album: String!
+    path: String!
+    date : String
+    genre : String
+    composer  : String
+    performer : String
+    disc : Int!
+    trackNum : Int!
+    duration : Int!
+    modifiedTime : Int!
+    addTime   : Int!
+}
+
+type Album {
+    id: Int!
+    name: String!
+    date: String
+    artist: String!
+    songs: [Song!]!
+    addTime: Int!
+    modifiedTime: Int!
+    totalDuration: Int!
+}
+
+type AlbumLite {
+    id: Int!
+    name: String!
+    artist: String!
+    date: String
+    addTime: Int!
+    modifiedTime: Int!
+    totalDuration: Int!
+}
+
+type Genre {
+    id: Int!
+    name: String!
+}
+
+type Artist {
+    id: Int!
+    name: String!
+}
+
+type AlbumArtist {
+    id: Int!
+    name: String!
+}
+
+type Query {
+    Albums: [Album]
+    Album (id: Int!): Album
+
+    Genres: [Genre]
+    Genre (id: Int!): [AlbumLite]
+
+    AlbumArtists: [AlbumArtist]
+    AlbumArtist (id: Int!): [AlbumLite]
+
+    Artists: [Artist]
+    Artist (id: Int!): [AlbumLite]
+}
+
+type Mutation {
+    Scan: Boolean
+}

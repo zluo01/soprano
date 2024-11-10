@@ -28,7 +28,7 @@
         <log4j.version>2.24.1</log4j.version>
         <jackson.version>2.18.1</jackson.version>
         <sqlite.version>3.47.0.0</sqlite.version>
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.34</lombok.version>
         <commons-io.version>2.17.0</commons-io.version>
         <jaudiotagger.version>3.0.1</jaudiotagger.version>
         <graphql-java.version>22.3</graphql-java.version>

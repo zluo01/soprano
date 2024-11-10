@@ -52,13 +52,13 @@ public final class MainVerticle extends AbstractVerticle {
                        .compose(config -> deployEventLoopVertical(DatabaseVerticle.class, config)
                                .compose(__ -> Future.all(deployEventLoopVertical(WebServerVerticle.class, config),
                                                          deployEventLoopVertical(PlaylistVerticle.class, config),
+                                                         deployEventLoopVertical(ImageOptimizerVerticle.class, config),
                                                          deployVerticle(AlbumScannerVerticle.class,
                                                                         new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
                                                                                                .setMaxWorkerExecuteTime(1)
                                                                                                .setMaxWorkerExecuteTimeUnit(TimeUnit.HOURS)
                                                                                                .setWorkerPoolSize(1)
-                                                                                               .setConfig(config)),
-                                                         deployVirtualThreadVertical(ImageOptimizerVerticle.class, config))))
+                                                                                               .setConfig(config)))))
                        .onSuccess(compositeFuture -> promise.complete())
                        .onFailure(promise::fail);
 
@@ -69,10 +69,6 @@ public final class MainVerticle extends AbstractVerticle {
 
     private Future<Void> deployEventLoopVertical(final Class<?> verticleClass, final JsonObject config) {
         return deployVerticle(verticleClass, new DeploymentOptions().setConfig(config));
-    }
-
-    private Future<Void> deployVirtualThreadVertical(final Class<?> verticleClass, final JsonObject config) {
-        return deployVerticle(verticleClass, new DeploymentOptions().setThreadingModel(ThreadingModel.VIRTUAL_THREAD).setConfig(config));
     }
 
     private Future<Void> deployVerticle(final Class<?> verticleClass,

@@ -1,3 +1,5 @@
+scalar Long
+
 type Song {
     name: String!
     artists: String
@@ -11,8 +13,8 @@ type Song {
     disc : Int!
     trackNum : Int!
     duration : Int!
-    modifiedTime : Int!
-    addTime   : Int!
+    modifiedTime : Long!
+    addTime   : Long!
 }
 
 type Album {
@@ -21,8 +23,8 @@ type Album {
     date: String
     artist: String!
     songs: [Song!]!
-    addTime: Int!
-    modifiedTime: Int!
+    addTime: Long!
+    modifiedTime: Long!
     totalDuration: Int!
 }
 
@@ -31,8 +33,8 @@ type AlbumLite {
     name: String!
     artist: String!
     date: String
-    addTime: Int!
-    modifiedTime: Int!
+    addTime: Long!
+    modifiedTime: Long!
     totalDuration: Int!
 }
 

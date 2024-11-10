@@ -2,11 +2,15 @@ package server;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.sun.jdi.IntegerValue;
 import database.DatabaseService;
 import graphql.GraphQL;
+import graphql.GraphQLException;
 import graphql.execution.preparsed.PreparsedDocumentEntry;
 import graphql.execution.preparsed.PreparsedDocumentProvider;
+import graphql.schema.Coercing;
 import graphql.schema.DataFetcher;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
@@ -85,6 +89,42 @@ final class GraphQLInitializer {
                             .type("Query", builder -> builder.dataFetcher("AlbumArtists", albumArtists))
                             .type("Query", builder -> builder.dataFetcher("Artists", artists))
                             .type("Mutation", builder -> builder.dataFetcher("Scan", scan))
+                            .scalar(longScalar())
                             .build();
+    }
+
+    private static GraphQLScalarType longScalar() {
+        return GraphQLScalarType.newScalar()
+                                .name("Long")
+                                .description("Java Long as scalar.")
+                                .coercing(new LongScalar())
+                                .build();
+    }
+
+    private static class LongScalar implements Coercing<Long, Long> {
+
+        @Override
+        public Long serialize(final Object input) {
+            if (input instanceof Long) {
+                return (Long) input;
+            }
+            throw new GraphQLException("Expected Long but got " + input.getClass().getSimpleName());
+        }
+
+        @Override
+        public Long parseValue(final Object input) {
+            if (input instanceof Number) {
+                return ((Number) input).longValue();
+            }
+            throw new GraphQLException("Expected Long but got " + input.getClass().getSimpleName());
+        }
+
+        @Override
+        public Long parseLiteral(final Object input) {
+            if (input instanceof IntegerValue) {
+                return ((IntegerValue) input).longValue();
+            }
+            throw new GraphQLException("Expected Long but got " + input.getClass().getSimpleName());
+        }
     }
 }

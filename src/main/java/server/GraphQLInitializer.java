@@ -41,7 +41,7 @@ final class GraphQLInitializer {
                                 final EventBus eventBus) {
         final PreparsedDocumentProvider preparsedCache = (executionInput, computeFunction) -> {
             Function<String, PreparsedDocumentEntry> mapCompute = key -> computeFunction.apply(executionInput);
-            return CompletableFuture.completedFuture(QUERY_CACHE.get(executionInput.getQuery(), mapCompute));
+            return QUERY_CACHE.get(executionInput.getQuery(), mapCompute);
         };
 
         final TypeDefinitionRegistry registry = new SchemaParser().parse(schema);

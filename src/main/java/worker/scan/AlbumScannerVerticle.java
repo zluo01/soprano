@@ -27,13 +27,14 @@ import static enums.WorkerAction.SCAN_DIRECTORY;
 import static worker.scan.AlbumScannerHelper.parseTag;
 import static worker.scan.AlbumScannerHelper.retrieveSongPaths;
 
-public final class ScannerVerticle extends AbstractVerticle {
-    private static final Logger LOGGER = LogManager.getLogger(ScannerVerticle.class);
+public final class AlbumScannerVerticle extends AbstractVerticle {
+    private static final Logger LOGGER = LogManager.getLogger(AlbumScannerVerticle.class);
 
     private DatabaseService databaseService;
 
     private EventBus eventBus;
     private FileSystem fileSystem;
+    private boolean isRunning = false;
 
     @Override
     public void start() {
@@ -48,15 +49,23 @@ public final class ScannerVerticle extends AbstractVerticle {
     }
 
     private void scanDirectory(final String root) {
-
-
+        if (isRunning) {
+            LOGGER.info("Already scanning the directory.");
+            return;
+        }
+        LOGGER.info("Start scanning directory: {}", root);
+        isRunning = true;
         retrieveSongPaths(fileSystem, root)
                 .compose(paths -> {
                     LOGGER.info("Start parsing {} song files.", paths.size());
                     return parseSongData(paths).compose(albumData -> databaseService.scan(albumData));
                 })
                 .onSuccess(__ -> LOGGER.info("Successfully update the database"))
-                .onFailure(throwable -> LOGGER.error("Fail to scan directory", throwable));
+                .onFailure(throwable -> LOGGER.error("Fail to scan directory", throwable))
+                .eventually(() -> {
+                    isRunning = false;
+                    return Future.succeededFuture();
+                });
     }
 
     private Future<List<AlbumData>> parseSongData(final List<String> paths) {

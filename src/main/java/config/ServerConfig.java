@@ -61,9 +61,9 @@ public final class ServerConfig {
 
     private static boolean isValidVariantList(final String input) {
         // Regular expression to match integers separated by commas
-        String regex = "^\\[(-?\\d+)(,-?\\d+)*]$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
+        final String regex = "^\\[(-?\\d+)(,-?\\d+)*]$";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(input);
         return matcher.matches();
     }
 

@@ -18,6 +18,8 @@ import io.vertx.ext.web.handler.graphql.GraphiQLHandler;
 import io.vertx.ext.web.handler.graphql.GraphiQLHandlerOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import playlists.PlaylistService;
+import playlists.PlaylistVerticle;
 
 import static config.ServerConfig.enableGraphQLDebug;
 import static config.ServerConfig.serverPort;
@@ -26,6 +28,7 @@ public final class WebServerVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(WebServerVerticle.class);
 
     private DatabaseService databaseService;
+    private PlaylistService playlistService;
     private Router router;
 
     @Override
@@ -44,6 +47,7 @@ public final class WebServerVerticle extends AbstractVerticle {
 
     private Future<Startup> setupServices(final Startup startup) {
         databaseService = ServiceHelper.createServiceProxy(vertx, DatabaseVerticle.class, DatabaseService.class);
+        playlistService = ServiceHelper.createServiceProxy(vertx, PlaylistVerticle.class, PlaylistService.class);
         router = Router.router(vertx);
         return Future.succeededFuture(startup);
     }
@@ -51,7 +55,7 @@ public final class WebServerVerticle extends AbstractVerticle {
     private Future<Startup> setupRoutes(final Startup startup) {
         final boolean enableDebugConsole = enableGraphQLDebug(config());
 
-        final GraphQL graphQL = GraphQLInitializer.setup(startup.schema, databaseService, vertx.eventBus());
+        final GraphQL graphQL = GraphQLInitializer.setup(startup.schema, databaseService, playlistService, vertx.eventBus());
 
         router.route().handler(BodyHandler.create());
 

@@ -40,4 +40,6 @@ public interface DatabaseService {
     Future<List<JsonObject>> artists();
 
     Future<Void> scan(List<AlbumData> albums);
+
+    Future<List<JsonObject>> songsFromPath(List<String> paths);
 }

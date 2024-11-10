@@ -20,6 +20,7 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.handler.graphql.instrumentation.JsonObjectAdapter;
 import models.Album;
+import playlists.PlaylistService;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -36,6 +37,7 @@ final class GraphQLInitializer {
 
     public static GraphQL setup(final String schema,
                                 final DatabaseService databaseService,
+                                final PlaylistService playlistService,
                                 final EventBus eventBus) {
         final PreparsedDocumentProvider preparsedCache = (executionInput, computeFunction) -> {
             Function<String, PreparsedDocumentEntry> mapCompute = key -> computeFunction.apply(executionInput);
@@ -43,7 +45,7 @@ final class GraphQLInitializer {
         };
 
         final TypeDefinitionRegistry registry = new SchemaParser().parse(schema);
-        final RuntimeWiring wiring = createWiring(databaseService, eventBus);
+        final RuntimeWiring wiring = createWiring(databaseService, playlistService, eventBus);
         final GraphQLSchema graphQLSchema = new SchemaGenerator().makeExecutableSchema(registry, wiring);
         return GraphQL.newGraphQL(graphQLSchema)
                       .preparsedDocumentProvider(preparsedCache)
@@ -51,7 +53,9 @@ final class GraphQLInitializer {
                       .build();
     }
 
-    static RuntimeWiring createWiring(final DatabaseService databaseService, final EventBus eventBus) {
+    static RuntimeWiring createWiring(final DatabaseService databaseService,
+                                      final PlaylistService playlistService,
+                                      final EventBus eventBus) {
         final DataFetcher<CompletionStage<List<Album>>> albums = environment -> databaseService.albums().toCompletionStage();
 
         final DataFetcher<CompletionStage<Album>> album = environment -> {
@@ -81,6 +85,77 @@ final class GraphQLInitializer {
             return CompletableFuture.completedFuture(true);
         };
 
+        /*
+         * Playlist Related
+         */
+        final DataFetcher<CompletionStage<List<JsonObject>>> playlists = environment -> playlistService.listPlaylists().toCompletionStage();
+
+        final DataFetcher<CompletionStage<List<JsonObject>>> playlistSongs = environment -> {
+            final String name = environment.getArgument("name");
+            if (name == null) {
+                throw new IllegalArgumentException("Playlist name is required");
+            }
+            return playlistService.playlistSongs(name).toCompletionStage();
+        };
+
+        final DataFetcher<CompletionStage<Boolean>> createPlaylist = environment -> {
+            final String name = environment.getArgument("name");
+            if (name == null) {
+                throw new IllegalArgumentException("Playlist name is required");
+            }
+            return playlistService.createPlaylist(name).toCompletionStage();
+        };
+
+        final DataFetcher<CompletionStage<Boolean>> deletePlaylist = environment -> {
+            final String name = environment.getArgument("name");
+            if (name == null) {
+                throw new IllegalArgumentException("Playlist name is required");
+            }
+            return playlistService.deletePlaylist(name).toCompletionStage();
+        };
+
+        final DataFetcher<CompletionStage<Boolean>> renamePlaylist = environment -> {
+            final String name = environment.getArgument("name");
+            if (name == null) {
+                throw new IllegalArgumentException("Playlist name is required");
+            }
+
+            final String newName = environment.getArgument("newName");
+            if (newName == null) {
+                throw new IllegalArgumentException("Playlist newName is required");
+            }
+
+            return playlistService.renamePlaylist(name, newName).toCompletionStage();
+        };
+
+        final DataFetcher<CompletionStage<Boolean>> addSongToPlaylist = environment -> {
+            final String name = environment.getArgument("name");
+            if (name == null) {
+                throw new IllegalArgumentException("Playlist name is required");
+            }
+
+            final String songPath = environment.getArgument("songPath");
+            if (songPath == null) {
+                throw new IllegalArgumentException("Song path is required");
+            }
+
+            return playlistService.addSongToPlaylist(name, songPath).toCompletionStage();
+        };
+
+        final DataFetcher<CompletionStage<Boolean>> deleteSongFromPlaylist = environment -> {
+            final String name = environment.getArgument("name");
+            if (name == null) {
+                throw new IllegalArgumentException("Playlist name is required");
+            }
+
+            final String songPath = environment.getArgument("songPath");
+            if (songPath == null) {
+                throw new IllegalArgumentException("Song path is required");
+            }
+
+            return playlistService.deleteSongFromPlaylist(name, songPath).toCompletionStage();
+        };
+
         return RuntimeWiring.newRuntimeWiring()
                             .type("Query", builder -> builder.dataFetcher("Albums", albums))
                             .type("Query", builder -> builder.dataFetcher("Album", album))
@@ -88,7 +163,14 @@ final class GraphQLInitializer {
                             .type("Query", builder -> builder.dataFetcher("Genre", albumsForGenre))
                             .type("Query", builder -> builder.dataFetcher("AlbumArtists", albumArtists))
                             .type("Query", builder -> builder.dataFetcher("Artists", artists))
+                            .type("Query", builder -> builder.dataFetcher("Playlists", playlists))
+                            .type("Query", builder -> builder.dataFetcher("Playlist", playlistSongs))
                             .type("Mutation", builder -> builder.dataFetcher("Scan", scan))
+                            .type("Mutation", builder -> builder.dataFetcher("CreatePlaylist", createPlaylist))
+                            .type("Mutation", builder -> builder.dataFetcher("DeletePlaylist", deletePlaylist))
+                            .type("Mutation", builder -> builder.dataFetcher("RenamePlaylist", renamePlaylist))
+                            .type("Mutation", builder -> builder.dataFetcher("AddSongToPlaylist", addSongToPlaylist))
+                            .type("Mutation", builder -> builder.dataFetcher("DeleteSongFromPlaylist", deleteSongFromPlaylist))
                             .scalar(longScalar())
                             .build();
     }

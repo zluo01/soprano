@@ -53,7 +53,14 @@ type AlbumArtist {
     name: String!
 }
 
+type Playlist {
+    name: String!
+    modifiedTime: Long!
+}
+
 type Query {
+    Song (path: String!): Song
+
     Albums: [Album]
     Album (id: Int!): Album
 
@@ -65,8 +72,17 @@ type Query {
 
     Artists: [Artist]
     Artist (id: Int!): [AlbumLite]
+
+    Playlists: [Playlist]
+    Playlist (name: String!): [Song]
 }
 
 type Mutation {
     Scan: Boolean
+
+    CreatePlaylist(name: String!): Boolean
+    DeletePlaylist(name: String!): Boolean
+    RenamePlaylist(name: String!, newName: String!): Boolean
+    AddSongToPlaylist(name: String!, songPath: String!): Boolean
+    DeleteSongFromPlaylist(name: String!, songPath: String!): Boolean
 }

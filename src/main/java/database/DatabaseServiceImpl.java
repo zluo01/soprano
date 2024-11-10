@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class DatabaseServiceImpl implements DatabaseService {
@@ -254,5 +255,20 @@ public class DatabaseServiceImpl implements DatabaseService {
                                                                     .executeBatch(albumArtistsQueryInput))
                                                             .compose(__ -> transaction.commit()))
                                                     .eventually((Supplier<Future<Void>>) connection::close));
+    }
+
+    @Override
+    public Future<List<JsonObject>> songsFromPath(final List<String> paths) {
+        final String payload = paths.stream().map(o -> "\"" + o + "\"").collect(Collectors.joining(","));
+        final String query = DatabaseAction.GET_SONGS_DATA_FROM_PATHS.query().replace("?", payload);
+        return pool.query(query)
+                   .execute()
+                   .map(rows -> {
+                       final List<JsonObject> genres = new ArrayList<>();
+                       for (Row row : rows) {
+                           genres.add(row.toJson());
+                       }
+                       return genres;
+                   });
     }
 }

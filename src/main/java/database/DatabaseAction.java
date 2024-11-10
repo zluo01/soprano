@@ -31,7 +31,8 @@ public enum DatabaseAction {
     INSERT_ALBUM_ARTIST,
     INSERT_ARTIST,
     INSERT_GENRE,
-    INSERT_SONG;
+    INSERT_SONG,
+    GET_SONGS_DATA_FROM_PATHS;
 
     private static final Map<DatabaseAction, String> QUERY_MAP;
 

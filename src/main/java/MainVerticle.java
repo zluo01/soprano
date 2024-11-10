@@ -14,6 +14,7 @@ import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import playlists.PlaylistVerticle;
 import server.WebServerVerticle;
 import worker.image.ImageOptimizerVerticle;
 import worker.scan.AlbumScannerVerticle;
@@ -50,6 +51,7 @@ public final class MainVerticle extends AbstractVerticle {
                        .compose(ServerConfig::verifyAndSetupConfig)
                        .compose(config -> deployEventLoopVertical(DatabaseVerticle.class, config)
                                .compose(__ -> Future.all(deployEventLoopVertical(WebServerVerticle.class, config),
+                                                         deployEventLoopVertical(PlaylistVerticle.class, config),
                                                          deployVerticle(AlbumScannerVerticle.class,
                                                                         new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
                                                                                                .setMaxWorkerExecuteTime(1)

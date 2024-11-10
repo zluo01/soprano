@@ -15,6 +15,7 @@ import org.jaudiotagger.tag.images.Artwork;
 import worker.eventBus.ArtworkPayload;
 import worker.eventBus.ArtworkPayloadCodec;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public final class AlbumScannerVerticle extends AbstractVerticle {
         retrieveSongPaths(fileSystem, root)
                 .compose(paths -> {
                     LOGGER.info("Start parsing {} song files.", paths.size());
-                    return parseSongData(paths).compose(albumData -> databaseService.scan(albumData));
+                    return parseSongData(paths, root).compose(albumData -> databaseService.scan(albumData));
                 })
                 .onSuccess(__ -> LOGGER.info("Successfully update the database"))
                 .onFailure(throwable -> LOGGER.error("Fail to scan directory", throwable))
@@ -68,13 +69,15 @@ public final class AlbumScannerVerticle extends AbstractVerticle {
                 });
     }
 
-    private Future<List<AlbumData>> parseSongData(final List<String> paths) {
+    private Future<List<AlbumData>> parseSongData(final List<String> paths, final String root) {
         final Map<Integer, AlbumData> sourceMap = new ConcurrentHashMap<>();
         final Map<Integer, Artwork> visitedAlbum = new ConcurrentHashMap<>();
+
+        final Path rootParent = Path.of(root).getParent();
         return vertx.executeBlocking(() -> {
             for (final String path : paths) {
                 try {
-                    final AlbumScannerHelper.SongPayload songPayload = parseTag(path);
+                    final AlbumScannerHelper.SongPayload songPayload = parseTag(path, rootParent);
 
                     final SongData song = songPayload.song();
                     final String albumArtist = song.albumArtist();

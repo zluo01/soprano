@@ -61,7 +61,7 @@ public final class SongData {
                                .put("albumArtist", albumArtist)
                                .put("title", title)
                                .put("genre", genre)
-                               .put("date", path)
+                               .put("date", date)
                                .put("composer", composer)
                                .put("performer", performer)
                                .put("disc", disc)

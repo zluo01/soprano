@@ -8,6 +8,8 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,6 +50,13 @@ public final class ServerConfig {
     }
 
     public static Future<JsonObject> verifyAndSetupConfig(final JsonObject config) {
+        if (!config.containsKey(MUSIC_DIRECTORY_CONFIG)
+            || config.getString(MUSIC_DIRECTORY_CONFIG) == null
+            || config.getString(MUSIC_DIRECTORY_CONFIG).isEmpty()
+            || !Files.exists(Path.of(config.getString(MUSIC_DIRECTORY_CONFIG)))) {
+            return Future.failedFuture("Fail to find valid music directory" + config.getString(MUSIC_DIRECTORY_CONFIG));
+        }
+
         // validate
         if (config.containsKey(COVER_VARIANT_DIMENSION) && !isValidVariantList(config.getString(COVER_VARIANT_DIMENSION))) {
             return Future.failedFuture("Cover variant should be a comma separated list of integer, but get "
@@ -65,6 +74,14 @@ public final class ServerConfig {
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(input);
         return matcher.matches();
+    }
+
+    public static String musicDirectory(final JsonObject config) {
+        final String directory = config.getString(MUSIC_DIRECTORY_CONFIG);
+        if (directory.contains("~")) {
+            return directory.replace("~", System.getProperty("user.home"));
+        }
+        return directory;
     }
 
     public static int serverPort(final JsonObject config) {

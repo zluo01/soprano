@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static config.ServerConfig.MUSIC_DIRECTORY_CONFIG;
+import static config.ServerConfig.musicDirectory;
 import static enums.WorkerAction.OPTIMIZE_IMAGE;
 import static enums.WorkerAction.SCAN_DIRECTORY;
 import static worker.scan.AlbumScannerHelper.parseTag;
@@ -45,7 +45,7 @@ public final class AlbumScannerVerticle extends AbstractVerticle {
 
         databaseService = ServiceHelper.createServiceProxy(vertx, DatabaseVerticle.class, DatabaseService.class);
 
-        vertx.eventBus().consumer(SCAN_DIRECTORY.name(), message -> scanDirectory(config().getString(MUSIC_DIRECTORY_CONFIG)));
+        vertx.eventBus().consumer(SCAN_DIRECTORY.name(), message -> scanDirectory(musicDirectory(config())));
     }
 
     private void scanDirectory(final String root) {

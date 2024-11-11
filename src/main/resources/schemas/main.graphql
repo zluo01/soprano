@@ -2,7 +2,7 @@ scalar Long
 
 type Song {
     name: String!
-    artists: String
+    artists: String!
     albumId: Int!
     album: String!
     path: String!
@@ -20,7 +20,7 @@ type Song {
 type Album {
     id: Int!
     name: String!
-    date: String
+    date: String!
     artist: String!
     songs: [Song!]!
     addTime: Long!
@@ -32,7 +32,7 @@ type AlbumLite {
     id: Int!
     name: String!
     artist: String!
-    date: String
+    date: String!
     addTime: Long!
     modifiedTime: Long!
     totalDuration: Int!
@@ -58,23 +58,40 @@ type Playlist {
     modifiedTime: Long!
 }
 
+type Stats {
+    albums: Int!
+    artists: Int!
+    songs: Int!
+}
+
+type SearchResult {
+    songs: [Song!]!
+    albums: [AlbumLite!]!
+    artists: [AlbumArtist!]!
+}
+
 type Query {
-    Song (path: String!): Song
+    Song(path: String!): Song!
+    Songs (paths: [String!]!): [Song!]!
 
-    Albums: [Album]
-    Album (id: Int!): Album
+    Albums: [Album!]!
+    Album (id: Int!): Album!
 
-    Genres: [Genre]
-    Genre (id: Int!): [AlbumLite]
+    Genres: [Genre!]
+    GenreAlbums (id: Int!): [AlbumLite!]!
 
-    AlbumArtists: [AlbumArtist]
-    AlbumArtist (id: Int!): [AlbumLite]
+    AlbumArtists: [AlbumArtist!]
+    AlbumArtistAlbums (id: Int!): [AlbumLite!]!
 
-    Artists: [Artist]
-    Artist (id: Int!): [AlbumLite]
+    Artists: [Artist!]
+    ArtistAlbums (id: Int!): [AlbumLite!]!
 
-    Playlists: [Playlist]
-    Playlist (name: String!): [Song]
+    Playlists: [Playlist!]
+    PlaylistSongs (name: String!): [Song!]!
+
+    Stats: Stats!
+
+    Search (key: String!): SearchResult!
 }
 
 type Mutation {

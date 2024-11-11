@@ -37,9 +37,19 @@ public interface DatabaseService {
 
     Future<List<JsonObject>> albumArtists();
 
+    Future<List<JsonObject>> albumsForAlbumArtists(int id);
+
     Future<List<JsonObject>> artists();
+
+    Future<List<JsonObject>> albumsForArtists(int id);
 
     Future<Void> scan(List<AlbumData> albums);
 
     Future<List<JsonObject>> songsFromPath(List<String> paths);
+
+    Future<JsonObject> stats();
+
+    Future<JsonObject> search(String keyword);
+
+    Future<JsonObject> song(String path);
 }

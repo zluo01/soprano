@@ -169,6 +169,19 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
+    public Future<List<JsonObject>> albumsForAlbumArtists(final int id) {
+        return pool.preparedQuery(DatabaseAction.GET_ALBUMS_FOR_ALBUM_ARTIST.query())
+                   .execute(Tuple.of(id))
+                   .map(rows -> {
+                       final List<JsonObject> albums = new ArrayList<>();
+                       for (Row row : rows) {
+                           albums.add(row.toJson());
+                       }
+                       return albums;
+                   });
+    }
+
+    @Override
     public Future<List<JsonObject>> artists() {
         return pool.query(DatabaseAction.GET_ARTISTS.query())
                    .execute()
@@ -178,6 +191,19 @@ public class DatabaseServiceImpl implements DatabaseService {
                            genres.add(row.toJson());
                        }
                        return genres;
+                   });
+    }
+
+    @Override
+    public Future<List<JsonObject>> albumsForArtists(final int id) {
+        return pool.preparedQuery(DatabaseAction.GET_ALBUMS_FOR_ARTIST.query())
+                   .execute(Tuple.of(id))
+                   .map(rows -> {
+                       final List<JsonObject> albums = new ArrayList<>();
+                       for (Row row : rows) {
+                           albums.add(row.toJson());
+                       }
+                       return albums;
                    });
     }
 
@@ -269,6 +295,67 @@ public class DatabaseServiceImpl implements DatabaseService {
                            genres.add(row.toJson());
                        }
                        return genres;
+                   });
+    }
+
+    @Override
+    public Future<JsonObject> stats() {
+        return pool.query(DatabaseAction.GET_STATS.query())
+                   .execute()
+                   .map(rows -> rows.iterator().next().toJson());
+    }
+
+    @Override
+    public Future<JsonObject> search(final String keyword) {
+        final String querySearchString = "%" + keyword + "%";
+        return Future.all(searchAlbums(querySearchString),
+                          searchArtists(querySearchString),
+                          searchSongs(querySearchString))
+                     .map(compositeFuture -> {
+                         final JsonObject response = new JsonObject();
+                         compositeFuture.<JsonObject>list().forEach(response::mergeIn);
+                         return response;
+                     });
+    }
+
+    @Override
+    public Future<JsonObject> song(final String path) {
+        return songsFromPath(List.of(path)).map(List::getFirst);
+    }
+
+    private Future<JsonObject> searchAlbums(final String keyword) {
+        return pool.preparedQuery(DatabaseAction.SEARCH_ALBUMS.query())
+                   .execute(Tuple.of(keyword))
+                   .map(rows -> {
+                       final List<JsonObject> albums = new ArrayList<>();
+                       for (Row row : rows) {
+                           albums.add(row.toJson());
+                       }
+                       return JsonObject.of("albums", albums);
+                   });
+    }
+
+    private Future<JsonObject> searchSongs(final String keyword) {
+        return pool.preparedQuery(DatabaseAction.SEARCH_SONGS.query())
+                   .execute(Tuple.of(keyword, keyword))
+                   .map(rows -> {
+                       final List<JsonObject> songs = new ArrayList<>();
+                       for (Row row : rows) {
+                           songs.add(row.toJson());
+                       }
+                       return JsonObject.of("songs", songs);
+                   });
+    }
+
+    private Future<JsonObject> searchArtists(final String keyword) {
+        return pool.preparedQuery(DatabaseAction.SEARCH_ARTISTS.query())
+                   .execute(Tuple.of(keyword))
+                   .map(rows -> {
+                       final List<JsonObject> artists = new ArrayList<>();
+                       for (Row row : rows) {
+                           artists.add(row.toJson());
+                       }
+                       return JsonObject.of("artists", artists);
                    });
     }
 }

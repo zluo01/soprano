@@ -29,7 +29,7 @@
         <jackson.version>2.18.2</jackson.version>
         <sqlite.version>3.47.1.0</sqlite.version>
         <lombok.version>1.18.36</lombok.version>
-        <commons-io.version>2.17.0</commons-io.version>
+        <commons-io.version>2.18.0</commons-io.version>
         <jaudiotagger.version>3.0.1</jaudiotagger.version>
         <caffeine.version>3.1.8</caffeine.version>
 

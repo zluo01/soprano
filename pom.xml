@@ -24,7 +24,7 @@
         <main.class>MainVerticle</main.class>
 
         <guava.version>33.3.1-jre</guava.version>
-        <vertx.version>4.5.10</vertx.version>
+        <vertx.version>4.5.11</vertx.version>
         <log4j.version>2.24.1</log4j.version>
         <jackson.version>2.18.2</jackson.version>
         <sqlite.version>3.47.0.0</sqlite.version>

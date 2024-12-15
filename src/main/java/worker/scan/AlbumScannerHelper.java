@@ -51,10 +51,10 @@ public final class AlbumScannerHelper {
 
                              return Future.all(dirFutures)
                                           .map(response -> response.<List<String>>list()
-                                                                   .stream()
-                                                                   .flatMap(Collection::stream)
-                                                                   .distinct()
-                                                                   .toList()
+                                                               .stream()
+                                                               .flatMap(Collection::stream)
+                                                               .distinct()
+                                                               .toList()
                                           );
                          });
     }
@@ -63,11 +63,11 @@ public final class AlbumScannerHelper {
         return !FilenameUtils.getName(path).startsWith(".") && ALLOWED_EXT.contains(FilenameUtils.getExtension(path));
     }
 
-    static SongPayload parseTag(final String path, final Path rootParent) throws CannotReadException,
-                                                                                 TagException,
-                                                                                 InvalidAudioFrameException,
-                                                                                 ReadOnlyFileException,
-                                                                                 IOException {
+    static SongPayload parseTag(final String path) throws CannotReadException,
+                                                          TagException,
+                                                          InvalidAudioFrameException,
+                                                          ReadOnlyFileException,
+                                                          IOException {
         final Path filePath = Path.of(path);
         final AudioFile f = AudioFileIO.read(filePath.toFile());
         final Tag tag = f.getTag();
@@ -78,7 +78,7 @@ public final class AlbumScannerHelper {
         final int disc = parseFractionValue(tag.getFirst(FieldKey.DISC_NO));
         final int trackNum = parseFractionValue(tag.getFirst(FieldKey.TRACK));
         final var songData = SongData.builder()
-                                     .path(rootParent.relativize(filePath).toString())
+                                     .path(path)
                                      .artist(tag.getFirst(FieldKey.ARTIST))
                                      .album(tag.getFirst(FieldKey.ALBUM))
                                      .albumArtist(tag.getFirst(FieldKey.ALBUM_ARTIST))

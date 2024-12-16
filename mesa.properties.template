@@ -25,5 +25,10 @@ log.level=INFO
 
 # By default, auto select available hardware for audio playback
 # hardware in mpv understandable format: https://mpv.io/manual/master/#audio
-# e.g. alsa/hw:2,0, hardware information can be obtained from aplay -l
+# i,e. alsa/hw:2,0, hardware information can be obtained from aplay -l
 # audio.hardware=
+
+# Option to allow override default mpv audio options
+# Format is a comma separate list string
+# i.e. alsa-resample=no,audio-fallback-to-null=yes
+# audio.options.override=

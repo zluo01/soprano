@@ -44,6 +44,8 @@ public final class ServerConfig {
 
     public static final String AUDIO_HARDWARE = "audio.hardware";
 
+    public static final String AUDIO_OPTIONS_OVERRIDE = "audio.options.override";
+
     private static final int DEFAULT_PORT = 6868;
 
     private static final int DEFAULT_COVER_SOURCE_DIMENSION = 800;

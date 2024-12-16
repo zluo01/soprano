@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static config.ServerConfig.AUDIO_HARDWARE;
+import static config.ServerConfig.AUDIO_OPTIONS_OVERRIDE;
 import static config.ServerConfig.LIB_MPV_SOURCE_OVERRIDE;
 
 public record MPVInstance(MPV instance, long handle) {
@@ -42,6 +43,17 @@ public record MPVInstance(MPV instance, long handle) {
 
         if (config.containsKey(AUDIO_HARDWARE)) {
             mpvOptions.put("audio-device", config.getString(AUDIO_HARDWARE));
+        }
+
+        if (config.containsKey(AUDIO_OPTIONS_OVERRIDE)) {
+            final var options = config.getString(AUDIO_OPTIONS_OVERRIDE).split(",");
+            for (final String option : options) {
+                if (option.trim().isEmpty()) {
+                    continue;
+                }
+                var optionValue = option.split("=", 2);
+                mpvOptions.put(optionValue[0], optionValue[1]);
+            }
         }
 
         for (Map.Entry<String, String> entry : mpvOptions.entrySet()) {

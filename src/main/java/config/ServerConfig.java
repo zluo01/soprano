@@ -40,7 +40,7 @@ public final class ServerConfig {
 
     public static final String COVER_VARIANT_DIMENSION = "cover.variant";
 
-    public static final String LIB_MPV_SOURCE = "lib.mpv.source";
+    public static final String LIB_MPV_SOURCE_OVERRIDE = "lib.mpv.source.override";
 
     public static final String AUDIO_HARDWARE = "audio.hardware";
 

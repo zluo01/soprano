@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static config.ServerConfig.AUDIO_HARDWARE;
-import static config.ServerConfig.LIB_MPV_SOURCE;
+import static config.ServerConfig.LIB_MPV_SOURCE_OVERRIDE;
 
 public record MPVInstance(MPV instance, long handle) {
 
@@ -60,8 +60,8 @@ public record MPVInstance(MPV instance, long handle) {
     }
 
     private static MPV createInstance(final JsonObject config) {
-        if (config.containsKey(LIB_MPV_SOURCE)) {
-            return Native.load(config.getString(LIB_MPV_SOURCE), MPV.class);
+        if (config.containsKey(LIB_MPV_SOURCE_OVERRIDE)) {
+            return Native.load(config.getString(LIB_MPV_SOURCE_OVERRIDE), MPV.class);
         }
 
         final var paths = determinePossibleMpvPath();

@@ -21,7 +21,7 @@ log.level=INFO
 # player
 
 # path for libmpv
-# lib.mpv.source=
+# lib.mpv.source.override=
 
 # By default, auto select available hardware for audio playback
 # hardware in mpv understandable format: https://mpv.io/manual/master/#audio

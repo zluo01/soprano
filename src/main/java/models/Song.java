@@ -5,11 +5,13 @@ import io.vertx.core.json.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @Builder
 @DataObject
 @AllArgsConstructor
+@Accessors(fluent = true)
 public final class Song {
     private String name;
     private String artists;

@@ -2,7 +2,7 @@
 directory.music=
 
 # Server
-server,port=6868
+server.port=6868
 
 # debug
 debug.switch=false
@@ -17,3 +17,13 @@ log.level=INFO
 
 # variant cover to generate. Default does not generate variant covers.
 # cover.variant=300,600
+
+# player
+
+# path for libmpv
+# lib.mpv.source=
+
+# By default, auto select available hardware for audio playback
+# hardware in mpv understandable format: https://mpv.io/manual/master/#audio
+# e.g. alsa/hw:2,0, hardware information can be obtained from aplay -l
+# audio.hardware=

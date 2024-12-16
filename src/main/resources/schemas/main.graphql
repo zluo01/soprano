@@ -17,6 +17,25 @@ type Song {
     addTime   : Long!
 }
 
+type PlaylistSong {
+    name: String!
+    artists: String!
+    albumId: Int!
+    album: String!
+    path: String!
+    date : String
+    genre : String
+    composer  : String
+    performer : String
+    disc : Int!
+    trackNum : Int!
+    duration : Int!
+    modifiedTime : Long!
+    addTime   : Long!
+    position: Int!
+    playing: Boolean!
+}
+
 type Album {
     id: Int!
     name: String!
@@ -70,6 +89,12 @@ type SearchResult {
     artists: [AlbumArtist!]!
 }
 
+type PlaybackStatus {
+    playing: Boolean!
+    elapsed: Int!
+    song: Song
+}
+
 type Query {
     Song(path: String!): Song!
     Songs (paths: [String!]!): [Song!]!
@@ -92,14 +117,32 @@ type Query {
     Stats: Stats!
 
     Search (key: String!): SearchResult!
+
+    # player
+    SongsInQueue: [PlaylistSong!]!
+    PlaybackStatus: PlaybackStatus!
 }
 
 type Mutation {
-    Scan: Boolean
+    Update: Boolean
+    Build: Boolean
 
-    CreatePlaylist(name: String!): Boolean
-    DeletePlaylist(name: String!): Boolean
-    RenamePlaylist(name: String!, newName: String!): Boolean
-    AddSongToPlaylist(name: String!, songPath: String!): Boolean
-    DeleteSongFromPlaylist(name: String!, songPath: String!): Boolean
+    # playlists
+    CreatePlaylist(name: String!): Boolean!
+    DeletePlaylist(name: String!): Boolean!
+    RenamePlaylist(name: String!, newName: String!): Boolean!
+    AddSongToPlaylist(name: String!, songPath: String!): Boolean!
+    DeleteSongFromPlaylist(name: String!, songPath: String!): Boolean!
+
+    # player
+    PlaySong(songPath: String!): Int!
+    PlayPlaylist(playlistName: String!): Int!
+    PlayAlbum(id: Int!): Int!
+    PauseSong: Int!
+    NextSong: Int!
+    PrevSong: Int!
+    PlaySongInQueueAtPosition(position: Int!): Int!
+    AddSongToQueue(songPath: String!): Int!
+    RemoveSongFromQueue(position: Int!): Int!
+    ClearQueue: Int!
 }

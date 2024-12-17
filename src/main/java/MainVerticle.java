@@ -1,3 +1,4 @@
+import collector.AudioDataCollectorVerticle;
 import config.ServerConfig;
 import database.DatabaseVerticle;
 import io.vertx.config.ConfigRetriever;
@@ -17,10 +18,7 @@ import org.apache.logging.log4j.Logger;
 import player.PlayerVerticle;
 import playlists.PlaylistVerticle;
 import server.WebServerVerticle;
-import worker.image.ImageOptimizerVerticle;
-import worker.scan.AlbumScannerVerticle;
 
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import static config.ServerConfig.verifyAndSetupConfig;
@@ -53,15 +51,9 @@ public final class MainVerticle extends AbstractVerticle {
                        .compose(config -> deployEventLoopVertical(DatabaseVerticle.class, config)
                                .compose(__ -> Future.all(deployEventLoopVertical(WebServerVerticle.class, config),
                                                          deployEventLoopVertical(PlaylistVerticle.class, config),
-                                                         deployEventLoopVertical(ImageOptimizerVerticle.class, config),
-                                                         deployVerticle(PlayerVerticle.class,
+                                                         deployEventLoopVertical(PlayerVerticle.class, config),
+                                                         deployVerticle(AudioDataCollectorVerticle.class,
                                                                         new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                                               .setConfig(config)),
-                                                         deployVerticle(AlbumScannerVerticle.class,
-                                                                        new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                                               .setMaxWorkerExecuteTime(1)
-                                                                                               .setMaxWorkerExecuteTimeUnit(TimeUnit.HOURS)
-                                                                                               .setWorkerPoolSize(1)
                                                                                                .setConfig(config)))))
                        .onSuccess(compositeFuture -> promise.complete())
                        .onFailure(promise::fail);

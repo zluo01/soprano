@@ -1,0 +1,11 @@
+.idea
+out
+gen
+node_modules
+.next
+package-lock.json
+app
+.vscode
+src-tauri
+dist
+.github

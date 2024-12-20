@@ -60,16 +60,19 @@ type AlbumLite {
 type Genre {
     id: Int!
     name: String!
+    albumCount: Int!
 }
 
 type Artist {
     id: Int!
     name: String!
+    albumCount: Int!
 }
 
 type AlbumArtist {
     id: Int!
     name: String!
+    albumCount: Int!
 }
 
 type Playlist {

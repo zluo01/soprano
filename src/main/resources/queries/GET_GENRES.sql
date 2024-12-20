@@ -1,3 +1,10 @@
-SELECT DISTINCT id, name
-FROM genres
-ORDER BY 2
+SELECT
+    id,
+    name,
+    COUNT(album) AS albumCount
+FROM
+    genres
+GROUP BY
+    id, name
+ORDER BY
+    name;

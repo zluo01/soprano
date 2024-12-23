@@ -67,6 +67,8 @@ public final class WebServerVerticle extends AbstractVerticle {
 
         router.route().handler(BodyHandler.create());
 
+        router.get().handler(StaticHandler.create());
+
         router.route("/covers/*").handler(StaticHandler.create(FileSystemAccess.ROOT, ServerConfig.COVER_PATH));
 
         router.route("/graphql").handler(GraphQLHandler.create(graphQL));

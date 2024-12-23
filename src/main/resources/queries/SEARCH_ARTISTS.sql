@@ -1,4 +1,7 @@
-SELECT DISTINCT id, name
-FROM main.albumArtists
+SELECT id,
+       name,
+       COUNT(album) AS albumCount
+FROM albumArtists
 WHERE name LIKE ?
-ORDER BY 2
+GROUP BY id, name
+ORDER BY name;

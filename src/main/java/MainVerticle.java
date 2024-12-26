@@ -51,9 +51,7 @@ public final class MainVerticle extends AbstractVerticle {
                        .compose(config -> deployEventLoopVertical(DatabaseVerticle.class, config)
                                .compose(__ -> Future.all(deployEventLoopVertical(WebServerVerticle.class, config),
                                                          deployEventLoopVertical(PlaylistVerticle.class, config),
-                                                         deployVerticle(PlayerVerticle.class,
-                                                                        new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                                               .setConfig(config)),
+                                                         deployEventLoopVertical(PlayerVerticle.class, config),
                                                          deployVerticle(AudioDataCollectorVerticle.class,
                                                                         new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
                                                                                                .setConfig(config)))))

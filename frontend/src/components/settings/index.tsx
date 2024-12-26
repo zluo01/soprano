@@ -20,7 +20,7 @@ export default function Settings({ open, close }: ISettingsPros) {
 
   return (
     <Drawer open={open} onOpenChange={close}>
-      <DrawerContent>
+      <DrawerContent className="pb-[env(safe-area-inset-bottom)]">
         <DrawerHeader className="text-left">
           <DrawerTitle>Settings</DrawerTitle>
         </DrawerHeader>

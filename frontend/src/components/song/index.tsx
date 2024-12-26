@@ -28,7 +28,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
       open={playbackModalState}
       onOpenChange={open => updatePlaybackModalState(open)}
     >
-      <DrawerContent className="h-[98%] rounded-2xl">
+      <DrawerContent className="h-full rounded-2xl pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
         <div className="flex h-full flex-col items-center justify-between px-6 pb-20 pt-12">
           <div className="flex w-full items-center justify-center">
             <Cover

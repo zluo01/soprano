@@ -3,7 +3,7 @@ import { AlbumGridView, GeneralTagItems } from '@/components/shares';
 import { Separator } from '@/components/ui/separator.tsx';
 import { GetGeneralTagAlbumsQuery, GetGeneralTagQuery } from '@/lib/queries';
 import { GeneralTag } from '@/type';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 export interface IGeneralTagViewProps {
   tag: GeneralTag;
@@ -23,12 +23,10 @@ export function GeneralTagAlbumsView({ tag }: IGeneralTagViewProps) {
 
   return (
     <>
-      <div className="p-6">
+      <div className="px-6 py-3">
         <Separator />
       </div>
-      <div className="size-full px-6">
-        {isLoading ? <LoadingAlbums /> : <AlbumGridView albums={data!} />}
-      </div>
+      {isLoading ? <LoadingAlbums /> : <AlbumGridView albums={data!} />}
     </>
   );
 }

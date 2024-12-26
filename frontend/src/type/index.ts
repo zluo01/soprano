@@ -33,6 +33,8 @@ export interface IAlbum {
 export interface IPlaylist {
   name: string;
   modifiedTime: number;
+  songCount: number;
+  coverId?: number;
 }
 
 export enum GeneralTag {

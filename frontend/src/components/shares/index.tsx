@@ -4,7 +4,7 @@ import { useSearchStore } from '@/lib/context';
 import { cn } from '@/lib/utils.ts';
 import { GeneralTag, IAlbum, IGeneralTag, ISong } from '@/type';
 import { DiscIcon } from '@radix-ui/react-icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 interface IAlbumGridView {
   albums: IAlbum[];
@@ -14,12 +14,12 @@ export function AlbumGridView({ albums }: IAlbumGridView) {
   const navigate = useNavigate();
 
   return (
-    <ScrollArea className="size-full">
+    <ScrollArea className="h-full py-3 pb-[70px]">
       <div
         className={cn(
-          'm-0 border-0',
+          'm-0 border-0 px-6',
           'grid grid-flow-dense auto-rows-fr',
-          'grid-cols-2 gap-5',
+          'grid-cols-2 gap-x-8 gap-y-4',
         )}
       >
         {albums.map(album => (
@@ -31,8 +31,8 @@ export function AlbumGridView({ albums }: IAlbumGridView) {
             <Cover
               albumId={album?.id}
               alt={album.name}
-              width={300}
-              height={300}
+              width={180}
+              height={180}
               style={'rounded-full'}
             />
             <p className="cursor-default truncate pt-1 text-center text-sm">
@@ -76,7 +76,7 @@ export function GeneralTagItem({
 
   return (
     <div
-      className="flex w-full cursor-pointer select-none flex-col flex-nowrap space-y-1 py-2"
+      className="w-full cursor-pointer select-none space-y-1 px-6 py-2"
       onClick={route}
     >
       <p className="truncate font-medium">{name}</p>
@@ -97,7 +97,7 @@ interface IGeneralTagItemsPros {
 
 export function GeneralTagItems({ tag, data }: IGeneralTagItemsPros) {
   return (
-    <ScrollArea className="size-full">
+    <ScrollArea className="h-full pb-[70px]">
       {data?.map(t => <GeneralTagItem key={t.id} tag={tag} {...t} />)}
     </ScrollArea>
   );

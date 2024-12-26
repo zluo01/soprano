@@ -4,15 +4,15 @@ import { Separator } from '@/components/ui/separator.tsx';
 import { GetAlbumDetailQuery, PlayAlbum, PlaySong } from '@/lib/queries';
 import { formatTime } from '@/lib/utils.ts';
 import { PlusIcon } from '@radix-ui/react-icons';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 export default function Album() {
   const { id } = useParams();
   const { data } = GetAlbumDetailQuery(id);
 
   return (
-    <div className="flex size-full select-none flex-col flex-nowrap items-center overflow-y-scroll pb-24">
-      <div className="w-full px-6">
+    <div className="flex size-full select-none flex-col flex-nowrap items-center overflow-y-scroll pb-[72px]">
+      <div className="w-full px-6 py-3">
         <Separator />
       </div>
 
@@ -28,7 +28,7 @@ export default function Album() {
       <div className="w-full px-6">
         <p className="w-full font-semibold">{data?.Album.name}</p>
         <p className="w-full truncate font-bold">{data?.Album.artist}</p>
-        <div className="sticky top-0 z-10 flex w-full flex-row flex-nowrap items-center justify-between bg-background py-3">
+        <div className="sticky top-0 z-10 flex w-full flex-row flex-nowrap items-center justify-between border-b bg-background py-3">
           <div className="flex flex-col flex-nowrap bg-inherit text-sm opacity-35">
             <span>Album</span>
             <span>
@@ -68,8 +68,6 @@ export default function Album() {
             </Button>
           </div>
         </div>
-
-        <Separator />
 
         <div className="flex flex-col pt-2">
           {data?.Album.songs.map(song => (

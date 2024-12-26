@@ -10,16 +10,16 @@ export default function Preview() {
 
   return (
     <>
-      <div className="fixed bottom-0 z-10 w-full bg-background sm:hidden">
-        <div className="mx-2 my-1 flex h-20 flex-row flex-nowrap rounded-lg border shadow-2xl">
+      <div className="fixed bottom-[env(safe-area-inset-bottom)] z-10 w-full bg-background sm:hidden">
+        <div className="mx-2 my-1 flex h-fit flex-row flex-nowrap rounded-lg border py-1 shadow-2xl">
           <div
             className="flex size-full cursor-pointer select-none flex-row flex-nowrap items-center gap-3 px-4"
             onClick={() => updatePlaybackModalState(true)}
           >
             <Cover
               albumId={data?.PlaybackStatus.song?.albumId}
-              height={65}
-              width={65}
+              height={50}
+              width={50}
               alt={data?.PlaybackStatus.song?.name || ''}
               style={'rounded'}
             />

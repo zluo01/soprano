@@ -17,7 +17,7 @@ import { DialogTitle } from '@radix-ui/react-dialog';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import isEmpty from 'lodash/isEmpty';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 function SearchAlbumItem({ id, name, artist }: IAlbum) {
   const navigate = useNavigate();
@@ -142,7 +142,7 @@ export default function Search() {
       open={searchModalState}
       onOpenChange={open => updateSearchModalState(open)}
     >
-      <DrawerContent className="h-screen  bg-primary-foreground ">
+      <DrawerContent className="h-full rounded-2xl bg-primary-foreground pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
         <DialogTitle>
           <div className="border-b-2 px-6 pt-6">
             <div className="relative space-x-1">

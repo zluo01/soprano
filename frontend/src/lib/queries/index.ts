@@ -102,6 +102,8 @@ const PlaylistsQueryDocument = /*GraphQL*/ `
         Playlists {
             name
             modifiedTime
+            songCount
+            coverId
         }
     }
 `;
@@ -404,43 +406,43 @@ export function GetSongInQueueQuery() {
 }
 
 const NextSongQueryDocument = /* GraphQL */ `
-  mutation NextSong {
+  mutation {
     NextSong
   }
 `;
 
 export async function NextSong() {
-  await fetch(NextSongQueryDocument);
+  await request(NextSongQueryDocument);
 }
 
 const PrevSongQueryDocument = /* GraphQL */ `
-  mutation PrevSong {
+  mutation {
     PrevSong
   }
 `;
 
 export async function PrevSong() {
-  await fetch(PrevSongQueryDocument);
+  await request(PrevSongQueryDocument);
 }
 
 const PauseSongQueryDocument = /* GraphQL */ `
-  mutation PauseSong {
+  mutation {
     PauseSong
   }
 `;
 
 export async function PauseSong() {
-  await fetch(PauseSongQueryDocument);
+  await request(PauseSongQueryDocument);
 }
 
 const BuildDatabaseQueryDocument = /* GraphQL */ `
-  mutation BuildDatabase {
+  mutation {
     Build
   }
 `;
 
 export async function BuildDatabase() {
-  await fetch(BuildDatabaseQueryDocument);
+  await request(BuildDatabaseQueryDocument);
 }
 
 const PlaySongQueryDocument = /* GraphQL */ `

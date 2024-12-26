@@ -22,7 +22,7 @@ export function LoadingSongs() {
 
 export function LoadingList() {
   return (
-    <div className="flex size-full flex-col overflow-hidden">
+    <div className="flex size-full flex-col overflow-hidden px-6">
       {Array.from({ length: 14 }, (_v, i) => (
         <div
           key={i}
@@ -40,9 +40,9 @@ export function LoadingAlbums() {
   return (
     <div
       className={cn(
-        'm-0 border-0 overflow-hidden',
+        'm-0 border-0 px-6 py-3',
         'grid grid-flow-dense auto-rows-fr',
-        'grid-cols-2 gap-3',
+        'grid-cols-2 gap-x-8 gap-y-4',
       )}
     >
       {Array.from({ length: 8 }, (_v, i) => (

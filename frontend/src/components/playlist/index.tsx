@@ -9,7 +9,7 @@ import {
   PlaySong,
 } from '@/lib/queries';
 import { PlusIcon } from '@radix-ui/react-icons';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 export default function Playlist() {
   const { playlistName } = useParams();
@@ -17,7 +17,7 @@ export default function Playlist() {
 
   return (
     <>
-      <div className="flex w-full flex-row flex-nowrap items-center gap-2 bg-background px-6 pb-2">
+      <div className="flex w-full flex-row flex-nowrap items-center gap-2 bg-background px-6 py-3">
         <Separator className="flex-1" />
         <>
           <Button
@@ -52,7 +52,7 @@ export default function Playlist() {
       {isLoading ? (
         <LoadingSongs />
       ) : (
-        <ScrollArea className="flex h-[calc(100vh-220px)] w-full flex-col px-6">
+        <ScrollArea className="flex size-full flex-col px-6 pb-[72px]">
           {data?.PlaylistSongs.map(o => (
             <SongItemWithCover
               key={o.path}

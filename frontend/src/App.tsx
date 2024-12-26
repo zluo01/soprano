@@ -1,11 +1,11 @@
 import Album from '@/components/album';
 import Albums from '@/components/albums';
 import { GeneralTagAlbumsView, GeneralTagView } from '@/components/general';
-import Home from '@/components/home';
 import Playlist from '@/components/playlist';
 import Playlists from '@/components/playlists';
+import RecentlyAdded from '@/components/recent';
 import { GeneralTag } from '@/type';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router';
 import Layout from 'src/components/layout';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
+          <Route index element={<RecentlyAdded />} />
           <Route path="playlists">
             <Route index element={<Playlists />} />
             <Route path=":playlistName" element={<Playlist />} />

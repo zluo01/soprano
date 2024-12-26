@@ -13,6 +13,42 @@
         "digest"
       ],
       "automerge": true
+    },
+    {
+      "groupName": "definitelyTyped",
+      "matchPackagePrefixes": ["@types/"]
+    },
+    {
+      "groupName": "eslint",
+      "matchPackagePrefixes": [
+        "@eslint",
+        "eslint",
+        "typescript-eslint",
+        "globals"
+      ]
+    },
+    {
+      "groupName": "styling",
+      "matchPackagePrefixes": [
+        "@radix-ui/",
+        "lucide-react",
+        "tailwind",
+        "tailwindcss",
+        "autoprefixer",
+        "postcss",
+        "clsx",
+        "class-variance-authority",
+        "vaul"
+      ]
+    },
+    {
+      "groupName": "build-tools",
+      "matchPackagePrefixes": ["vite", "@vitejs/"]
+    },
+    {
+      "groupName": "utilities",
+      "matchPackagePrefixes": ["@tanstack", "lodash", "next-themes", "zustand", "react-router", "motion"]
     }
-  ]
+  ],
+  "postUpdateOptions": ["npmDedupe"]
 }

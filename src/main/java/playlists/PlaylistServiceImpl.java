@@ -7,6 +7,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.util.Strings;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -38,13 +39,37 @@ public class PlaylistServiceImpl implements PlaylistService {
                          .compose(paths -> {
                              final var futures =
                                      paths.stream()
-                                          .map(o -> fileSystem.props(o)
-                                                              .map(props -> JsonObject.of("name", FilenameUtils.getBaseName(o),
-                                                                                          "modifiedTime", props.lastModifiedTime())))
+                                          .map(this::playlistDetail)
                                           .toList();
 
                              return Future.all(futures).map(CompositeFuture::<JsonObject>list);
                          });
+    }
+
+    private Future<JsonObject> playlistDetail(final String path) {
+        final var payload = JsonObject.of("name", FilenameUtils.getBaseName(path));
+        final var futures = List.of(
+                fileSystem.props(path).map(props -> JsonObject.of("modifiedTime", props.lastModifiedTime())),
+                fileSystem.readFile(path)
+                          .compose(content -> {
+                              final List<String> songPaths = Arrays.stream(content.toString(StandardCharsets.UTF_8)
+                                                                                  .trim()
+                                                                                  .split("\n"))
+                                                                   .filter(s -> !Strings.isBlank(s))
+                                                                   .toList();
+                              final int size = songPaths.size();
+                              if (!songPaths.isEmpty()) {
+                                  return databaseService.song(songPaths.getFirst())
+                                                 .map(song -> JsonObject.of("coverId", song.getInteger("albumId"),
+                                                                        "songCount", size));
+                              }
+                              return Future.succeededFuture(JsonObject.of("songCount", size));
+                          })
+        );
+        return Future.all(futures).map(compositeFuture -> {
+            compositeFuture.list().forEach(resp -> payload.mergeIn((JsonObject) resp));
+            return (payload);
+        });
     }
 
     @Override

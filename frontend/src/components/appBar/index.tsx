@@ -1,4 +1,3 @@
-import Search from '@/components/search';
 import Settings from '@/components/settings';
 import { Button } from '@/components/ui/button.tsx';
 import { useSearchStore } from '@/lib/context';
@@ -7,10 +6,12 @@ import {
   GearIcon,
   CaretLeftIcon,
 } from '@radix-ui/react-icons';
-import { useState } from 'react';
+import { lazy, useState } from 'react';
 import { Link } from 'react-router';
 import { useParams } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
+
+const Search = lazy(() => import('@/components/search'));
 
 interface ISecondaryHeader {
   header?: string;

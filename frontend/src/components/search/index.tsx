@@ -7,14 +7,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input.tsx';
+import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet.tsx';
 import { useDebounce } from '@/hooks/useDebounce.ts';
 import { useSearchStore } from '@/lib/context';
 import { GetSearchQuery, PlaySong } from '@/lib/queries';
 import { GeneralTag, IAlbum } from '@/type';
-import { DialogTitle } from '@radix-ui/react-dialog';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { motion, PanInfo } from 'framer-motion';
 import isEmpty from 'lodash/isEmpty';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -35,7 +35,7 @@ function SearchAlbumItem({ id, name, artist }: IAlbum) {
       onClick={route}
     >
       <Cover albumId={id} height={48} width={48} alt={name} style={'rounded'} />
-      <div className="flex w-fit flex-col justify-center">
+      <div className="flex w-[calc(100%-50px)] flex-col justify-center">
         <p className="truncate font-medium">{name}</p>
         <div className="truncate text-sm opacity-35">{artist}</div>
       </div>
@@ -76,7 +76,7 @@ function SearchContent({ searchText }: { searchText: string }) {
   }
 
   if (isSearchResultEmpty()) {
-    return <span>No Search Result</span>;
+    return <p className="m-auto">No Search Result</p>;
   }
 
   return (
@@ -86,7 +86,7 @@ function SearchContent({ searchText }: { searchText: string }) {
       defaultValue={accordianDefaultExpand()}
     >
       {!isEmpty(data?.Search.albums) && (
-        <AccordionItem value="albums">
+        <AccordionItem value="albums" className="px-6">
           <AccordionTrigger>
             <span className="text-lg font-bold">Albums</span>
           </AccordionTrigger>
@@ -99,7 +99,7 @@ function SearchContent({ searchText }: { searchText: string }) {
       )}
 
       {!isEmpty(data?.Search.artists) && (
-        <AccordionItem value="artists">
+        <AccordionItem value="artists" className="px-6">
           <AccordionTrigger>
             <span className="text-lg font-bold">Artists</span>
           </AccordionTrigger>
@@ -112,7 +112,7 @@ function SearchContent({ searchText }: { searchText: string }) {
       )}
 
       {!isEmpty(data?.Search.songs) && (
-        <AccordionItem value="songs">
+        <AccordionItem value="songs" className="px-6">
           <AccordionTrigger>
             <span className="text-lg font-bold">Songs</span>
           </AccordionTrigger>
@@ -137,30 +137,64 @@ export default function Search() {
   const [searchText, setSearchText] = useState('');
   const debounceSearch = useDebounce(searchText);
 
+  function dragEndHandler(dragInfo: PanInfo) {
+    const draggedDistance = dragInfo.offset.x;
+    const swipeThreshold = 100;
+    // swipe to the right
+    if (draggedDistance > swipeThreshold) {
+      updateSearchModalState(false);
+    }
+  }
+
   return (
-    <Drawer
+    <Sheet
       open={searchModalState}
       onOpenChange={open => updateSearchModalState(open)}
     >
-      <DrawerContent className="h-screen rounded-2xl bg-primary-foreground pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
-        <DialogTitle>
-          <div className="border-b-2 px-6 pt-6">
-            <div className="relative space-x-1">
-              <MagnifyingGlassIcon className="absolute left-2 top-2.5 size-5 text-muted-foreground" />
-              <Input
-                autoFocus
-                placeholder="Search Albums, Artists, Songs..."
-                className="border-0 pl-8 placeholder:text-lg placeholder:opacity-35 focus-visible:ring-0"
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-              />
-            </div>
+      <SheetContent className="max-h-screen w-full overflow-y-scroll rounded-2xl px-0 pb-[env(safe-area-inset-bottom)] pt-0">
+        <SheetHeader className="sticky top-0 z-10 border-b-2 bg-primary-foreground px-6 pb-0.5 pt-[calc(env(safe-area-inset-top)+12px)]">
+          <div className="relative space-x-1">
+            <MagnifyingGlassIcon className="absolute left-2 top-2.5 size-5 text-muted-foreground" />
+            <Input
+              autoFocus
+              placeholder="Search Albums, Artists, Songs..."
+              className="border-0 pl-8 placeholder:text-lg placeholder:opacity-35 focus-visible:ring-0"
+              value={searchText}
+              onChange={e => setSearchText(e.target.value)}
+            />
           </div>
-        </DialogTitle>
-        <div className="flex size-full flex-col items-center justify-center overflow-y-scroll bg-background px-6 py-2">
+        </SheetHeader>
+        <motion.div
+          className="flex min-h-[calc(100%-120px)] w-full flex-col py-2"
+          animate="active"
+          exit="exit"
+          variants={sliderVariants}
+          transition={sliderTransition}
+          //Only on x-axis
+          drag="x"
+          //End of the window either side
+          dragConstraints={{ left: 0, right: 0 }}
+          // The degree of movement allowed outside constraints.
+          dragElastic={0}
+          onDragEnd={(_, dragInfo) => dragEndHandler(dragInfo)}
+        >
           <SearchContent searchText={debounceSearch} />
-        </div>
-      </DrawerContent>
-    </Drawer>
+        </motion.div>
+      </SheetContent>
+    </Sheet>
   );
 }
+
+const sliderVariants = {
+  active: { x: 0, scale: 1, opacity: 1 },
+  exit: {
+    x: '-100%',
+    scale: 1,
+    opacity: 0.2,
+  },
+};
+
+const sliderTransition = {
+  duration: 0.5,
+  ease: [0.56, 0.03, 0.12, 1.04],
+};

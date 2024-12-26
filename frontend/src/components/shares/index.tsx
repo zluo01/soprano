@@ -74,10 +74,7 @@ export function GeneralTagItem({
   }
 
   return (
-    <div
-      className="cursor-pointer select-none space-y-1 px-6 py-2"
-      onClick={route}
-    >
+    <div className="cursor-pointer select-none space-y-1 py-2" onClick={route}>
       <p className="truncate font-medium">{name}</p>
       <div className="flex flex-row flex-nowrap items-center gap-1.5 text-sm opacity-35">
         <DiscIcon />
@@ -96,7 +93,7 @@ interface IGeneralTagItemsPros {
 
 export function GeneralTagItems({ tag, data }: IGeneralTagItemsPros) {
   return (
-    <div className="w-full">
+    <div className="w-full px-6 ">
       {data?.map(t => <GeneralTagItem key={t.id} tag={tag} {...t} />)}
     </div>
   );

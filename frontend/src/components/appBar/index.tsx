@@ -59,7 +59,7 @@ export default function AppBar() {
 
   return (
     <>
-      <div className="flex flex-row flex-nowrap items-center px-6 pt-3 sm:hidden">
+      <div className="flex max-h-11 flex-row flex-nowrap items-center px-6 pt-3 sm:hidden">
         <Header />
         <div className="flex-1" />
         <Button

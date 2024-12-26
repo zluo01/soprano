@@ -10,7 +10,7 @@ export default function Preview() {
 
   return (
     <>
-      <div className="fixed bottom-[env(safe-area-inset-bottom)] z-10 w-full bg-background sm:hidden">
+      <div className="w-full sm:hidden">
         <div className="mx-2 my-1 flex h-fit flex-row flex-nowrap rounded-lg border py-1 shadow-2xl">
           <div
             className="flex size-full cursor-pointer select-none flex-row flex-nowrap items-center gap-3 px-4"

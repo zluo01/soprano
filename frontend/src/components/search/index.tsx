@@ -142,7 +142,7 @@ export default function Search() {
       open={searchModalState}
       onOpenChange={open => updateSearchModalState(open)}
     >
-      <DrawerContent className="h-full rounded-2xl bg-primary-foreground pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+      <DrawerContent className="h-screen rounded-2xl bg-primary-foreground pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
         <DialogTitle>
           <div className="border-b-2 px-6 pt-6">
             <div className="relative space-x-1">

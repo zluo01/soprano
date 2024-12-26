@@ -1,6 +1,5 @@
 import Cover from '@/components/cover';
 import { LoadingList } from '@/components/loading';
-import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { GetPlaylistsQuery } from '@/lib/queries';
 import { Music2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -13,7 +12,7 @@ export default function Playlists() {
     return <LoadingList />;
   }
   return (
-    <ScrollArea className="h-full py-3 pb-[70px]">
+    <div className="py-3">
       <div className="flex select-none flex-col px-6">
         {data?.Playlists.map(o => (
           <div
@@ -40,6 +39,6 @@ export default function Playlists() {
           </div>
         ))}
       </div>
-    </ScrollArea>
+    </div>
   );
 }

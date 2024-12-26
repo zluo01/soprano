@@ -1,5 +1,4 @@
 import Cover from '@/components/cover';
-import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { useSearchStore } from '@/lib/context';
 import { cn } from '@/lib/utils.ts';
 import { GeneralTag, IAlbum, IGeneralTag, ISong } from '@/type';
@@ -14,7 +13,7 @@ export function AlbumGridView({ albums }: IAlbumGridView) {
   const navigate = useNavigate();
 
   return (
-    <ScrollArea className="h-full py-3 pb-[70px]">
+    <div className="py-3">
       <div
         className={cn(
           'm-0 border-0 px-6',
@@ -41,7 +40,7 @@ export function AlbumGridView({ albums }: IAlbumGridView) {
           </div>
         ))}
       </div>
-    </ScrollArea>
+    </div>
   );
 }
 
@@ -76,7 +75,7 @@ export function GeneralTagItem({
 
   return (
     <div
-      className="w-full cursor-pointer select-none space-y-1 px-6 py-2"
+      className="cursor-pointer select-none space-y-1 px-6 py-2"
       onClick={route}
     >
       <p className="truncate font-medium">{name}</p>
@@ -97,9 +96,9 @@ interface IGeneralTagItemsPros {
 
 export function GeneralTagItems({ tag, data }: IGeneralTagItemsPros) {
   return (
-    <ScrollArea className="h-full pb-[70px]">
+    <div className="w-full">
       {data?.map(t => <GeneralTagItem key={t.id} tag={tag} {...t} />)}
-    </ScrollArea>
+    </div>
   );
 }
 

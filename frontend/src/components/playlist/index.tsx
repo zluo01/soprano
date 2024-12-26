@@ -1,7 +1,6 @@
 import { LoadingSongs } from '@/components/loading';
 import { SongItemWithCover } from '@/components/shares';
 import { Button } from '@/components/ui/button.tsx';
-import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import {
   GetSongsForPlaylistQuery,
@@ -17,7 +16,7 @@ export default function Playlist() {
 
   return (
     <>
-      <div className="flex w-full flex-row flex-nowrap items-center gap-2 bg-background px-6 py-3">
+      <div className="sticky top-[calc(env(safe-area-inset-top)+44px)] z-10 flex w-full flex-row flex-nowrap items-center gap-2 bg-background px-6 py-3">
         <Separator className="flex-1" />
         <>
           <Button
@@ -52,7 +51,7 @@ export default function Playlist() {
       {isLoading ? (
         <LoadingSongs />
       ) : (
-        <ScrollArea className="flex size-full flex-col px-6 pb-[72px]">
+        <div className="flex size-full flex-col px-6">
           {data?.PlaylistSongs.map(o => (
             <SongItemWithCover
               key={o.path}
@@ -60,7 +59,7 @@ export default function Playlist() {
               song={o}
             />
           ))}
-        </ScrollArea>
+        </div>
       )}
     </>
   );

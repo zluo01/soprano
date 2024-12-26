@@ -11,25 +11,30 @@ export default function Album() {
   const { data } = GetAlbumDetailQuery(id);
 
   return (
-    <div className="flex size-full select-none flex-col flex-nowrap items-center overflow-y-scroll pb-[72px]">
+    <>
       <div className="w-full px-6 py-3">
         <Separator />
       </div>
 
-      <div className="mx-0 flex w-[61.8%] items-center justify-center py-3">
-        <Cover
-          albumId={data?.Album.id}
-          height={800}
-          width={800}
-          alt={data?.Album.name || ''}
-        />
+      <div className="flex w-full flex-row items-center justify-center py-3">
+        <div className="mx-0 w-[61.8%]">
+          <Cover
+            albumId={data?.Album.id}
+            height={300}
+            width={300}
+            alt={data?.Album.name || ''}
+          />
+        </div>
       </div>
 
       <div className="w-full px-6">
         <p className="w-full font-semibold">{data?.Album.name}</p>
         <p className="w-full truncate font-bold">{data?.Album.artist}</p>
-        <div className="sticky top-0 z-10 flex w-full flex-row flex-nowrap items-center justify-between border-b bg-background py-3">
-          <div className="flex flex-col flex-nowrap bg-inherit text-sm opacity-35">
+      </div>
+
+      <div className="sticky top-[calc(env(safe-area-inset-top)+44px)] z-10  px-6">
+        <div className="flex w-full flex-row flex-nowrap items-center justify-between bg-background py-3">
+          <div className="flex flex-col flex-nowrap text-sm opacity-35">
             <span>Album</span>
             <span>
               {data?.Album.songs.length} songs •{' '}
@@ -68,22 +73,21 @@ export default function Album() {
             </Button>
           </div>
         </div>
-
-        <div className="flex flex-col pt-2">
-          {data?.Album.songs.map(song => (
-            <div
-              key={song.path}
-              className="flex w-full cursor-pointer flex-col flex-nowrap items-start justify-center py-2.5"
-              onClick={() => PlaySong(song.path)}
-            >
-              <span className="truncate font-medium">{song.name}</span>
-              <span className="truncate text-sm opacity-35">
-                {song.artists}
-              </span>
-            </div>
-          ))}
-        </div>
+        <Separator />
       </div>
-    </div>
+
+      <div className="flex w-full flex-col pt-2">
+        {data?.Album.songs.map(song => (
+          <div
+            key={song.path}
+            className="flex cursor-pointer flex-col flex-nowrap items-start justify-center px-6 py-2.5"
+            onClick={() => PlaySong(song.path)}
+          >
+            <p className="w-full truncate font-medium">{song.name}</p>
+            <p className="w-full truncate text-sm opacity-35">{song.artists}</p>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

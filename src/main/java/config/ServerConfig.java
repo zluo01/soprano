@@ -10,11 +10,20 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class ServerConfig {
+    private static final int DEFAULT_COVER_SOURCE_DIMENSION = 800;
+
+    private static final Level DEAULT_LOG_LEVEL = Level.ERROR;
+
+    private static final List<Integer> DEFAULT_COVER_VARIANTS = List.of(50, 180);
+
+
     public static final String DATABASE_CONFIG = "DATABASE_CONFIG";
 
     private static final String BASE_CONFIG_PATH = System.getProperty("user.home") + "/.config/mesa/";
@@ -30,11 +39,11 @@ public final class ServerConfig {
     // configuration keys
     public static final String MUSIC_DIRECTORY_CONFIG = "directory.music";
 
-    public static final String SERVER_PORT_CONFIG = "server.port";
-
     public static final String DEBUG_SWITCH_CONFIG = "debug.switch";
 
     public static final String LOG_LEVEL = "log.level";
+
+    public static final String WEB_UI_ENABLE = "webUI.enable";
 
     public static final String COVER_SOURCE_DIMENSION = "cover.source";
 
@@ -45,12 +54,6 @@ public final class ServerConfig {
     public static final String AUDIO_HARDWARE = "audio.hardware";
 
     public static final String AUDIO_OPTIONS_OVERRIDE = "audio.options.override";
-
-    private static final int DEFAULT_PORT = 6868;
-
-    private static final int DEFAULT_COVER_SOURCE_DIMENSION = 800;
-
-    private static final Level DEAULT_LOG_LEVEL = Level.ERROR;
 
     private ServerConfig() {
     }
@@ -90,8 +93,8 @@ public final class ServerConfig {
         return directory;
     }
 
-    public static int serverPort(final JsonObject config) {
-        return config.getInteger(SERVER_PORT_CONFIG, DEFAULT_PORT);
+    public static boolean isWebUiEnabled(final JsonObject config) {
+        return config.getBoolean(WEB_UI_ENABLE, true);
     }
 
     public static int coverSourceDimension(final JsonObject config) {
@@ -103,13 +106,18 @@ public final class ServerConfig {
     }
 
     public static List<Integer> coverVariants(final JsonObject config) {
+        final var variants = new HashSet<Integer>();
         if (config.containsKey(COVER_VARIANT_DIMENSION)) {
-            return config.getJsonArray(COVER_VARIANT_DIMENSION)
-                         .stream()
-                         .map(o -> (Integer) o)
-                         .toList();
+            config.getJsonArray(COVER_VARIANT_DIMENSION)
+                  .stream()
+                  .forEach(o -> variants.add((Integer) o));
         }
-        return List.of();
+
+        if (isWebUiEnabled(config)) {
+            variants.addAll(DEFAULT_COVER_VARIANTS);
+        }
+
+        return new ArrayList<>(variants);
     }
 
     /**

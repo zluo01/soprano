@@ -33,8 +33,8 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
           <div className="flex w-full items-center justify-center">
             <Cover
               albumId={status?.song?.albumId}
-              height={800}
-              width={800}
+              height={400}
+              width={400}
               alt={status?.song?.name || ''}
             />
           </div>

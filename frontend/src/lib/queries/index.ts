@@ -43,8 +43,15 @@ async function request<T>(query: string, variables: object = {}): Promise<T> {
   return (await response.json()).data as T;
 }
 
-export function constructImg(albumId?: number): string {
-  return BASE_URL + `/covers/${albumId}_300x300.webp`;
+export function constructImg(
+  width: number,
+  height: number,
+  albumId?: number,
+): string {
+  if (width >= 250) {
+    return BASE_URL + `/covers/${albumId}.webp`;
+  }
+  return BASE_URL + `/covers/${albumId}_${width}x${height}.webp`;
 }
 
 const AlbumsQueryDocument = /*GraphQL*/ `

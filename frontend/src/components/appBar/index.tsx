@@ -22,7 +22,12 @@ function SecondaryHeader({ header }: ISecondaryHeader) {
 
   return (
     <div className="flex w-full max-w-[61.2%] select-none flex-row flex-nowrap items-center space-x-1 overflow-hidden">
-      <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => navigate(-1)}
+        className="p-0"
+      >
         <CaretLeftIcon className="size-6 stroke-1 dark:stroke-white [&>path]:stroke-inherit" />
       </Button>
       <span className="truncate font-semibold">{header}</span>
@@ -65,12 +70,18 @@ export default function AppBar() {
         <div className="flex-1" />
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={() => updateSearchModalState(true)}
+          className="p-0"
         >
           <MagnifyingGlassIcon className="size-6" />
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => setOpenSetting(true)}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setOpenSetting(true)}
+          className="p-0"
+        >
           <GearIcon className="size-6" />
         </Button>
       </div>

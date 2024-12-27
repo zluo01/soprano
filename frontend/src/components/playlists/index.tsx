@@ -17,13 +17,13 @@ export default function Playlists() {
         {data?.Playlists.map(o => (
           <div
             key={o.name}
-            className="flex w-full cursor-pointer select-none flex-row flex-nowrap items-center space-x-2 py-2"
+            className="flex w-full cursor-pointer select-none flex-row flex-nowrap items-center space-x-3 py-2"
             onClick={() => navigate(`/playlists/${o.name}`)}
           >
             <Cover
               albumId={o.coverId}
-              height={48}
-              width={48}
+              height={50}
+              width={50}
               alt={o.name}
               style={'rounded'}
             />

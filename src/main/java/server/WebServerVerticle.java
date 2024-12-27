@@ -24,10 +24,12 @@ import playlists.PlaylistService;
 import playlists.PlaylistVerticle;
 
 import static config.ServerConfig.enableGraphQLDebug;
-import static config.ServerConfig.serverPort;
+import static config.ServerConfig.isWebUiEnabled;
 
 public final class WebServerVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(WebServerVerticle.class);
+
+    private static final int DEFAULT_PORT = 6868;
 
     private DatabaseService databaseService;
     private PlaylistService playlistService;
@@ -57,6 +59,7 @@ public final class WebServerVerticle extends AbstractVerticle {
     }
 
     private Future<Startup> setupRoutes(final Startup startup) {
+        final boolean enableWebUI = isWebUiEnabled(config());
         final boolean enableDebugConsole = enableGraphQLDebug(config());
 
         final GraphQL graphQL = GraphQLInitializer.setup(startup.schema,
@@ -67,7 +70,9 @@ public final class WebServerVerticle extends AbstractVerticle {
 
         router.route().handler(BodyHandler.create());
 
-        router.get().handler(StaticHandler.create());
+        if (enableWebUI) {
+            router.get().handler(StaticHandler.create());
+        }
 
         router.route("/covers/*").handler(StaticHandler.create(FileSystemAccess.ROOT, ServerConfig.COVER_PATH)
                                                        .setCachingEnabled(true));
@@ -86,12 +91,11 @@ public final class WebServerVerticle extends AbstractVerticle {
 
     private Future<Void> startServer(final Startup startup) {
         final Promise<Void> promise = Promise.promise();
-        final int port = serverPort(config());
         vertx.createHttpServer(new HttpServerOptions().setCompressionSupported(true))
              .requestHandler(router)
-             .listen(port)
+             .listen(DEFAULT_PORT)
              .onSuccess(__ -> {
-                 LOGGER.info("HTTP server running on port {}", port);
+                 LOGGER.info("HTTP server running on port {}", DEFAULT_PORT);
                  promise.complete();
              })
              .onFailure(startup.bootstrap::fail);

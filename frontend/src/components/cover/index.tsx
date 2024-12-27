@@ -3,12 +3,20 @@ import { cn } from '@/lib/utils.ts';
 import { IImageLoaderPops } from '@/type';
 import { ReactElement } from 'react';
 
-function Cover({ albumId, style, ...props }: IImageLoaderPops): ReactElement {
+function Cover({
+  albumId,
+  style,
+  width,
+  height,
+  ...props
+}: IImageLoaderPops): ReactElement {
   return (
     <img
       className={cn('aspect-square h-auto max-w-full object-cover', style)}
-      src={constructImg(albumId)}
+      src={constructImg(width, height, albumId)}
       {...props}
+      width={width}
+      height={height}
       alt={props.alt}
       loading="lazy"
       crossOrigin="anonymous"

@@ -31,10 +31,10 @@ function SearchAlbumItem({ id, name, artist }: IAlbum) {
 
   return (
     <div
-      className="flex w-full cursor-pointer select-none flex-row flex-nowrap items-center space-x-2 py-2"
+      className="flex w-full cursor-pointer select-none flex-row flex-nowrap items-center space-x-3 py-2"
       onClick={route}
     >
-      <Cover albumId={id} height={48} width={48} alt={name} style={'rounded'} />
+      <Cover albumId={id} height={50} width={50} alt={name} style={'rounded'} />
       <div className="flex w-[calc(100%-50px)] flex-col justify-center">
         <p className="truncate font-medium">{name}</p>
         <div className="truncate text-sm opacity-35">{artist}</div>

@@ -1,14 +1,16 @@
 # Directory
 directory.music=
 
-# Server
-server.port=6868
-
 # debug
 debug.switch=false
 
 # log level
 log.level=INFO
+
+# WebUI
+# whether enable wbe UI
+# disable if you like to implement your own
+# webUI.enable=true
 
 # cover
 
@@ -16,7 +18,8 @@ log.level=INFO
 # cover.source=800
 
 # variant cover to generate. Default does not generate variant covers.
-# cover.variant=300,600
+# when webUI is enabled, 50x50 and 180x180 size image will additionally created
+# cover.variant=50,180
 
 # player
 

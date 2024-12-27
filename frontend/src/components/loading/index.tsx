@@ -7,7 +7,7 @@ export function LoadingSongs() {
       {Array.from({ length: 14 }, (_v, i) => (
         <div
           key={i}
-          className="flex w-full select-none flex-row flex-nowrap items-center space-x-2 py-2"
+          className="flex w-full select-none flex-row flex-nowrap items-center space-x-3 py-2"
         >
           <Skeleton className="aspect-square size-12 rounded" />
           <div className="flex flex-1 flex-col justify-center gap-1">

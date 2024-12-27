@@ -107,13 +107,13 @@ interface ISongItemWithCoverProps {
 export function SongItemWithCover({ song, play }: ISongItemWithCoverProps) {
   return (
     <div
-      className="flex w-full cursor-pointer select-none flex-row flex-nowrap items-center space-x-2 py-2"
+      className="flex w-full cursor-pointer select-none flex-row flex-nowrap items-center space-x-3 py-2"
       onClick={play}
     >
       <Cover
         albumId={song.albumId}
-        height={48}
-        width={48}
+        height={50}
+        width={50}
         alt={song.name}
         style={'rounded'}
       />

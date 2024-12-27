@@ -17,7 +17,7 @@ export default function Album() {
       </div>
 
       <div className="flex w-full flex-row items-center justify-center py-3">
-        <div className="mx-0 w-[61.8%]">
+        <div className="mx-0 aspect-square w-[61.8%]">
           <Cover
             albumId={data?.Album.id}
             height={300}

@@ -66,7 +66,8 @@
                     <target>${maven.compiler.target}</target>
                     <annotationProcessors>
                         <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
-                        <annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</annotationProcessor>
+                        <annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor
+                        </annotationProcessor>
                     </annotationProcessors>
                 </configuration>
             </plugin>
@@ -77,6 +78,12 @@
                     <filesets>
                         <fileset>
                             <directory>${project.basedir}/src/main/generated</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>${project.basedir}/frontend/dist</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>${project.basedir}/frontend/node_modules</directory>
                         </fileset>
                     </filesets>
                 </configuration>

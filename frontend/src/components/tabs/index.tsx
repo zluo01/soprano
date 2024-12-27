@@ -37,7 +37,7 @@ export default function Tabs() {
   return (
     <div
       className={cn(
-        'no-scrollbar flex w-full flex-row items-center space-x-2 overflow-auto px-6 py-3 sm:hidden h-full min-h-14 max-h-14',
+        'no-scrollbar flex w-full flex-row items-center space-x-2 overflow-x-scroll overflow-y-hidden px-6 py-3 sm:hidden h-full min-h-14 max-h-14',
         !ALLOW_PATHS.has(location.pathname) && 'hidden',
       )}
     >

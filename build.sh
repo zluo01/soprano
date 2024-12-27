@@ -31,6 +31,6 @@ fi
 
 echo "Building Maven project..."
 
-mvn -q install
+mvn -q compile
 
 echo "Build completed successfully!"

@@ -3,7 +3,7 @@ import { SongItemWithCover } from '@/components/shares';
 import { Drawer, DrawerContent } from '@/components/ui/drawer.tsx';
 import { usePlaybackQueueStore } from '@/lib/context';
 import { GetSongInQueueQuery, PlaySongInAtPosition } from '@/lib/queries';
-import { slice } from 'lodash';
+import slice from 'lodash/slice';
 
 export default function PlaybackQueue() {
   const { playbackQueueModalState, updatePlaybackQueueModalState } =

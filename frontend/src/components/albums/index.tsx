@@ -1,7 +1,7 @@
 import { LoadingAlbums } from '@/components/loading';
 import { AlbumGridView } from '@/components/shares';
 import { GetDisplayAlbumsQuery } from '@/lib/queries';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 export default function Albums() {
   const { data, isLoading } = GetDisplayAlbumsQuery();

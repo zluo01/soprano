@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.zluo01</groupId>
-    <artifactId>Mesa</artifactId>
+    <artifactId>mesa</artifactId>
     <version>0.0.1</version>
 
     <properties>
@@ -145,7 +145,7 @@
                                 </transformer>
                             </transformers>
                             <outputFile>
-                                ${project.build.directory}/${project.artifactId}-fat.jar
+                                ${project.build.directory}/${project.artifactId}-main.jar
                             </outputFile>
                         </configuration>
                     </execution>

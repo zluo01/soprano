@@ -2,7 +2,7 @@
  * https://sinja.io/blog/swipe-actions-react-framer-motion
  */
 import { useSnap } from '@/hooks/useSnap.ts';
-import clsx from 'clsx';
+import { cn } from '@/lib/utils.ts';
 import {
   motion,
   MotionValue,
@@ -89,7 +89,7 @@ const Root = ({ className, children }: SwipeActionsRootProps) => {
         setOpen: open => snapTo(open ? 0 : 1),
       }}
     >
-      <div className={clsx('SwipeActions', className)}>{children}</div>
+      <div className={cn('relative', className)}>{children}</div>
     </SwipeActionsContext.Provider>
   );
 };
@@ -106,7 +106,7 @@ const Trigger = ({ className, children }: SwipeActionsTriggerProps) => {
     <motion.div
       role="button"
       tabIndex={0}
-      className={clsx('trigger', className)}
+      className={cn('relative z-[2]', className)}
       ref={triggerRef}
       {...dragProps}
     >
@@ -138,7 +138,10 @@ const Actions = ({
 
   return (
     <motion.div
-      className={clsx('actions-wrapper', wrapperClassName)}
+      className={cn(
+        'absolute flex justify-end overflow-hidden items-center',
+        wrapperClassName,
+      )}
       style={{
         // Need to set height explicitly or otherwise Firefox and Safari will incorrectly calculate actions width
         height: actionsWrapperHeight,
@@ -146,7 +149,7 @@ const Actions = ({
       }}
     >
       <motion.div
-        className={clsx('actions', className)}
+        className={cn('flex h-full items-stretch', className)}
         ref={actionsMeasureRef}
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
@@ -168,7 +171,12 @@ const Action = ({
   const { setOpen } = useSwipeActionsContext();
   return (
     <motion.button
-      className={clsx('action', className)}
+      className={cn(
+        'focus-visible:outline-offset-[-2px] cursor-pointer focus-visible:outline-2 gap-2 border-0 rounded-r-lg',
+        'flex aspect-square h-full flex-col items-center justify-center z-[1]',
+        'last:-ml-2 last:mr-2 last:aspect-[1.1] last:z-0',
+        className,
+      )}
       onClick={e => {
         onClick?.(e);
         if (!e.defaultPrevented) {

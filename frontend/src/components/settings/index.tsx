@@ -7,7 +7,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
-import { BuildDatabase, GetStatsQuery } from '@/lib/queries';
+import { BuildDatabase, GetStatsQuery, UpdateDatabase } from '@/lib/queries';
 import { ReloadIcon, UpdateIcon } from '@radix-ui/react-icons';
 
 interface ISettingsPros {
@@ -57,7 +57,11 @@ export default function Settings({ open, close }: ISettingsPros) {
           </div>
         </div>
         <DrawerFooter className="flex flex-row items-center justify-around py-3">
-          <Button variant="outline" className="size-12 rounded-full p-2">
+          <Button
+            variant="outline"
+            className="size-12 rounded-full p-2"
+            onClick={UpdateDatabase}
+          >
             <UpdateIcon className="size-[1.2rem]" />
           </Button>
           <Button

@@ -4,6 +4,12 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx,js,jsx}'],
   theme: {
     extend: {
+      backgroundColor: {
+        delete: '#CC5F5A',
+        favor: 'rgb(160,155,186)',
+        edit: 'rgb(220,185,208)',
+        add: 'rgb(181,186,155)',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

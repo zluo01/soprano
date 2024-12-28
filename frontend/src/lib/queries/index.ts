@@ -12,6 +12,8 @@ import {
 import { QueryClient, skipToken, useQuery } from '@tanstack/react-query';
 import isEmpty from 'lodash/isEmpty';
 
+import { request } from './utils';
+
 export const QUERY_CLIENT = new QueryClient();
 
 const IMMUTABLE_REQUEST = {
@@ -19,40 +21,6 @@ const IMMUTABLE_REQUEST = {
   refetchOnWindowFocus: false,
   refetchOnReconnect: false,
 };
-
-const BASE_URL =
-  import.meta.env.MODE === 'development' ? 'http://localhost:6868' : '';
-
-async function request<T>(query: string, variables: object = {}): Promise<T> {
-  const response = await fetch(BASE_URL + '/graphql', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/graphql-response+json',
-    },
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Network response was not ok.' + response.statusText);
-  }
-
-  return (await response.json()).data as T;
-}
-
-export function constructImg(
-  width: number,
-  height: number,
-  albumId?: number,
-): string {
-  if (width >= 250) {
-    return BASE_URL + `/covers/${albumId}.webp`;
-  }
-  return BASE_URL + `/covers/${albumId}_${width}x${height}.webp`;
-}
 
 const AlbumsQueryDocument = /*GraphQL*/ `
     query {
@@ -412,91 +380,7 @@ export function GetSongInQueueQuery() {
   });
 }
 
-const NextSongQueryDocument = /* GraphQL */ `
-  mutation {
-    NextSong
-  }
-`;
-
-export async function NextSong() {
-  await request(NextSongQueryDocument);
-}
-
-const PrevSongQueryDocument = /* GraphQL */ `
-  mutation {
-    PrevSong
-  }
-`;
-
-export async function PrevSong() {
-  await request(PrevSongQueryDocument);
-}
-
-const PauseSongQueryDocument = /* GraphQL */ `
-  mutation {
-    PauseSong
-  }
-`;
-
-export async function PauseSong() {
-  await request(PauseSongQueryDocument);
-}
-
-const BuildDatabaseQueryDocument = /* GraphQL */ `
-  mutation {
-    Build
-  }
-`;
-
-export async function BuildDatabase() {
-  await request(BuildDatabaseQueryDocument);
-}
-
-const PlaySongQueryDocument = /* GraphQL */ `
-  mutation PlaySong($songPath: String!) {
-    PlaySong(songPath: $songPath)
-  }
-`;
-
-export async function PlaySong(songPath: string) {
-  await request(PlaySongQueryDocument, { songPath });
-}
-
-const PlayPlaylistQueryDocument = /* GraphQL */ `
-  mutation PlayPlaylist($playlistName: String!) {
-    PlayPlaylist(playlistName: $playlistName)
-  }
-`;
-
-export async function PlayPlaylist(playlistName?: string) {
-  if (!playlistName) {
-    return;
-  }
-  await request(PlayPlaylistQueryDocument, { playlistName });
-}
-
-const PlayAlbumQueryDocument = /* GraphQL */ `
-  mutation PlayAlbum($id: Int!) {
-    PlayAlbum(id: $id)
-  }
-`;
-
-export async function PlayAlbum(id?: number) {
-  if (!id) {
-    return;
-  }
-  await request(PlayAlbumQueryDocument, { id });
-}
-
-const PlaySongInAtPositionQueryDocument = /* GraphQL */ `
-  mutation PlaySongInQueueAtPosition($position: Int!) {
-    PlaySongInQueueAtPosition(position: $position)
-  }
-`;
-
-export async function PlaySongInAtPosition(position?: number) {
-  if (!position) {
-    return;
-  }
-  await request(PlaySongInAtPositionQueryDocument, { position });
-}
+export * from './player-mutation.ts';
+export * from './playlist-mutation.ts';
+export * from './database-mutation.ts';
+export { constructImg } from './utils.ts';

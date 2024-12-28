@@ -1,13 +1,17 @@
 import { LoadingSongs } from '@/components/loading';
-import { SongItemWithCover } from '@/components/shares';
+import { Song } from '@/components/song';
+import { SwipeActions } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import {
+  AddSongsToQueue,
+  DeleteSongFromPlaylist,
   GetSongsForPlaylistQuery,
   PlayPlaylist,
   PlaySong,
 } from '@/lib/queries';
-import { PlusIcon } from '@radix-ui/react-icons';
+import { PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { ListPlus } from 'lucide-react';
 import { useParams } from 'react-router';
 
 export default function Playlist() {
@@ -23,6 +27,9 @@ export default function Playlist() {
             variant="ghost"
             size={'icon'}
             className="rounded-full"
+            onClick={() =>
+              AddSongsToQueue(data?.PlaylistSongs?.map(o => o.path) || [])
+            }
             disabled={!data}
           >
             <PlusIcon className="size-6" />
@@ -53,10 +60,26 @@ export default function Playlist() {
       ) : (
         <div className="flex size-full flex-col px-6">
           {data?.PlaylistSongs.map(o => (
-            <SongItemWithCover
+            <Song
               key={o.path}
               play={() => PlaySong(o.path)}
               song={o}
+              actions={
+                <>
+                  <SwipeActions.Action
+                    className="bg-delete"
+                    onClick={() => DeleteSongFromPlaylist(o.name)}
+                  >
+                    <TrashIcon className="size-6" />
+                  </SwipeActions.Action>
+                  <SwipeActions.Action
+                    className="bg-add"
+                    onClick={() => AddSongsToQueue([o.path])}
+                  >
+                    <ListPlus className="ml-1.5 size-6" />
+                  </SwipeActions.Action>
+                </>
+              }
             />
           ))}
         </div>

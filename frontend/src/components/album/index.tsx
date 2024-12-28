@@ -1,9 +1,16 @@
 import Cover from '@/components/cover';
+import { SwipeActions } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
-import { GetAlbumDetailQuery, PlayAlbum, PlaySong } from '@/lib/queries';
+import {
+  AddSongsToQueue,
+  GetAlbumDetailQuery,
+  PlayAlbum,
+  PlaySong,
+} from '@/lib/queries';
 import { formatTime } from '@/lib/utils.ts';
-import { PlusIcon } from '@radix-ui/react-icons';
+import { HeartFilledIcon, PlusIcon } from '@radix-ui/react-icons';
+import { ListPlus } from 'lucide-react';
 import { useParams } from 'react-router';
 
 export default function Album() {
@@ -48,6 +55,9 @@ export default function Album() {
               variant="ghost"
               size={'icon'}
               className="rounded-full"
+              onClick={() =>
+                AddSongsToQueue(data?.Album?.songs.map(o => o.path) || [])
+              }
               disabled={!data}
             >
               <PlusIcon className="size-7 opacity-35" />
@@ -76,16 +86,32 @@ export default function Album() {
         <Separator />
       </div>
 
-      <div className="flex w-full flex-col pt-2">
+      <div className="flex w-full flex-col px-6 pt-2">
         {data?.Album.songs.map(song => (
-          <div
-            key={song.path}
-            className="flex cursor-pointer flex-col flex-nowrap items-start justify-center px-6 py-2.5"
-            onClick={() => PlaySong(song.path)}
-          >
-            <p className="w-full truncate font-medium">{song.name}</p>
-            <p className="w-full truncate text-sm opacity-35">{song.artists}</p>
-          </div>
+          <SwipeActions.Root key={song.path} className="w-full">
+            <SwipeActions.Trigger className="w-full cursor-grab border-0 bg-background">
+              <div
+                className="flex cursor-pointer flex-col flex-nowrap items-start justify-center py-2.5"
+                onClick={() => PlaySong(song.path)}
+              >
+                <p className="w-full truncate font-medium">{song.name}</p>
+                <p className="w-full truncate text-sm opacity-35">
+                  {song.artists}
+                </p>
+              </div>
+            </SwipeActions.Trigger>
+            <SwipeActions.Actions>
+              <SwipeActions.Action
+                className="bg-add"
+                onClick={() => AddSongsToQueue([song.path])}
+              >
+                <ListPlus className="size-6" />
+              </SwipeActions.Action>
+              <SwipeActions.Action className="bg-favor">
+                <HeartFilledIcon className="size-6" />
+              </SwipeActions.Action>
+            </SwipeActions.Actions>
+          </SwipeActions.Root>
         ))}
       </div>
     </>

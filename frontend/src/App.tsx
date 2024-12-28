@@ -1,12 +1,14 @@
 import Album from '@/components/album';
 import Albums from '@/components/albums';
 import { GeneralTagAlbumsView, GeneralTagView } from '@/components/general';
-import Playlist from '@/components/playlist';
-import Playlists from '@/components/playlists';
 import RecentlyAdded from '@/components/recent';
 import { GeneralTag } from '@/type';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import Layout from 'src/components/layout';
+
+const Playlist = lazy(() => import('@/components/playlist'));
+const Playlists = lazy(() => import('@/components/playlists'));
 
 function App() {
   return (
@@ -15,8 +17,22 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<RecentlyAdded />} />
           <Route path="playlists">
-            <Route index element={<Playlists />} />
-            <Route path=":playlistName" element={<Playlist />} />
+            <Route
+              index
+              element={
+                <Suspense>
+                  <Playlists />
+                </Suspense>
+              }
+            />
+            <Route
+              path=":playlistName"
+              element={
+                <Suspense>
+                  <Playlist />
+                </Suspense>
+              }
+            />
           </Route>
           <Route path="albums">
             <Route index element={<Albums />} />

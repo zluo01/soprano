@@ -1,7 +1,7 @@
 import Cover from '@/components/cover';
-import PlaybackDrawer from '@/components/song';
 import { usePlaybackStore } from '@/lib/context';
 import { GetPlaybackStatusQuery } from '@/lib/queries';
+import PlaybackDrawer from 'src/components/playback';
 
 export default function Preview() {
   const { data } = GetPlaybackStatusQuery();

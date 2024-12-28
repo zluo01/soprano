@@ -1,6 +1,8 @@
 import Cover from '@/components/cover';
 import { LoadingList } from '@/components/loading';
-import { GeneralTagItem, SongItemWithCover } from '@/components/shares';
+import { GeneralTagItem } from '@/components/shares';
+import { Song } from '@/components/song';
+import { SwipeActions } from '@/components/swipe';
 import {
   Accordion,
   AccordionContent,
@@ -11,11 +13,12 @@ import { Input } from '@/components/ui/input.tsx';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet.tsx';
 import { useDebounce } from '@/hooks/useDebounce.ts';
 import { useSearchStore } from '@/lib/context';
-import { GetSearchQuery, PlaySong } from '@/lib/queries';
+import { AddSongsToQueue, GetSearchQuery, PlaySong } from '@/lib/queries';
 import { GeneralTag, IAlbum } from '@/type';
-import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { HeartFilledIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { motion, PanInfo } from 'framer-motion';
 import isEmpty from 'lodash/isEmpty';
+import { ListPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -118,10 +121,23 @@ function SearchContent({ searchText }: { searchText: string }) {
           </AccordionTrigger>
           <AccordionContent>
             {data?.Search.songs.map(o => (
-              <SongItemWithCover
+              <Song
                 key={o.path}
                 play={() => PlaySong(o.path)}
                 song={o}
+                actions={
+                  <>
+                    <SwipeActions.Action
+                      className="bg-add"
+                      onClick={() => AddSongsToQueue([o.path])}
+                    >
+                      <ListPlus className="size-6" />
+                    </SwipeActions.Action>
+                    <SwipeActions.Action className="bg-favor">
+                      <HeartFilledIcon className="ml-1 size-6" />
+                    </SwipeActions.Action>
+                  </>
+                }
               />
             ))}
           </AccordionContent>

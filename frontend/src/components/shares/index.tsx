@@ -1,7 +1,7 @@
 import Cover from '@/components/cover';
 import { useSearchStore } from '@/lib/context';
 import { cn } from '@/lib/utils.ts';
-import { GeneralTag, IAlbum, IGeneralTag, ISong } from '@/type';
+import { GeneralTag, IAlbum, IGeneralTag } from '@/type';
 import { DiscIcon } from '@radix-ui/react-icons';
 import { useNavigate } from 'react-router';
 
@@ -95,32 +95,6 @@ export function GeneralTagItems({ tag, data }: IGeneralTagItemsPros) {
   return (
     <div className="w-full px-6 ">
       {data?.map(t => <GeneralTagItem key={t.id} tag={tag} {...t} />)}
-    </div>
-  );
-}
-
-interface ISongItemWithCoverProps {
-  song: ISong;
-  play: VoidFunction;
-}
-
-export function SongItemWithCover({ song, play }: ISongItemWithCoverProps) {
-  return (
-    <div
-      className="flex w-full cursor-pointer select-none flex-row flex-nowrap items-center space-x-3 py-2"
-      onClick={play}
-    >
-      <Cover
-        albumId={song.albumId}
-        height={50}
-        width={50}
-        alt={song.name}
-        style={'rounded'}
-      />
-      <div className="flex w-[calc(100%-60px)] flex-col justify-center">
-        <p className="w-full truncate font-medium">{song.name}</p>
-        <div className="truncate text-sm opacity-35">{song.artists}</div>
-      </div>
     </div>
   );
 }

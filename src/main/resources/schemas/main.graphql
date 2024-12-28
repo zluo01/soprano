@@ -147,7 +147,7 @@ type Mutation {
     NextSong: Int!
     PrevSong: Int!
     PlaySongInQueueAtPosition(position: Int!): Int!
-    AddSongToQueue(songPath: String!): Int!
+    AddSongsToQueue(songPaths: [String!]!): Int!
     RemoveSongFromQueue(position: Int!): Int!
     ClearQueue: Int!
 }

@@ -37,7 +37,7 @@ public interface PlayerService {
 
     Future<Integer> playSongInQueueAtPosition(int position);
 
-    Future<Integer> addSongToQueue(String songPath);
+    Future<Integer> addSongsToQueue(List<String> songPaths);
 
     Future<Integer> removeSongFromQueue(int position);
 

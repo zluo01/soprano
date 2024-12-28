@@ -114,10 +114,13 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public Future<Integer> addSongToQueue(final String songPath) {
-        final int error = mpv.instance().mpv_command(mpv.handle(), new String[]{"loadfile", songPath, "append-play"});
-        if (error != 0) {
-            return Future.failedFuture("Failed to add song to queue: " + MPVError.getError(error));
+    public Future<Integer> addSongsToQueue(final List<String> songPaths) {
+        int error = MPVError.MPV_ERROR_SUCCESS.ordinal();
+        for (String songPath : songPaths) {
+            error = mpv.instance().mpv_command(mpv.handle(), new String[]{"loadfile", songPath, "append-play"});
+            if (error != 0) {
+                return Future.failedFuture("Failed to add song to queue: " + MPVError.getError(error));
+            }
         }
         return Future.succeededFuture(error);
     }

@@ -320,13 +320,13 @@ final class GraphQLInitializer {
             return playerService.playSongInQueueAtPosition(position).toCompletionStage();
         };
 
-        final DataFetcher<CompletionStage<Integer>> addSongToQueue = environment -> {
-            final String songPath = environment.getArgument("songPath");
-            if (songPath == null) {
-                throw new IllegalArgumentException("Song path is required");
+        final DataFetcher<CompletionStage<Integer>> addSongsToQueue = environment -> {
+            final List<String> songPaths = environment.getArgument("songPaths");
+            if (songPaths == null) {
+                throw new IllegalArgumentException("Song paths are required");
             }
 
-            return playerService.addSongToQueue(songPath).toCompletionStage();
+            return playerService.addSongsToQueue(songPaths).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Integer>> removeSongFromQueue = environment -> {
@@ -350,7 +350,7 @@ final class GraphQLInitializer {
                 .type("Mutation", builder -> builder.dataFetcher("NextSong", nextSong))
                 .type("Mutation", builder -> builder.dataFetcher("PrevSong", prevSong))
                 .type("Mutation", builder -> builder.dataFetcher("PlaySongInQueueAtPosition", playSongInQueueAtPosition))
-                .type("Mutation", builder -> builder.dataFetcher("AddSongToQueue", addSongToQueue))
+                .type("Mutation", builder -> builder.dataFetcher("AddSongsToQueue", addSongsToQueue))
                 .type("Mutation", builder -> builder.dataFetcher("RemoveSongFromQueue", removeSongFromQueue))
                 .type("Mutation", builder -> builder.dataFetcher("ClearQueue", clearQueue));
     }

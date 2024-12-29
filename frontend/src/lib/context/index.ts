@@ -30,3 +30,13 @@ export const useSearchStore = create<ISearchState>()(set => ({
   searchModalState: false,
   updateSearchModalState: state => set({ searchModalState: state }),
 }));
+
+interface ISettingState {
+  settingModalState: boolean;
+  updateSettingModalState: (state: boolean) => void;
+}
+
+export const useSettingStore = create<ISettingState>()(set => ({
+  settingModalState: false,
+  updateSettingModalState: state => set({ settingModalState: state }),
+}));

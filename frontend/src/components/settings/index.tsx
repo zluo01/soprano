@@ -7,19 +7,19 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import { useSettingStore } from '@/lib/context';
 import { BuildDatabase, GetStatsQuery, UpdateDatabase } from '@/lib/queries';
 import { ReloadIcon, UpdateIcon } from '@radix-ui/react-icons';
 
-interface ISettingsPros {
-  open: boolean;
-  close: (status: boolean) => void;
-}
-
-export default function Settings({ open, close }: ISettingsPros) {
+export default function Settings() {
+  const { settingModalState, updateSettingModalState } = useSettingStore();
   const { data } = GetStatsQuery();
 
   return (
-    <Drawer open={open} onOpenChange={close}>
+    <Drawer
+      open={settingModalState}
+      onOpenChange={status => updateSettingModalState(status)}
+    >
       <DrawerContent className="pb-[env(safe-area-inset-bottom)]">
         <DrawerHeader className="text-left">
           <DrawerTitle>Settings</DrawerTitle>

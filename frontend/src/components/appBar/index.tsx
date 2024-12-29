@@ -1,17 +1,15 @@
-import Settings from '@/components/settings';
 import { Button } from '@/components/ui/button.tsx';
-import { useSearchStore } from '@/lib/context';
+import { useSearchStore, useSettingStore } from '@/lib/context';
 import {
-  MagnifyingGlassIcon,
-  GearIcon,
   CaretLeftIcon,
+  GearIcon,
+  MagnifyingGlassIcon,
 } from '@radix-ui/react-icons';
-import { lazy, useState } from 'react';
-import { Link } from 'react-router';
-import { useParams } from 'react-router';
-import { useLocation, useNavigate } from 'react-router';
+import { lazy, Suspense } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 const Search = lazy(() => import('@/components/search'));
+const Settings = lazy(() => import('@/components/settings'));
 
 interface ISecondaryHeader {
   header?: string;
@@ -40,8 +38,7 @@ export default function AppBar() {
   const { playlistName, name } = useParams();
 
   const { updateSearchModalState } = useSearchStore();
-
-  const [openSetting, setOpenSetting] = useState(false);
+  const { updateSettingModalState } = useSettingStore();
 
   function Header() {
     const pathname = location.pathname;
@@ -79,14 +76,16 @@ export default function AppBar() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setOpenSetting(true)}
+          onClick={() => updateSettingModalState(true)}
           className="p-0"
         >
           <GearIcon className="size-6" />
         </Button>
       </div>
-      <Search />
-      <Settings open={openSetting} close={setOpenSetting} />
+      <Suspense>
+        <Search />
+        <Settings />
+      </Suspense>
     </>
   );
 }

@@ -1,8 +1,10 @@
 import AppBar from '@/components/appBar';
-import PlaybackQueue from '@/components/queue';
 import Tabs from '@/components/tabs';
+import { lazy, Suspense } from 'react';
 import { Outlet } from 'react-router';
 import Preview from 'src/components/preview';
+
+const PlaybackQueue = lazy(() => import('@/components/queue'));
 
 export default function Layout() {
   return (
@@ -19,7 +21,9 @@ export default function Layout() {
       <div className="fixed bottom-0 z-10 w-full bg-background pb-[env(safe-area-inset-bottom)]">
         <Preview />
       </div>
-      <PlaybackQueue />
+      <Suspense>
+        <PlaybackQueue />
+      </Suspense>
     </>
   );
 }

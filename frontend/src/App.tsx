@@ -1,4 +1,3 @@
-import Album from '@/components/album';
 import Albums from '@/components/albums';
 import { GeneralTagAlbumsView, GeneralTagView } from '@/components/general';
 import RecentlyAdded from '@/components/recent';
@@ -7,6 +6,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import Layout from 'src/components/layout';
 
+const Album = lazy(() => import('@/components/album'));
 const Playlist = lazy(() => import('@/components/playlist'));
 const Playlists = lazy(() => import('@/components/playlists'));
 
@@ -36,7 +36,14 @@ function App() {
           </Route>
           <Route path="albums">
             <Route index element={<Albums />} />
-            <Route path=":id" element={<Album />} />
+            <Route
+              path=":id"
+              element={
+                <Suspense>
+                  <Album />
+                </Suspense>
+              }
+            />
           </Route>
           <Route path="artists">
             <Route index element={<GeneralTagView tag={GeneralTag.ARTIST} />} />

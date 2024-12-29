@@ -34,7 +34,7 @@ export default function PlaybackQueue() {
       open={playbackQueueModalState}
       onOpenChange={open => updatePlaybackQueueModalState(open)}
     >
-      <DrawerContent className="size-full rounded-2xl pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+      <DrawerContent className="size-full rounded-2xl pt-[env(safe-area-inset-top)]">
         <div className="flex size-full flex-col flex-nowrap overflow-y-scroll p-6">
           <p className="font-bold">Now Playing</p>
           {isPlaying ? (

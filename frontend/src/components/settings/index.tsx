@@ -20,7 +20,7 @@ export default function Settings() {
       open={settingModalState}
       onOpenChange={status => updateSettingModalState(status)}
     >
-      <DrawerContent className="pb-[env(safe-area-inset-bottom)]">
+      <DrawerContent>
         <DrawerHeader className="text-left">
           <DrawerTitle>Settings</DrawerTitle>
         </DrawerHeader>

@@ -171,7 +171,7 @@ export default function Search() {
       open={searchModalState}
       onOpenChange={open => updateSearchModalState(open)}
     >
-      <SheetContent className="max-h-screen w-full overflow-y-scroll rounded-2xl px-0 pb-[env(safe-area-inset-bottom)] pt-0">
+      <SheetContent className="max-h-screen w-full overflow-y-scroll rounded-2xl px-0 pt-0">
         <SheetHeader className="sticky top-0 z-20 border-b-2 bg-primary-foreground px-6 pb-0.5 pt-[calc(env(safe-area-inset-top)+12px)]">
           <div className="relative space-x-1">
             <MagnifyingGlassIcon className="absolute left-2 top-2.5 size-5 text-muted-foreground" />

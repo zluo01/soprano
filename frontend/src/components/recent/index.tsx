@@ -1,5 +1,6 @@
 import { LoadingAlbums } from '@/components/loading';
 import { AlbumGridView } from '@/components/shares';
+import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { GetDisplayAlbumsQuery } from '@/lib/queries';
 import orderBy from 'lodash/orderBy';
 
@@ -15,5 +16,9 @@ export default function RecentlyAdded() {
     30,
   );
 
-  return <AlbumGridView albums={recentAddedAlbums} />;
+  return (
+    <ScrollArea className="h-[calc(100%-100px)] w-full pt-2">
+      <AlbumGridView albums={recentAddedAlbums} />
+    </ScrollArea>
+  );
 }

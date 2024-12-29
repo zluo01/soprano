@@ -10,16 +10,14 @@ const PlaybackQueue = lazy(() => import('@/components/queue'));
 export default function Layout() {
   return (
     <>
-      <div className="h-screen w-screen select-none scroll-smooth">
-        <div className="relative pb-[calc(env(safe-area-inset-bottom)+72px)]">
-          <div className="sticky top-0 z-20 flex flex-col bg-background pt-[env(safe-area-inset-top)]">
-            <AppBar />
-            <Tabs />
-          </div>
+      <div className="h-full w-screen select-none scroll-smooth pt-[env(safe-area-inset-top)]">
+        <div className="h-full pb-[72px]">
+          <AppBar />
+          <Tabs />
           <Outlet />
         </div>
       </div>
-      <div className="fixed bottom-0 z-20 w-full bg-background pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-0 z-20 w-full">
         <Preview />
       </div>
       <Suspense>

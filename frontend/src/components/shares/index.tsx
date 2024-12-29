@@ -11,31 +11,29 @@ interface IAlbumGridView {
 
 export function AlbumGridView({ albums }: IAlbumGridView) {
   return (
-    <div className="py-3">
-      <div
-        className={cn(
-          'm-0 border-0 px-6',
-          'grid grid-flow-dense auto-rows-fr',
-          'grid-cols-2 gap-x-8 gap-y-4',
-        )}
-      >
-        {albums.map(album => (
-          <Link key={album.id} to={`/albums/${album.id}`}>
-            <div className="relative isolate w-full cursor-pointer">
-              <Cover
-                albumId={album?.id}
-                alt={album.name}
-                width={180}
-                height={180}
-                style={'rounded-full'}
-              />
-              <p className="cursor-default truncate pt-1 text-center text-sm">
-                {album.name}
-              </p>
-            </div>
-          </Link>
-        ))}
-      </div>
+    <div
+      className={cn(
+        'm-0 border-0 px-6',
+        'grid grid-flow-dense auto-rows-fr',
+        'grid-cols-2 gap-x-8 gap-y-4',
+      )}
+    >
+      {albums.map(album => (
+        <Link key={album.id} to={`/albums/${album.id}`}>
+          <div className="relative isolate w-full cursor-pointer">
+            <Cover
+              albumId={album?.id}
+              alt={album.name}
+              width={180}
+              height={180}
+              style={'rounded-full'}
+            />
+            <p className="cursor-default truncate pt-1 text-center text-sm">
+              {album.name}
+            </p>
+          </div>
+        </Link>
+      ))}
     </div>
   );
 }
@@ -89,7 +87,7 @@ interface IGeneralTagItemsPros {
 
 export function GeneralTagItems({ tag, data }: IGeneralTagItemsPros) {
   return (
-    <div className="w-full px-6 ">
+    <div className="w-full px-6">
       {data?.map(t => <GeneralTagItem key={t.id} tag={tag} {...t} />)}
     </div>
   );

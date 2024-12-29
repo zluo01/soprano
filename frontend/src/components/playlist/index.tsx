@@ -2,6 +2,7 @@ import { LoadingSongs } from '@/components/loading';
 import { Song } from '@/components/song';
 import { SwipeActions } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
+import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import {
   AddSongsToQueue,
@@ -21,8 +22,8 @@ export default function Playlist() {
   const mutation = DeleteSongFromPlaylistMutation();
 
   return (
-    <>
-      <div className="sticky top-[calc(env(safe-area-inset-top)+44px)] z-20 flex w-full flex-row flex-nowrap items-center gap-2 bg-background px-6 py-3">
+    <ScrollArea className="h-[calc(100%-45px)] w-full pt-2">
+      <div className="sticky top-0 z-20 flex w-full flex-row flex-nowrap items-center gap-2 bg-background px-6 py-3">
         <Separator className="flex-1" />
         <>
           <Button
@@ -88,6 +89,6 @@ export default function Playlist() {
           ))}
         </div>
       )}
-    </>
+    </ScrollArea>
   );
 }

@@ -154,9 +154,9 @@ export default function Search() {
   const debounceSearch = useDebounce(searchText);
 
   function dragEndHandler(dragInfo: PanInfo) {
-    const draggedDistance = dragInfo.offset.y;
-    const swipeThreshold = 300;
-    // swipe from top to bottom
+    const draggedDistance = dragInfo.offset.x;
+    const swipeThreshold = 100;
+    // swipe to the right
     if (draggedDistance > swipeThreshold) {
       updateSearchModalState(false);
     }
@@ -167,10 +167,7 @@ export default function Search() {
       open={searchModalState}
       onOpenChange={open => updateSearchModalState(open)}
     >
-      <SheetContent
-        side="bottom"
-        className="size-full max-h-screen overflow-y-scroll rounded-2xl px-0 pb-[env(safe-area-inset-bottom)] pt-0"
-      >
+      <SheetContent className="max-h-screen w-full overflow-y-scroll rounded-2xl px-0 pb-[env(safe-area-inset-bottom)] pt-0">
         <SheetHeader className="sticky top-0 z-10 border-b-2 bg-primary-foreground px-6 pb-0.5 pt-[calc(env(safe-area-inset-top)+12px)]">
           <div className="relative space-x-1">
             <MagnifyingGlassIcon className="absolute left-2 top-2.5 size-5 text-muted-foreground" />
@@ -184,13 +181,15 @@ export default function Search() {
           </div>
         </SheetHeader>
         <motion.div
-          className="flex min-h-[calc(100vh-120px)] w-full flex-col py-2"
+          className="flex min-h-[calc(100%-120px)] w-full flex-col py-2"
           animate="active"
           exit="exit"
-          //Only on y-axis
-          drag="y"
+          variants={sliderVariants}
+          transition={sliderTransition}
+          //Only on x-axis
+          drag="x"
           //End of the window either side
-          dragConstraints={{ top: 0, bottom: 0 }}
+          dragConstraints={{ left: 0, right: 0 }}
           // The degree of movement allowed outside constraints.
           dragElastic={0}
           onDragEnd={(_, dragInfo) => dragEndHandler(dragInfo)}
@@ -201,3 +200,17 @@ export default function Search() {
     </Sheet>
   );
 }
+
+const sliderVariants = {
+  active: { x: 0, scale: 1, opacity: 1 },
+  exit: {
+    x: '-100%',
+    scale: 1,
+    opacity: 0.2,
+  },
+};
+
+const sliderTransition = {
+  duration: 0.5,
+  ease: [0.56, 0.03, 0.12, 1.04],
+};

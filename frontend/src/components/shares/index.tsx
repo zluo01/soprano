@@ -3,15 +3,13 @@ import { useSearchStore } from '@/lib/context';
 import { cn } from '@/lib/utils.ts';
 import { GeneralTag, IAlbum, IGeneralTag } from '@/type';
 import { DiscIcon } from '@radix-ui/react-icons';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 interface IAlbumGridView {
   albums: IAlbum[];
 }
 
 export function AlbumGridView({ albums }: IAlbumGridView) {
-  const navigate = useNavigate();
-
   return (
     <div className="py-3">
       <div
@@ -22,22 +20,20 @@ export function AlbumGridView({ albums }: IAlbumGridView) {
         )}
       >
         {albums.map(album => (
-          <div
-            key={album.id}
-            className="relative isolate w-full cursor-pointer"
-            onClick={() => navigate(`/albums/${album.id}`)}
-          >
-            <Cover
-              albumId={album?.id}
-              alt={album.name}
-              width={180}
-              height={180}
-              style={'rounded-full'}
-            />
-            <p className="cursor-default truncate pt-1 text-center text-sm">
-              {album.name}
-            </p>
-          </div>
+          <Link key={album.id} to={`/albums/${album.id}`}>
+            <div className="relative isolate w-full cursor-pointer">
+              <Cover
+                albumId={album?.id}
+                alt={album.name}
+                width={180}
+                height={180}
+                style={'rounded-full'}
+              />
+              <p className="cursor-default truncate pt-1 text-center text-sm">
+                {album.name}
+              </p>
+            </div>
+          </Link>
         ))}
       </div>
     </div>

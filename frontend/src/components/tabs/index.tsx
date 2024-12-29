@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils.ts';
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { Link, useLocation } from 'react-router';
 
 interface ITab {
   name: string;
@@ -18,7 +18,6 @@ const TABS = new Map<string, ITab>([
 const ALLOW_PATHS = new Set(TABS.keys());
 
 export default function Tabs() {
-  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -42,18 +41,18 @@ export default function Tabs() {
       )}
     >
       {Array.from(TABS.entries()).map(([path, v], index) => (
-        <span
-          id={`tab-${index}`}
-          key={index}
-          className={cn(
-            'cursor-pointer select-none whitespace-nowrap p-1.5 text font-bold opacity-30',
-            location.pathname === path &&
-              'scale-105 opacity-100 border-b-4 dark:border-[#F04A4A]',
-          )}
-          onClick={() => navigate(path)}
-        >
-          {v.name}
-        </span>
+        <Link key={index} to={path}>
+          <span
+            id={`tab-${index}`}
+            className={cn(
+              'cursor-pointer select-none whitespace-nowrap p-1.5 text font-bold opacity-30',
+              location.pathname === path &&
+                'scale-105 opacity-100 border-b-4 dark:border-[#F04A4A]',
+            )}
+          >
+            {v.name}
+          </span>
+        </Link>
       ))}
     </div>
   );

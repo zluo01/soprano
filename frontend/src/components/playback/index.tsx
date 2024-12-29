@@ -15,18 +15,26 @@ import {
 import { IPlaybackStatus } from '@/type';
 import {
   HeartFilledIcon,
-  ShuffleIcon,
   ListBulletIcon,
+  ShuffleIcon,
 } from '@radix-ui/react-icons';
+import { useNavigate } from 'react-router';
 
 interface IPlaybackDrawerProps {
   status?: IPlaybackStatus;
 }
 
 export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
+  const navigate = useNavigate();
+
   const { playbackModalState, updatePlaybackModalState } = usePlaybackStore();
   const { updatePlaybackQueueModalState } = usePlaybackQueueStore();
   const { openFavorModal } = useFavorStore();
+
+  async function toAlbumPage() {
+    await navigate(`/albums/${status?.song?.albumId}`);
+    updatePlaybackModalState(false);
+  }
 
   return (
     <Drawer
@@ -48,7 +56,10 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
             <span className="w-full truncate text-xl font-extrabold">
               {status?.song?.name}
             </span>
-            <span className="w-full truncate text-primary/35">
+            <span
+              className="w-full cursor-pointer truncate text-primary/35"
+              onClick={toAlbumPage}
+            >
               {status?.song?.album}
             </span>
           </div>

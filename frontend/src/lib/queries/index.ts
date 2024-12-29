@@ -3,24 +3,14 @@ import {
   IAlbum,
   IGeneralTag,
   IPlaybackStatus,
-  IPlaylist,
   IQueueSong,
   ISearchResponse,
-  ISong,
   IStats,
 } from '@/type';
-import { QueryClient, skipToken, useQuery } from '@tanstack/react-query';
+import { skipToken, useQuery } from '@tanstack/react-query';
 import isEmpty from 'lodash/isEmpty';
 
-import { request } from './utils';
-
-export const QUERY_CLIENT = new QueryClient();
-
-const IMMUTABLE_REQUEST = {
-  staleTime: Infinity,
-  refetchOnWindowFocus: false,
-  refetchOnReconnect: false,
-};
+import { IMMUTABLE_REQUEST, request } from './utils';
 
 const AlbumsQueryDocument = /*GraphQL*/ `
     query {
@@ -66,51 +56,6 @@ export function GetAlbumDetailQuery(albumId?: string) {
       ? async () =>
           request<{ Album: IAlbum }>(AlbumDetailQueryDocument, {
             id: parseInt(albumId!),
-          })
-      : skipToken,
-    ...IMMUTABLE_REQUEST,
-  });
-}
-
-const PlaylistsQueryDocument = /*GraphQL*/ `
-    query {
-        Playlists {
-            name
-            modifiedTime
-            songCount
-            coverId
-        }
-    }
-`;
-
-export function GetPlaylistsQuery() {
-  return useQuery({
-    queryKey: [PlaylistsQueryDocument],
-    queryFn: async () =>
-      request<{ Playlists: IPlaylist[] }>(PlaylistsQueryDocument),
-    ...IMMUTABLE_REQUEST,
-  });
-}
-
-const SongsForPlaylistQueryDocument = /*GraphQL*/ `
-    query PlaylistSongs($name: String!) {
-        PlaylistSongs(name: $name) {
-            name
-            artists
-            path
-            duration
-            albumId
-        }
-    }
-`;
-
-export function GetSongsForPlaylistQuery(name?: string) {
-  return useQuery({
-    queryKey: [SongsForPlaylistQueryDocument, name],
-    queryFn: name
-      ? async () =>
-          request<{ PlaylistSongs: ISong[] }>(SongsForPlaylistQueryDocument, {
-            name,
           })
       : skipToken,
     ...IMMUTABLE_REQUEST,
@@ -335,6 +280,7 @@ const PlaybackStatusQueryDocument = /* GraphQL */ `
       elapsed
       song {
         name
+        path
         artists
         albumId
         album
@@ -362,6 +308,7 @@ const SongsInQueueQueryDocument = /* GraphQL */ `
       playing
       position
       name
+      path
       artists
       albumId
     }
@@ -381,6 +328,6 @@ export function GetSongInQueueQuery() {
 }
 
 export * from './player-mutation.ts';
-export * from './playlist-mutation.ts';
+export * from './playlist.ts';
 export * from './database-mutation.ts';
-export { constructImg } from './utils.ts';
+export { constructImg, QUERY_CLIENT } from './utils.ts';

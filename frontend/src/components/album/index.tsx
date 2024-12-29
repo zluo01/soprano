@@ -2,6 +2,7 @@ import Cover from '@/components/cover';
 import { SwipeActions } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
+import { useFavorStore } from '@/lib/context';
 import {
   AddSongsToQueue,
   GetAlbumDetailQuery,
@@ -16,6 +17,8 @@ import { useParams } from 'react-router';
 export default function Album() {
   const { id } = useParams();
   const { data } = GetAlbumDetailQuery(id);
+
+  const { openFavorModal } = useFavorStore();
 
   return (
     <>
@@ -107,7 +110,10 @@ export default function Album() {
               >
                 <ListPlus className="size-6" />
               </SwipeActions.Action>
-              <SwipeActions.Action className="bg-favor">
+              <SwipeActions.Action
+                className="bg-favor"
+                onClick={() => openFavorModal(song.path)}
+              >
                 <HeartFilledIcon className="size-6" />
               </SwipeActions.Action>
             </SwipeActions.Actions>

@@ -7,7 +7,11 @@ import {
   DrawerContent,
   DrawerFooter,
 } from '@/components/ui/drawer.tsx';
-import { usePlaybackQueueStore, usePlaybackStore } from '@/lib/context';
+import {
+  useFavorStore,
+  usePlaybackQueueStore,
+  usePlaybackStore,
+} from '@/lib/context';
 import { IPlaybackStatus } from '@/type';
 import {
   HeartFilledIcon,
@@ -22,6 +26,7 @@ interface IPlaybackDrawerProps {
 export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
   const { playbackModalState, updatePlaybackModalState } = usePlaybackStore();
   const { updatePlaybackQueueModalState } = usePlaybackQueueStore();
+  const { openFavorModal } = useFavorStore();
 
   return (
     <Drawer
@@ -65,7 +70,11 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
           >
             <ListBulletIcon className="size-6" />
           </Button>
-          <Button variant="ghost" className="size-10 rounded-full p-1">
+          <Button
+            variant="ghost"
+            className="size-10 rounded-full p-1"
+            onClick={() => openFavorModal(status?.song?.path)}
+          >
             <HeartFilledIcon className="size-6" />
             <span className="sr-only">Favor album</span>
           </Button>

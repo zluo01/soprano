@@ -1,13 +1,15 @@
 import Cover from '@/components/cover';
 import { LoadingList } from '@/components/loading';
 import { SwipeActions } from '@/components/swipe';
-import { DeletePlaylist, GetPlaylistsQuery } from '@/lib/queries';
+import { DeletePlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
 import { Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
 import { Music2 } from 'lucide-react';
 import { Link } from 'react-router';
 
 export default function Playlists() {
   const { data, isLoading } = GetPlaylistsQuery();
+  const mutation = DeletePlaylistMutation();
+
   if (isLoading) {
     return <LoadingList />;
   }
@@ -41,7 +43,7 @@ export default function Playlists() {
             <SwipeActions.Actions>
               <SwipeActions.Action
                 className="bg-delete"
-                onClick={() => DeletePlaylist(o.name)}
+                onClick={() => mutation.mutate({ name: o.name })}
               >
                 <TrashIcon className="size-6" />
               </SwipeActions.Action>

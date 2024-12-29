@@ -5,10 +5,14 @@ export default {
   theme: {
     extend: {
       backgroundColor: {
+        char: '#F04A4A',
         delete: '#CC5F5A',
         favor: 'rgb(160,155,186)',
         edit: 'rgb(220,185,208)',
         add: 'rgb(181,186,155)',
+      },
+      textColor: {
+        char: '#F04A4A',
       },
       borderRadius: {
         lg: 'var(--radius)',

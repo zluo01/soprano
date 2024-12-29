@@ -1,19 +1,23 @@
 import { LoadingSongs } from '@/components/loading';
 import { Song } from '@/components/song';
 import { SwipeActions } from '@/components/swipe';
+import { Button } from '@/components/ui/button.tsx';
 import { Drawer, DrawerContent } from '@/components/ui/drawer.tsx';
-import { usePlaybackQueueStore } from '@/lib/context';
+import { useFavorStore, usePlaybackQueueStore } from '@/lib/context';
 import {
+  ClearQueue,
   GetSongInQueueQuery,
   PlaySongInAtPosition,
   RemoveSongFromQueue,
 } from '@/lib/queries';
 import { HeartFilledIcon, TrashIcon } from '@radix-ui/react-icons';
+import isEmpty from 'lodash/isEmpty';
 import slice from 'lodash/slice';
 
 export default function PlaybackQueue() {
   const { playbackQueueModalState, updatePlaybackQueueModalState } =
     usePlaybackQueueStore();
+  const { openFavorModal } = useFavorStore();
 
   const { data, isLoading } = GetSongInQueueQuery();
 
@@ -37,7 +41,18 @@ export default function PlaybackQueue() {
           ) : (
             <div className="h-16 w-full" />
           )}
-          <p className="font-bold">Continue Playing</p>
+          <div className="flex w-full flex-row flex-nowrap justify-between">
+            <p className="font-bold">Continue Playing</p>
+            <Button
+              variant="link"
+              className="dark:text-char"
+              onClick={ClearQueue}
+              disabled={isEmpty(data?.SongsInQueue)}
+            >
+              Clear
+            </Button>
+          </div>
+
           {isLoading ? (
             <LoadingSongs />
           ) : (
@@ -54,7 +69,10 @@ export default function PlaybackQueue() {
                     >
                       <TrashIcon className="size-6" />
                     </SwipeActions.Action>
-                    <SwipeActions.Action className="bg-favor">
+                    <SwipeActions.Action
+                      className="bg-favor"
+                      onClick={() => openFavorModal(song.path)}
+                    >
                       <HeartFilledIcon className="ml-1 size-6" />
                     </SwipeActions.Action>
                   </>

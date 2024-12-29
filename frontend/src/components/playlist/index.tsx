@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import {
   AddSongsToQueue,
-  DeleteSongFromPlaylist,
+  DeleteSongFromPlaylistMutation,
   GetSongsForPlaylistQuery,
   PlayPlaylist,
   PlaySong,
@@ -17,6 +17,8 @@ import { useParams } from 'react-router';
 export default function Playlist() {
   const { playlistName } = useParams();
   const { data, isLoading } = GetSongsForPlaylistQuery(playlistName!);
+
+  const mutation = DeleteSongFromPlaylistMutation();
 
   return (
     <>
@@ -68,7 +70,9 @@ export default function Playlist() {
                 <>
                   <SwipeActions.Action
                     className="bg-delete"
-                    onClick={() => DeleteSongFromPlaylist(o.name)}
+                    onClick={() =>
+                      mutation.mutate({ name: playlistName, songPath: o.path })
+                    }
                   >
                     <TrashIcon className="size-6" />
                   </SwipeActions.Action>

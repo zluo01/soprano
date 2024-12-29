@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input.tsx';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet.tsx';
 import { useDebounce } from '@/hooks/useDebounce.ts';
-import { useSearchStore } from '@/lib/context';
+import { useFavorStore, useSearchStore } from '@/lib/context';
 import { AddSongsToQueue, GetSearchQuery, PlaySong } from '@/lib/queries';
 import { GeneralTag, IAlbum } from '@/type';
 import { HeartFilledIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
@@ -48,6 +48,7 @@ function SearchAlbumItem({ id, name, artist }: IAlbum) {
 
 function SearchContent({ searchText }: { searchText: string }) {
   const { data, isLoading } = GetSearchQuery(searchText);
+  const { openFavorModal } = useFavorStore();
 
   function isSearchResultEmpty(): boolean {
     if (!data) {
@@ -133,7 +134,10 @@ function SearchContent({ searchText }: { searchText: string }) {
                     >
                       <ListPlus className="size-6" />
                     </SwipeActions.Action>
-                    <SwipeActions.Action className="bg-favor">
+                    <SwipeActions.Action
+                      className="bg-favor"
+                      onClick={() => openFavorModal(o.path)}
+                    >
                       <HeartFilledIcon className="ml-1 size-6" />
                     </SwipeActions.Action>
                   </>

@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react';
 import { Outlet } from 'react-router';
 import Preview from 'src/components/preview';
 
+const Favor = lazy(() => import('@/components/favor'));
 const PlaybackQueue = lazy(() => import('@/components/queue'));
 
 export default function Layout() {
@@ -22,6 +23,7 @@ export default function Layout() {
         <Preview />
       </div>
       <Suspense>
+        <Favor />
         <PlaybackQueue />
       </Suspense>
     </>

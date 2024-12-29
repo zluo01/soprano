@@ -40,3 +40,21 @@ export const useSettingStore = create<ISettingState>()(set => ({
   settingModalState: false,
   updateSettingModalState: state => set({ settingModalState: state }),
 }));
+
+interface IFavorPayload {
+  open: boolean;
+  songPath?: string;
+}
+
+interface IFavorState {
+  favorModalState: IFavorPayload;
+  openFavorModal: (songPath?: string) => void;
+  closeFavorModal: () => void;
+}
+
+export const useFavorStore = create<IFavorState>()(set => ({
+  favorModalState: { open: false },
+  openFavorModal: songPath =>
+    set({ favorModalState: { open: true, songPath } }),
+  closeFavorModal: () => set({ favorModalState: { open: false } }),
+}));

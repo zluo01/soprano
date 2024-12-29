@@ -172,7 +172,7 @@ const Action = ({
   return (
     <motion.button
       className={cn(
-        'focus-visible:outline-offset-[-2px] cursor-pointer focus-visible:outline-2 gap-2 border-0 rounded-r-lg',
+        'focus-visible:outline-offset-[-2px] cursor-pointer focus-visible:outline-2 gap-2 border-0 rounded-r-lg text-white',
         'flex aspect-square h-full flex-col items-center justify-center z-[1]',
         'last:-ml-2 last:mr-2 last:aspect-[1.1] last:z-0',
         className,

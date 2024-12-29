@@ -2,7 +2,11 @@ import { LoadingSongs } from '@/components/loading';
 import { Song } from '@/components/song';
 import { SwipeActions } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
-import { Drawer, DrawerContent } from '@/components/ui/drawer.tsx';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerFooter,
+} from '@/components/ui/drawer.tsx';
 import { useFavorStore, usePlaybackQueueStore } from '@/lib/context';
 import {
   ClearQueue,
@@ -41,17 +45,7 @@ export default function PlaybackQueue() {
           ) : (
             <div className="h-16 w-full" />
           )}
-          <div className="flex w-full flex-row flex-nowrap justify-between">
-            <p className="font-bold">Continue Playing</p>
-            <Button
-              variant="link"
-              className="dark:text-char"
-              onClick={ClearQueue}
-              disabled={isEmpty(data?.SongsInQueue)}
-            >
-              Clear
-            </Button>
-          </div>
+          <p className="font-bold">Continue Playing</p>
 
           {isLoading ? (
             <LoadingSongs />
@@ -81,6 +75,17 @@ export default function PlaybackQueue() {
             ))
           )}
         </div>
+        <DrawerFooter className="items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={ClearQueue}
+            disabled={isEmpty(data?.SongsInQueue)}
+            className="size-10 rounded-full p-1.5"
+          >
+            <TrashIcon className="size-6" />
+          </Button>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );

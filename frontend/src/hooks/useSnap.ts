@@ -8,7 +8,7 @@ import {
   DragHandlers,
   MotionProps,
   SpringOptions,
-} from 'framer-motion';
+} from 'motion/react';
 import { RefObject, useRef, useState } from 'react';
 
 export type Point = {

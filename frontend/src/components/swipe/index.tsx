@@ -8,7 +8,7 @@ import {
   MotionValue,
   useMotionValueEvent,
   useTransform,
-} from 'framer-motion';
+} from 'motion/react';
 import {
   ComponentProps,
   createContext,

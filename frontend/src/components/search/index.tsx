@@ -16,9 +16,9 @@ import { useFavorStore, useSearchStore } from '@/lib/context';
 import { AddSongsToQueue, GetSearchQuery, PlaySong } from '@/lib/queries';
 import { GeneralTag, IAlbum } from '@/type';
 import { HeartFilledIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
-import { motion, PanInfo } from 'framer-motion';
 import isEmpty from 'lodash/isEmpty';
 import { ListPlus } from 'lucide-react';
+import { motion, PanInfo } from 'motion/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -171,7 +171,7 @@ export default function Search() {
       open={searchModalState}
       onOpenChange={open => updateSearchModalState(open)}
     >
-      <SheetContent className="max-h-screen w-full overflow-y-scroll rounded-2xl px-0 pt-0">
+      <SheetContent className="max-h-screen w-full overflow-y-scroll px-0 pt-0">
         <SheetHeader className="sticky top-0 z-20 border-b-2 bg-primary-foreground px-6 pb-0.5 pt-[calc(env(safe-area-inset-top)+12px)]">
           <div className="relative space-x-1">
             <MagnifyingGlassIcon className="absolute left-2 top-2.5 size-5 text-muted-foreground" />

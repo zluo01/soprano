@@ -8,10 +8,15 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input.tsx';
 import { useCreatePlaylistStore } from '@/lib/context';
-import { CreatePlaylistMutation } from '@/lib/queries';
+import { CreatePlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
+import { cn } from '@/lib/utils.ts';
 import { useState } from 'react';
 
 export default function CreatePlaylistModal() {
+  const { data } = GetPlaylistsQuery();
+
+  const playlists = data?.Playlists.map(o => o.name);
+
   const [name, setName] = useState('');
 
   const { createPlaylistModalState, updateCreatePlaylistModalState } =
@@ -19,10 +24,20 @@ export default function CreatePlaylistModal() {
 
   const mutation = CreatePlaylistMutation();
 
+  function isValid(name: string, playlists: string[] | undefined) {
+    if (playlists === undefined) {
+      return false;
+    }
+    return !playlists.includes(name);
+  }
+
+  const valid = isValid(name, playlists);
+
   function submit() {
-    mutation.mutate({
-      name,
-    });
+    if (!valid)
+      mutation.mutate({
+        name,
+      });
     updateCreatePlaylistModalState(false);
   }
 
@@ -37,6 +52,7 @@ export default function CreatePlaylistModal() {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Input
+            className={cn(!valid && 'border border-red-500')}
             value={name}
             placeholder="Name..."
             onChange={e => setName(e.target.value)}
@@ -46,7 +62,9 @@ export default function CreatePlaylistModal() {
           />
         </div>
         <DialogFooter>
-          <Button onClick={submit}>Save</Button>
+          <Button onClick={submit} disabled={!data || !valid}>
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -8,19 +8,37 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input.tsx';
 import { useRenamePlaylistStore } from '@/lib/context';
-import { RenamePlaylistMutation } from '@/lib/queries';
+import { GetPlaylistsQuery, RenamePlaylistMutation } from '@/lib/queries';
+import { cn } from '@/lib/utils.ts';
 
 export default function RenamePlaylistModal() {
   const { renamePlaylistModalState, closeRenamePlaylistModal, updateName } =
     useRenamePlaylistStore();
 
+  const { data } = GetPlaylistsQuery();
+
+  const playlists = data?.Playlists.map(o => o.name).filter(
+    o => o !== renamePlaylistModalState.prevName,
+  );
+
   const mutation = RenamePlaylistMutation();
 
+  function isValid(name: string | undefined, playlists: string[] | undefined) {
+    if (playlists === undefined || !name) {
+      return false;
+    }
+    return !playlists.includes(name);
+  }
+
+  const valid = isValid(renamePlaylistModalState.name, playlists);
+
   function submit() {
-    mutation.mutate({
-      name: renamePlaylistModalState.prevName,
-      newName: renamePlaylistModalState.name,
-    });
+    if (renamePlaylistModalState.prevName !== renamePlaylistModalState.name) {
+      mutation.mutate({
+        name: renamePlaylistModalState.prevName,
+        newName: renamePlaylistModalState.name,
+      });
+    }
     closeRenamePlaylistModal();
   }
 
@@ -35,6 +53,7 @@ export default function RenamePlaylistModal() {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Input
+            className={cn(!valid && 'border border-red-500')}
             value={renamePlaylistModalState.name}
             onChange={e => updateName(e.target.value)}
             type="text"
@@ -43,7 +62,9 @@ export default function RenamePlaylistModal() {
           />
         </div>
         <DialogFooter>
-          <Button onClick={submit}>Save</Button>
+          <Button onClick={submit} disabled={!data || !valid}>
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

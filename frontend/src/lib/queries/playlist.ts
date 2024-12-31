@@ -91,11 +91,25 @@ const RenamePlaylistMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function RenamePlaylist(name?: string, newName?: string) {
-  if (!name || !newName) {
-    return;
-  }
-  await request(RenamePlaylistMutationDocument, { name, newName });
+export function RenamePlaylistMutation() {
+  return useMutation({
+    mutationFn: async ({
+      name,
+      newName,
+    }: {
+      name?: string;
+      newName?: string;
+    }) => {
+      if (!name || !newName) {
+        return;
+      }
+
+      await request(RenamePlaylistMutationDocument, { name, newName });
+    },
+    onSuccess: () => {
+      QUERY_CLIENT.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+    },
+  });
 }
 
 const AddSongToPlaylistMutationDocument = /* GraphQL */ `

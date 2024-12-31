@@ -58,3 +58,28 @@ export const useFavorStore = create<IFavorState>()(set => ({
     set({ favorModalState: { open: true, songPath } }),
   closeFavorModal: () => set({ favorModalState: { open: false } }),
 }));
+
+interface IRenamePlaylistPayload {
+  open: boolean;
+  name?: string;
+  readonly prevName?: string;
+}
+
+interface IRenamePlaylistState {
+  renamePlaylistModalState: IRenamePlaylistPayload;
+  updateName: (name: string) => void;
+  openRenamePlaylistModal: (name: string) => void;
+  closeRenamePlaylistModal: () => void;
+}
+
+export const useRenamePlaylistStore = create<IRenamePlaylistState>()(set => ({
+  renamePlaylistModalState: { open: false },
+  updateName: name =>
+    set(state => ({
+      renamePlaylistModalState: { ...state.renamePlaylistModalState, name },
+    })),
+  openRenamePlaylistModal: name =>
+    set({ renamePlaylistModalState: { open: true, name, prevName: name } }),
+  closeRenamePlaylistModal: () =>
+    set({ renamePlaylistModalState: { open: false } }),
+}));

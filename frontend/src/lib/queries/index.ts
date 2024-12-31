@@ -2,8 +2,6 @@ import {
   GeneralTag,
   IAlbum,
   IGeneralTag,
-  IPlaybackStatus,
-  IQueueSong,
   ISearchResponse,
   IStats,
 } from '@/type';
@@ -273,61 +271,7 @@ export function GetSearchQuery(searchText: string) {
   });
 }
 
-const PlaybackStatusQueryDocument = /* GraphQL */ `
-  query {
-    PlaybackStatus {
-      playing
-      elapsed
-      song {
-        name
-        path
-        artists
-        albumId
-        album
-        duration
-      }
-    }
-  }
-`;
-
-export function GetPlaybackStatusQuery() {
-  return useQuery({
-    queryKey: [PlaybackStatusQueryDocument],
-    queryFn: async () =>
-      request<{
-        PlaybackStatus: IPlaybackStatus;
-      }>(PlaybackStatusQueryDocument),
-    refetchInterval: 1000,
-    refetchIntervalInBackground: false,
-  });
-}
-
-const SongsInQueueQueryDocument = /* GraphQL */ `
-  query {
-    SongsInQueue {
-      playing
-      position
-      name
-      path
-      artists
-      albumId
-    }
-  }
-`;
-
-export function GetSongInQueueQuery() {
-  return useQuery({
-    queryKey: [SongsInQueueQueryDocument],
-    queryFn: async () =>
-      request<{
-        SongsInQueue: IQueueSong[];
-      }>(SongsInQueueQueryDocument),
-    refetchInterval: 1000,
-    refetchIntervalInBackground: false,
-  });
-}
-
-export * from './player-mutation.ts';
+export * from './playback.ts';
 export * from './playlist.ts';
 export * from './database-mutation.ts';
 export { constructImg, QUERY_CLIENT } from './utils.ts';

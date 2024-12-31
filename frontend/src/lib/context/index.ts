@@ -83,3 +83,14 @@ export const useRenamePlaylistStore = create<IRenamePlaylistState>()(set => ({
   closeRenamePlaylistModal: () =>
     set({ renamePlaylistModalState: { open: false } }),
 }));
+
+interface ICreatePlaylistState {
+  createPlaylistModalState: boolean;
+  updateCreatePlaylistModalState: (state: boolean) => void;
+}
+
+export const useCreatePlaylistStore = create<ICreatePlaylistState>()(set => ({
+  createPlaylistModalState: false,
+  updateCreatePlaylistModalState: state =>
+    set({ createPlaylistModalState: state }),
+}));

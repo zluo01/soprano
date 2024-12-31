@@ -3,8 +3,8 @@ import { cn } from '@/lib/utils.ts';
 
 export function LoadingSongs() {
   return (
-    <div className="flex size-full flex-col overflow-hidden px-6">
-      {Array.from({ length: 14 }, (_v, i) => (
+    <div className="flex w-full flex-col overflow-hidden px-6">
+      {Array.from({ length: 6 }, (_v, i) => (
         <div
           key={i}
           className="flex w-full select-none flex-row flex-nowrap items-center space-x-3 py-2"
@@ -22,8 +22,8 @@ export function LoadingSongs() {
 
 export function LoadingList() {
   return (
-    <div className="flex size-full flex-col overflow-hidden px-6">
-      {Array.from({ length: 14 }, (_v, i) => (
+    <div className="flex w-full flex-col overflow-hidden px-6">
+      {Array.from({ length: 6 }, (_v, i) => (
         <div
           key={i}
           className="flex w-full select-none flex-col flex-nowrap space-y-1 py-1.5"
@@ -45,7 +45,7 @@ export function LoadingAlbums() {
         'grid-cols-2 gap-x-8 gap-y-4',
       )}
     >
-      {Array.from({ length: 8 }, (_v, i) => (
+      {Array.from({ length: 6 }, (_v, i) => (
         <div className="relative isolate w-full" key={i}>
           <Skeleton className="aspect-square h-auto w-full rounded-full" />
           <Skeleton className="mt-1 h-6 w-3/5 rounded" />

@@ -12,7 +12,7 @@ export default function Preview() {
 
   return (
     <>
-      <div className="w-full sm:hidden">
+      <div className="w-full shadow-md sm:hidden">
         <div className="mx-2 my-1 flex h-fit flex-row flex-nowrap rounded-lg border py-1.5 shadow-2xl">
           <div
             className="flex size-full cursor-pointer select-none flex-row flex-nowrap items-center gap-3 px-4"

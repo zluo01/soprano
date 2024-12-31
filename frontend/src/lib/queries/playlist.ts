@@ -55,11 +55,18 @@ const CreatePlaylistMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function CreatePlaylist(name?: string) {
-  if (!name) {
-    return;
-  }
-  await request(CreatePlaylistMutationDocument, { name });
+export function CreatePlaylistMutation() {
+  return useMutation({
+    mutationFn: async ({ name }: { name?: string }) => {
+      if (!name) {
+        return;
+      }
+      await request(CreatePlaylistMutationDocument, { name });
+    },
+    onSuccess: () => {
+      QUERY_CLIENT.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+    },
+  });
 }
 
 const DeletePlaylistMutationDocument = /* GraphQL */ `

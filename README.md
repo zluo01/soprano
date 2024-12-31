@@ -1,9 +1,9 @@
-# Mesa
+# Soprano
 
-Mesa is an all-in-one music control solution.  
+Soprano is an all-in-one music control solution.  
 
 ## Prerequisite
-Mesa replies on two hard dependencies, mpv and ffmpeg (Should come with mpv).
+Soprano relies on two hard dependencies, mpv and ffmpeg (Should come with mpv).
 
 ### MacOS
 
@@ -26,12 +26,12 @@ https://github.com/mpv-player/mpv-build
 
 
 ## Setup
- - Create file `.confg/mesa/mesa.properties` with content from
+ - Create file `.confg/soprano/soprano.properties` with content from
  - Update required music directory
 
 ## Run
 ```
-java -jar mesa-main.jar
+java -jar soprano-main.jar
 ```
 You can access webUI through `<HOST_IP>:6868`.
 

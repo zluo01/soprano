@@ -8,8 +8,8 @@ const manifestForPlugIn: Partial<VitePWAOptions> = {
   registerType: 'prompt',
   includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
   manifest: {
-    name: 'Mesa',
-    short_name: 'Mesa',
+    name: 'Soprano',
+    short_name: 'Soprano',
     icons: [
       {
         src: 'pwa-64x64.png',

@@ -26,9 +26,9 @@ public final class ServerConfig {
 
     public static final String DATABASE_CONFIG = "DATABASE_CONFIG";
 
-    private static final String BASE_CONFIG_PATH = System.getProperty("user.home") + "/.config/mesa/";
+    private static final String BASE_CONFIG_PATH = System.getProperty("user.home") + "/.config/soprano/";
 
-    public static final String CONFIG_FILE_PATH = BASE_CONFIG_PATH + "mesa.properties";
+    public static final String CONFIG_FILE_PATH = BASE_CONFIG_PATH + "soprano.properties";
 
     public static final String COVER_PATH = BASE_CONFIG_PATH + "cover";
 

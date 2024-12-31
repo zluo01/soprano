@@ -54,8 +54,8 @@ export default function AppBar() {
       return <SecondaryHeader header={''} />;
     }
     return (
-      <p className="cursor-pointer select-none text-2xl font-semibold">
-        <Link to="/">Mesa</Link>
+      <p className="cursor-pointer select-none font-mono text-2xl font-semibold">
+        <Link to="/">Soprano</Link>
       </p>
     );
   }

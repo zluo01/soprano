@@ -57,5 +57,5 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mesa
-          path: target/mesa-main.jar
+          name: soprano
+          path: target/soprano-main.jar

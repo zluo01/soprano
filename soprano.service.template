@@ -1,0 +1,18 @@
+[Unit]
+Description=Mesa Server
+
+# modified based on need. To see all active target systemctl list-units --type target --state active
+After=sound.target network.target remote-fs.target
+
+[Service]
+User=<CURRENT_USER> # whoami
+Group=<CURRENT_USER> # groups
+ExecStart=/usr/bin/java -jar <PATH_TO_JAR>
+ExecStop=/bin/kill -15 $MAINPID
+Restart=on-failure
+RestartSec=10
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

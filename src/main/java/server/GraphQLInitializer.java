@@ -310,6 +310,15 @@ final class GraphQLInitializer {
         final DataFetcher<CompletionStage<Integer>> nextSong = environment -> playerService.nextSong().toCompletionStage();
         final DataFetcher<CompletionStage<Integer>> prevSong = environment -> playerService.prevSong().toCompletionStage();
 
+        final DataFetcher<CompletionStage<Integer>> toggleLoop = environment -> {
+            final Integer id = environment.getArgument("id");
+            if (id == null) {
+                throw new IllegalArgumentException("Loop id is required");
+            }
+
+            return playerService.toggleLoop(id).toCompletionStage();
+        };
+
 
         final DataFetcher<CompletionStage<Integer>> playSongInQueueAtPosition = environment -> {
             final Integer position = environment.getArgument("position");
@@ -349,6 +358,7 @@ final class GraphQLInitializer {
                 .type("Mutation", builder -> builder.dataFetcher("PauseSong", pauseSong))
                 .type("Mutation", builder -> builder.dataFetcher("NextSong", nextSong))
                 .type("Mutation", builder -> builder.dataFetcher("PrevSong", prevSong))
+                .type("Mutation", builder -> builder.dataFetcher("ToggleLoop", toggleLoop))
                 .type("Mutation", builder -> builder.dataFetcher("PlaySongInQueueAtPosition", playSongInQueueAtPosition))
                 .type("Mutation", builder -> builder.dataFetcher("AddSongsToQueue", addSongsToQueue))
                 .type("Mutation", builder -> builder.dataFetcher("RemoveSongFromQueue", removeSongFromQueue))

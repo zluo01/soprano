@@ -35,6 +35,8 @@ public interface PlayerService {
 
     Future<Integer> prevSong();
 
+    Future<Integer> toggleLoop(int loopId);
+
     Future<Integer> playSongInQueueAtPosition(int position);
 
     Future<Integer> addSongsToQueue(List<String> songPaths);

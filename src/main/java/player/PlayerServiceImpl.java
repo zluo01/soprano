@@ -105,6 +105,40 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public Future<Integer> toggleLoop(final int loopId) {
+        int error;
+        if (loopId == 0) {
+            error = mpv.instance().mpv_set_option_string(mpv.handle(), "loop", "no");
+            if (error != 0) {
+                return Future.failedFuture("Failed to set loop option: " + MPVError.getError(error));
+            }
+            error = mpv.instance().mpv_set_option_string(mpv.handle(), "loop-playlist", "no");
+            if (error != 0) {
+                return Future.failedFuture("Failed to set loop option: " + MPVError.getError(error));
+            }
+        } else if (loopId == 1) {
+            error = mpv.instance().mpv_set_option_string(mpv.handle(), "loop", "no");
+            if (error != 0) {
+                return Future.failedFuture("Failed to set loop option: " + MPVError.getError(error));
+            }
+            error = mpv.instance().mpv_set_option_string(mpv.handle(), "loop-playlist", "inf");
+            if (error != 0) {
+                return Future.failedFuture("Failed to set loop option: " + MPVError.getError(error));
+            }
+        } else {
+            error = mpv.instance().mpv_set_option_string(mpv.handle(), "loop", "inf");
+            if (error != 0) {
+                return Future.failedFuture("Failed to set loop option: " + MPVError.getError(error));
+            }
+            error = mpv.instance().mpv_set_option_string(mpv.handle(), "loop-playlist", "no");
+            if (error != 0) {
+                return Future.failedFuture("Failed to set loop option: " + MPVError.getError(error));
+            }
+        }
+        return Future.succeededFuture(error);
+    }
+
+    @Override
     public Future<Integer> playSongInQueueAtPosition(final int position) {
         final int error = mpv.instance().mpv_command(mpv.handle(), new String[]{"playlist-play-index", position + ""});
         if (error != 0) {
@@ -195,12 +229,20 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public Future<JsonObject> playbackStatus() {
         final var currentPlayingSongPathProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "path");
+
+        final int loopId = loopId();
+        if (loopId == -1) {
+            return Future.failedFuture("Fail to get loop id");
+        }
+
         if (currentPlayingSongPathProperty == null) {
             return Future.succeededFuture(JsonObject.of(
                     "playing", false,
-                    "elapsed", 0
+                    "elapsed", 0,
+                    "loopId", loopId
             ));
         }
+
         final var songPath = currentPlayingSongPathProperty.getString(0);
 
         final var pauseProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "pause");
@@ -219,7 +261,32 @@ public class PlayerServiceImpl implements PlayerService {
                               .map(song -> JsonObject.of(
                                       "playing", isPlaying,
                                       "elapsed", (int) playbackTime,
+                                      "loopId", loopId,
                                       "song", song
                               ));
+    }
+
+    private int loopId() {
+        final var loopStatusProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "loop");
+        if (loopStatusProperty == null) {
+            return -1;
+        }
+        final String loopStatus = loopStatusProperty.getString(0);
+
+        final var loopPlaylistStatusProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "loop-playlist");
+        if (loopPlaylistStatusProperty == null) {
+            return -1;
+        }
+        final String loopPlaylistStatus = loopPlaylistStatusProperty.getString(0);
+
+        if (loopStatus.equals("no") && loopPlaylistStatus.equals("no")) {
+            return 0;
+        }
+
+        if (loopPlaylistStatus.equals("inf")) {
+            return 1;
+        }
+
+        return 2;
     }
 }

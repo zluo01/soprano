@@ -97,6 +97,7 @@ type SearchResult {
 type PlaybackStatus {
     playing: Boolean!
     elapsed: Int!
+    loopId: Int!
     song: Song
 }
 
@@ -146,6 +147,7 @@ type Mutation {
     PauseSong: Int!
     NextSong: Int!
     PrevSong: Int!
+    ToggleLoop(id: Int!): Int!
     PlaySongInQueueAtPosition(position: Int!): Int!
     AddSongsToQueue(songPaths: [String!]!): Int!
     RemoveSongFromQueue(position: Int!): Int!

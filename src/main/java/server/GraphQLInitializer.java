@@ -10,6 +10,7 @@ import graphql.execution.preparsed.PreparsedDocumentEntry;
 import graphql.execution.preparsed.PreparsedDocumentProvider;
 import graphql.schema.Coercing;
 import graphql.schema.DataFetcher;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
@@ -62,40 +63,28 @@ final class GraphQLInitializer {
         final DataFetcher<CompletionStage<List<Album>>> albums = environment -> databaseService.albums().toCompletionStage();
 
         final DataFetcher<CompletionStage<Album>> album = environment -> {
-            final Integer id = environment.getArgument("id");
-            if (id == null) {
-                throw new IllegalArgumentException("Album id is required");
-            }
+            final int id = extractField(environment, "id");
             return databaseService.album(id).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<List<JsonObject>>> genres = environment -> databaseService.genres().toCompletionStage();
 
         final DataFetcher<CompletionStage<List<JsonObject>>> albumsForGenre = environment -> {
-            final Integer id = environment.getArgument("id");
-            if (id == null) {
-                throw new IllegalArgumentException("Genre id is required");
-            }
+            final int id = extractField(environment, "id");
             return databaseService.albumsForGenre(id).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<List<JsonObject>>> albumArtists = environment -> databaseService.albumArtists().toCompletionStage();
 
         final DataFetcher<CompletionStage<List<JsonObject>>> albumsForAlbumArtists = environment -> {
-            final Integer id = environment.getArgument("id");
-            if (id == null) {
-                throw new IllegalArgumentException("Album Artist id is required");
-            }
+            final int id = extractField(environment, "id");
             return databaseService.albumsForAlbumArtists(id).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<List<JsonObject>>> artists = environment -> databaseService.artists().toCompletionStage();
 
         final DataFetcher<CompletionStage<List<JsonObject>>> albumsForArtist = environment -> {
-            final Integer id = environment.getArgument("id");
-            if (id == null) {
-                throw new IllegalArgumentException("Artist id is required");
-            }
+            final int id = extractField(environment, "id");
             return databaseService.albumsForArtists(id).toCompletionStage();
         };
 
@@ -107,11 +96,7 @@ final class GraphQLInitializer {
         final DataFetcher<CompletionStage<JsonObject>> stats = environment -> databaseService.stats().toCompletionStage();
 
         final DataFetcher<CompletionStage<JsonObject>> search = environment -> {
-            final String key = environment.getArgument("key");
-            if (key == null) {
-                throw new IllegalArgumentException("keyword is required");
-            }
-
+            final String key = extractField(environment, "key");
             return databaseService.search(key).toCompletionStage();
         };
 
@@ -174,18 +159,12 @@ final class GraphQLInitializer {
 
     private static void initializeSongOperations(final RuntimeWiring.Builder wiringBuilder, final DatabaseService databaseService) {
         final DataFetcher<CompletionStage<JsonObject>> song = environment -> {
-            final String path = environment.getArgument("path");
-            if (path == null) {
-                throw new IllegalArgumentException("Path is required");
-            }
+            final String path = extractField(environment, "path");
             return databaseService.song(path).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<List<JsonObject>>> songs = environment -> {
-            final List<String> paths = environment.getArgument("paths");
-            if (paths == null) {
-                throw new IllegalArgumentException("Paths are required");
-            }
+            final List<String> paths = extractField(environment, "paths");
             return databaseService.songsFromPath(paths).toCompletionStage();
         };
 
@@ -198,68 +177,35 @@ final class GraphQLInitializer {
         final DataFetcher<CompletionStage<List<JsonObject>>> playlists = environment -> playlistService.listPlaylists().toCompletionStage();
 
         final DataFetcher<CompletionStage<List<JsonObject>>> playlistSongs = environment -> {
-            final String name = environment.getArgument("name");
-            if (name == null) {
-                throw new IllegalArgumentException("Playlist name is required");
-            }
+            final String name = extractField(environment, "name");
             return playlistService.playlistSongs(name).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Boolean>> createPlaylist = environment -> {
-            final String name = environment.getArgument("name");
-            if (name == null) {
-                throw new IllegalArgumentException("Playlist name is required");
-            }
+            final String name = extractField(environment, "name");
             return playlistService.createPlaylist(name).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Boolean>> deletePlaylist = environment -> {
-            final String name = environment.getArgument("name");
-            if (name == null) {
-                throw new IllegalArgumentException("Playlist name is required");
-            }
+            final String name = extractField(environment, "name");
             return playlistService.deletePlaylist(name).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Boolean>> renamePlaylist = environment -> {
-            final String name = environment.getArgument("name");
-            if (name == null) {
-                throw new IllegalArgumentException("Playlist name is required");
-            }
-
-            final String newName = environment.getArgument("newName");
-            if (newName == null) {
-                throw new IllegalArgumentException("Playlist newName is required");
-            }
-
+            final String name = extractField(environment, "name");
+            final String newName = extractField(environment, "newName");
             return playlistService.renamePlaylist(name, newName).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Boolean>> addSongToPlaylist = environment -> {
-            final String name = environment.getArgument("name");
-            if (name == null) {
-                throw new IllegalArgumentException("Playlist name is required");
-            }
-
-            final String songPath = environment.getArgument("songPath");
-            if (songPath == null) {
-                throw new IllegalArgumentException("Song path is required");
-            }
-
+            final String name = extractField(environment, "name");
+            final String songPath = extractField(environment, "songPath");
             return playlistService.addSongToPlaylist(name, songPath).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Boolean>> deleteSongFromPlaylist = environment -> {
-            final String name = environment.getArgument("name");
-            if (name == null) {
-                throw new IllegalArgumentException("Playlist name is required");
-            }
-
-            final String songPath = environment.getArgument("songPath");
-            if (songPath == null) {
-                throw new IllegalArgumentException("Song path is required");
-            }
-
+            final String name = extractField(environment, "name");
+            final String songPath = extractField(environment, "songPath");
             return playlistService.deleteSongFromPlaylist(name, songPath).toCompletionStage();
         };
 
@@ -280,29 +226,17 @@ final class GraphQLInitializer {
         final DataFetcher<CompletionStage<JsonObject>> playbackStatus = environment -> playerService.playbackStatus().toCompletionStage();
 
         final DataFetcher<CompletionStage<Integer>> playSong = environment -> {
-            final String songPath = environment.getArgument("songPath");
-            if (songPath == null) {
-                throw new IllegalArgumentException("Song path is required");
-            }
-
+            final String songPath = extractField(environment, "songPath");
             return playerService.playSong(songPath).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Integer>> playPlaylist = environment -> {
-            final String playlistName = environment.getArgument("playlistName");
-            if (playlistName == null) {
-                throw new IllegalArgumentException("Playlist name is required");
-            }
-
+            final String playlistName = extractField(environment, "playlistName");
             return playerService.playPlaylist(playlistName).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Integer>> playAlbum = environment -> {
-            final Integer id = environment.getArgument("id");
-            if (id == null) {
-                throw new IllegalArgumentException("Album id is required");
-            }
-
+            final int id = extractField(environment, "id");
             return playerService.playAlbum(id).toCompletionStage();
         };
 
@@ -311,39 +245,23 @@ final class GraphQLInitializer {
         final DataFetcher<CompletionStage<Integer>> prevSong = environment -> playerService.prevSong().toCompletionStage();
 
         final DataFetcher<CompletionStage<Integer>> toggleLoop = environment -> {
-            final Integer id = environment.getArgument("id");
-            if (id == null) {
-                throw new IllegalArgumentException("Loop id is required");
-            }
-
+            final int id = extractField(environment, "id");
             return playerService.toggleLoop(id).toCompletionStage();
         };
 
 
         final DataFetcher<CompletionStage<Integer>> playSongInQueueAtPosition = environment -> {
-            final Integer position = environment.getArgument("position");
-            if (position == null) {
-                throw new IllegalArgumentException("Song position in queue is required");
-            }
-
+            final int position = extractField(environment, "position");
             return playerService.playSongInQueueAtPosition(position).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Integer>> addSongsToQueue = environment -> {
-            final List<String> songPaths = environment.getArgument("songPaths");
-            if (songPaths == null) {
-                throw new IllegalArgumentException("Song paths are required");
-            }
-
+            final List<String> songPaths = extractField(environment, "songPaths");
             return playerService.addSongsToQueue(songPaths).toCompletionStage();
         };
 
         final DataFetcher<CompletionStage<Integer>> removeSongFromQueue = environment -> {
-            final Integer position = environment.getArgument("position");
-            if (position == null) {
-                throw new IllegalArgumentException("Song position in queue is required");
-            }
-
+            final int position = extractField(environment, "position");
             return playerService.removeSongFromQueue(position).toCompletionStage();
         };
 
@@ -363,5 +281,13 @@ final class GraphQLInitializer {
                 .type("Mutation", builder -> builder.dataFetcher("AddSongsToQueue", addSongsToQueue))
                 .type("Mutation", builder -> builder.dataFetcher("RemoveSongFromQueue", removeSongFromQueue))
                 .type("Mutation", builder -> builder.dataFetcher("ClearQueue", clearQueue));
+    }
+
+    private static <T> T extractField(final DataFetchingEnvironment env, final String key) {
+        final T field = env.getArgument(key);
+        if (field == null) {
+            throw new IllegalArgumentException(key + " is required.");
+        }
+        return field;
     }
 }

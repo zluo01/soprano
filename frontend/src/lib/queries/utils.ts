@@ -39,8 +39,5 @@ export function constructImg(
   height: number,
   albumId?: number,
 ): string {
-  if (width >= 250) {
-    return BASE_URL + `/covers/${albumId}.webp`;
-  }
   return BASE_URL + `/covers/${albumId}_${width}x${height}.webp`;
 }

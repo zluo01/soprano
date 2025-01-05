@@ -5,13 +5,13 @@ import database.DatabaseService;
 import database.DatabaseVerticle;
 import graphql.GraphQL;
 import helper.ServiceHelper;
+import images.StaticImageHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.FileSystemAccess;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.graphql.GraphQLHandler;
 import io.vertx.ext.web.handler.graphql.GraphiQLHandler;
@@ -74,8 +74,7 @@ public final class WebServerVerticle extends AbstractVerticle {
             router.get().handler(StaticHandler.create());
         }
 
-        router.route("/covers/*").handler(StaticHandler.create(FileSystemAccess.ROOT, ServerConfig.COVER_PATH)
-                                                       .setCachingEnabled(true));
+        router.route("/covers/*").handler(StaticImageHandler.create(ServerConfig.COVER_PATH));
 
         router.route("/graphql").handler(GraphQLHandler.create(graphQL));
 

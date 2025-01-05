@@ -1,8 +1,8 @@
 import Cover from '@/components/cover';
 import { LoadingSongs } from '@/components/loading';
+import ScrollContainer from '@/components/scroll';
 import { SwipeActions } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
-import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { useCreatePlaylistStore, useRenamePlaylistStore } from '@/lib/context';
 import { DeletePlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
 import { Pencil2Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
@@ -25,7 +25,7 @@ function PlaylistsView() {
   }
   return (
     <div className="flex h-[calc(100%-100px)] w-full flex-col pt-2">
-      <ScrollArea className="size-full px-6">
+      <ScrollContainer className="size-full px-6">
         {data?.Playlists.map(o => (
           <SwipeActions.Root key={o.name} className="w-full">
             <SwipeActions.Trigger className="w-full border-0">
@@ -66,7 +66,7 @@ function PlaylistsView() {
             </SwipeActions.Actions>
           </SwipeActions.Root>
         ))}
-      </ScrollArea>
+      </ScrollContainer>
       <div className="static bottom-0 z-10 px-6 py-1.5">
         <Button
           variant="outline"

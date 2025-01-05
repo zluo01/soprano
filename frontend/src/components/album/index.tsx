@@ -1,7 +1,7 @@
 import Cover from '@/components/cover';
+import ScrollContainer from '@/components/scroll';
 import { SwipeActions } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
-import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import { useFavorStore } from '@/lib/context';
 import {
@@ -22,7 +22,7 @@ export default function Album() {
   const { openFavorModal } = useFavorStore();
 
   return (
-    <ScrollArea className="h-[calc(100%-45px)] w-full">
+    <ScrollContainer className="h-[calc(100%-45px)] w-full">
       <div className="w-full px-6 py-3">
         <Separator />
       </div>
@@ -121,6 +121,6 @@ export default function Album() {
           </SwipeActions.Root>
         ))}
       </div>
-    </ScrollArea>
+    </ScrollContainer>
   );
 }

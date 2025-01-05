@@ -6,6 +6,8 @@ import com.sun.jdi.IntegerValue;
 import database.DatabaseService;
 import graphql.GraphQL;
 import graphql.GraphQLException;
+import graphql.execution.instrumentation.ChainedInstrumentation;
+import graphql.execution.instrumentation.Instrumentation;
 import graphql.execution.preparsed.PreparsedDocumentEntry;
 import graphql.execution.preparsed.PreparsedDocumentProvider;
 import graphql.schema.Coercing;
@@ -17,16 +19,16 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import io.vertx.core.Future;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.handler.graphql.instrumentation.JsonObjectAdapter;
+import io.vertx.ext.web.handler.graphql.instrumentation.VertxFutureAdapter;
 import models.Album;
 import player.PlayerService;
 import playlists.PlaylistService;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
 import static enums.WorkerAction.SCAN_DIRECTORY;
@@ -51,9 +53,12 @@ final class GraphQLInitializer {
         final TypeDefinitionRegistry registry = new SchemaParser().parse(schema);
         final RuntimeWiring wiring = createWiring(databaseService, playlistService, playerService, eventBus);
         final GraphQLSchema graphQLSchema = new SchemaGenerator().makeExecutableSchema(registry, wiring);
+
+        final List<Instrumentation> intrumentationList = List.of(new JsonObjectAdapter(), VertxFutureAdapter.create());
+        final ChainedInstrumentation chainedInstrumentation = new ChainedInstrumentation(intrumentationList);
         return GraphQL.newGraphQL(graphQLSchema)
                       .preparsedDocumentProvider(preparsedCache)
-                      .instrumentation(new JsonObjectAdapter())
+                      .instrumentation(chainedInstrumentation)
                       .build();
     }
 
@@ -61,49 +66,49 @@ final class GraphQLInitializer {
                                       final PlaylistService playlistService,
                                       final PlayerService playerService,
                                       final EventBus eventBus) {
-        final DataFetcher<CompletionStage<List<Album>>> albums = environment -> databaseService.albums().toCompletionStage();
+        final DataFetcher<Future<List<Album>>> albums = environment -> databaseService.albums();
 
-        final DataFetcher<CompletionStage<Album>> album = environment -> {
+        final DataFetcher<Future<Album>> album = environment -> {
             final int id = extractField(environment, "id");
-            return databaseService.album(id).toCompletionStage();
+            return databaseService.album(id);
         };
 
-        final DataFetcher<CompletionStage<List<JsonObject>>> genres = environment -> databaseService.genres().toCompletionStage();
+        final DataFetcher<Future<List<JsonObject>>> genres = environment -> databaseService.genres();
 
-        final DataFetcher<CompletionStage<List<JsonObject>>> albumsForGenre = environment -> {
+        final DataFetcher<Future<List<JsonObject>>> albumsForGenre = environment -> {
             final int id = extractField(environment, "id");
-            return databaseService.albumsForGenre(id).toCompletionStage();
+            return databaseService.albumsForGenre(id);
         };
 
-        final DataFetcher<CompletionStage<List<JsonObject>>> albumArtists = environment -> databaseService.albumArtists().toCompletionStage();
+        final DataFetcher<Future<List<JsonObject>>> albumArtists = environment -> databaseService.albumArtists();
 
-        final DataFetcher<CompletionStage<List<JsonObject>>> albumsForAlbumArtists = environment -> {
+        final DataFetcher<Future<List<JsonObject>>> albumsForAlbumArtists = environment -> {
             final int id = extractField(environment, "id");
-            return databaseService.albumsForAlbumArtists(id).toCompletionStage();
+            return databaseService.albumsForAlbumArtists(id);
         };
 
-        final DataFetcher<CompletionStage<List<JsonObject>>> artists = environment -> databaseService.artists().toCompletionStage();
+        final DataFetcher<Future<List<JsonObject>>> artists = environment -> databaseService.artists();
 
-        final DataFetcher<CompletionStage<List<JsonObject>>> albumsForArtist = environment -> {
+        final DataFetcher<Future<List<JsonObject>>> albumsForArtist = environment -> {
             final int id = extractField(environment, "id");
-            return databaseService.albumsForArtists(id).toCompletionStage();
+            return databaseService.albumsForArtists(id);
         };
 
-        final DataFetcher<CompletionStage<Boolean>> update = environment -> {
+        final DataFetcher<Future<Boolean>> update = environment -> {
             eventBus.publish(UPDATE_DIRECTORY.name(), null);
-            return CompletableFuture.completedFuture(true);
+            return Future.succeededFuture(true);
         };
 
-        final DataFetcher<CompletionStage<Boolean>> build = environment -> {
+        final DataFetcher<Future<Boolean>> build = environment -> {
             eventBus.publish(SCAN_DIRECTORY.name(), null);
-            return CompletableFuture.completedFuture(true);
+            return Future.succeededFuture(true);
         };
 
-        final DataFetcher<CompletionStage<JsonObject>> stats = environment -> databaseService.stats().toCompletionStage();
+        final DataFetcher<Future<JsonObject>> stats = environment -> databaseService.stats();
 
-        final DataFetcher<CompletionStage<JsonObject>> search = environment -> {
+        final DataFetcher<Future<JsonObject>> search = environment -> {
             final String key = extractField(environment, "key");
-            return databaseService.search(key).toCompletionStage();
+            return databaseService.search(key);
         };
 
         final var wiringBuilder = RuntimeWiring.newRuntimeWiring();
@@ -164,14 +169,14 @@ final class GraphQLInitializer {
     }
 
     private static void initializeSongOperations(final RuntimeWiring.Builder wiringBuilder, final DatabaseService databaseService) {
-        final DataFetcher<CompletionStage<JsonObject>> song = environment -> {
+        final DataFetcher<Future<JsonObject>> song = environment -> {
             final String path = extractField(environment, "path");
-            return databaseService.song(path).toCompletionStage();
+            return databaseService.song(path);
         };
 
-        final DataFetcher<CompletionStage<List<JsonObject>>> songs = environment -> {
+        final DataFetcher<Future<List<JsonObject>>> songs = environment -> {
             final List<String> paths = extractField(environment, "paths");
-            return databaseService.songsFromPath(paths).toCompletionStage();
+            return databaseService.songsFromPath(paths);
         };
 
         wiringBuilder.type("Query", builder -> builder.dataFetcher("Song", song))
@@ -180,39 +185,39 @@ final class GraphQLInitializer {
 
     private static void initializePlaylistOperations(final RuntimeWiring.Builder wiringBuilder,
                                                      final PlaylistService playlistService) {
-        final DataFetcher<CompletionStage<List<JsonObject>>> playlists = environment -> playlistService.listPlaylists().toCompletionStage();
+        final DataFetcher<Future<List<JsonObject>>> playlists = environment -> playlistService.listPlaylists();
 
-        final DataFetcher<CompletionStage<List<JsonObject>>> playlistSongs = environment -> {
+        final DataFetcher<Future<List<JsonObject>>> playlistSongs = environment -> {
             final String name = extractField(environment, "name");
-            return playlistService.playlistSongs(name).toCompletionStage();
+            return playlistService.playlistSongs(name);
         };
 
-        final DataFetcher<CompletionStage<Boolean>> createPlaylist = environment -> {
+        final DataFetcher<Future<Boolean>> createPlaylist = environment -> {
             final String name = extractField(environment, "name");
-            return playlistService.createPlaylist(name).toCompletionStage();
+            return playlistService.createPlaylist(name);
         };
 
-        final DataFetcher<CompletionStage<Boolean>> deletePlaylist = environment -> {
+        final DataFetcher<Future<Boolean>> deletePlaylist = environment -> {
             final String name = extractField(environment, "name");
-            return playlistService.deletePlaylist(name).toCompletionStage();
+            return playlistService.deletePlaylist(name);
         };
 
-        final DataFetcher<CompletionStage<Boolean>> renamePlaylist = environment -> {
+        final DataFetcher<Future<Boolean>> renamePlaylist = environment -> {
             final String name = extractField(environment, "name");
             final String newName = extractField(environment, "newName");
-            return playlistService.renamePlaylist(name, newName).toCompletionStage();
+            return playlistService.renamePlaylist(name, newName);
         };
 
-        final DataFetcher<CompletionStage<Boolean>> addSongToPlaylist = environment -> {
+        final DataFetcher<Future<Boolean>> addSongToPlaylist = environment -> {
             final String name = extractField(environment, "name");
             final String songPath = extractField(environment, "songPath");
-            return playlistService.addSongToPlaylist(name, songPath).toCompletionStage();
+            return playlistService.addSongToPlaylist(name, songPath);
         };
 
-        final DataFetcher<CompletionStage<Boolean>> deleteSongFromPlaylist = environment -> {
+        final DataFetcher<Future<Boolean>> deleteSongFromPlaylist = environment -> {
             final String name = extractField(environment, "name");
             final String songPath = extractField(environment, "songPath");
-            return playlistService.deleteSongFromPlaylist(name, songPath).toCompletionStage();
+            return playlistService.deleteSongFromPlaylist(name, songPath);
         };
 
         wiringBuilder
@@ -227,51 +232,51 @@ final class GraphQLInitializer {
 
     private static void initializePlayerOperations(final RuntimeWiring.Builder wiringBuilder,
                                                    final PlayerService playerService) {
-        final DataFetcher<CompletionStage<List<JsonObject>>> songsInQueue = environment -> playerService.songsInQueue().toCompletionStage();
+        final DataFetcher<Future<List<JsonObject>>> songsInQueue = environment -> playerService.songsInQueue();
 
-        final DataFetcher<CompletionStage<JsonObject>> playbackStatus = environment -> playerService.playbackStatus().toCompletionStage();
+        final DataFetcher<Future<JsonObject>> playbackStatus = environment -> playerService.playbackStatus();
 
-        final DataFetcher<CompletionStage<Integer>> playSong = environment -> {
+        final DataFetcher<Future<Integer>> playSong = environment -> {
             final String songPath = extractField(environment, "songPath");
-            return playerService.playSong(songPath).toCompletionStage();
+            return playerService.playSong(songPath);
         };
 
-        final DataFetcher<CompletionStage<Integer>> playPlaylist = environment -> {
+        final DataFetcher<Future<Integer>> playPlaylist = environment -> {
             final String playlistName = extractField(environment, "playlistName");
-            return playerService.playPlaylist(playlistName).toCompletionStage();
+            return playerService.playPlaylist(playlistName);
         };
 
-        final DataFetcher<CompletionStage<Integer>> playAlbum = environment -> {
+        final DataFetcher<Future<Integer>> playAlbum = environment -> {
             final int id = extractField(environment, "id");
-            return playerService.playAlbum(id).toCompletionStage();
+            return playerService.playAlbum(id);
         };
 
-        final DataFetcher<CompletionStage<Integer>> pauseSong = environment -> playerService.pauseSong().toCompletionStage();
-        final DataFetcher<CompletionStage<Integer>> nextSong = environment -> playerService.nextSong().toCompletionStage();
-        final DataFetcher<CompletionStage<Integer>> prevSong = environment -> playerService.prevSong().toCompletionStage();
+        final DataFetcher<Future<Integer>> pauseSong = environment -> playerService.pauseSong();
+        final DataFetcher<Future<Integer>> nextSong = environment -> playerService.nextSong();
+        final DataFetcher<Future<Integer>> prevSong = environment -> playerService.prevSong();
 
-        final DataFetcher<CompletionStage<Integer>> toggleLoop = environment -> {
+        final DataFetcher<Future<Integer>> toggleLoop = environment -> {
             final int id = extractField(environment, "id");
-            return playerService.toggleLoop(id).toCompletionStage();
+            return playerService.toggleLoop(id);
         };
 
 
-        final DataFetcher<CompletionStage<Integer>> playSongInQueueAtPosition = environment -> {
+        final DataFetcher<Future<Integer>> playSongInQueueAtPosition = environment -> {
             final int position = extractField(environment, "position");
-            return playerService.playSongInQueueAtPosition(position).toCompletionStage();
+            return playerService.playSongInQueueAtPosition(position);
         };
 
-        final DataFetcher<CompletionStage<Integer>> addSongsToQueue = environment -> {
+        final DataFetcher<Future<Integer>> addSongsToQueue = environment -> {
             final List<String> songPaths = extractField(environment, "songPaths");
-            return playerService.addSongsToQueue(songPaths).toCompletionStage();
+            return playerService.addSongsToQueue(songPaths);
         };
 
-        final DataFetcher<CompletionStage<Integer>> removeSongFromQueue = environment -> {
+        final DataFetcher<Future<Integer>> removeSongFromQueue = environment -> {
             final int position = extractField(environment, "position");
-            return playerService.removeSongFromQueue(position).toCompletionStage();
+            return playerService.removeSongFromQueue(position);
         };
 
-        final DataFetcher<CompletionStage<Integer>> clearQueue = environment -> playerService.clearQueue().toCompletionStage();
+        final DataFetcher<Future<Integer>> clearQueue = environment -> playerService.clearQueue();
 
         wiringBuilder
                 .type("Query", builder -> builder.dataFetcher("SongsInQueue", songsInQueue))

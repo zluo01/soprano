@@ -60,16 +60,16 @@ export default function Settings() {
           <Button
             variant="outline"
             className="size-12 rounded-full p-2"
-            onClick={UpdateDatabase}
+            onClick={BuildDatabase}
           >
-            <UpdateIcon className="size-[1.2rem]" />
+            <ReloadIcon className="size-[1.2rem]" />
           </Button>
           <Button
             variant="outline"
             className="size-12 rounded-full p-2"
-            onClick={BuildDatabase}
+            onClick={UpdateDatabase}
           >
-            <ReloadIcon className="size-[1.2rem]" />
+            <UpdateIcon className="size-[1.2rem]" />
           </Button>
           <ModeToggle />
         </DrawerFooter>

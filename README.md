@@ -23,7 +23,7 @@ sudo apt install mpv libmpv-dev
 ```
 sudo dnf instal mpv mpv-libs
 ```
-##### Windows
+#### Windows
 > For Windows user, you need to add java and ffmpg to path such that they can be run directly in Command Prompt/Terminal.
 
 https://mpv.io/installation/

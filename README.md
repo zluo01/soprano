@@ -11,7 +11,7 @@ You can follow guide for [Amazon Corretto OpenJDK](https://docs.aws.amazon.com/c
 ### MPV
 #### MacOS
 
-`brew install mpv`
+```brew install mpv```
 
 #### Linux
 ##### Debian/Ubuntu

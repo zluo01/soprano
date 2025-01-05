@@ -28,7 +28,7 @@ function PlaylistsView() {
       <ScrollArea className="size-full px-6">
         {data?.Playlists.map(o => (
           <SwipeActions.Root key={o.name} className="w-full">
-            <SwipeActions.Trigger className="w-full cursor-grab border-0">
+            <SwipeActions.Trigger className="w-full border-0">
               <Link to={`/playlists/${o.name}`}>
                 <div className=" flex select-none flex-row flex-nowrap items-center space-x-3 bg-background py-2">
                   <Cover

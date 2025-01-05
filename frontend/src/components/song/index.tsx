@@ -12,7 +12,7 @@ interface ISongProps {
 export function Song({ song, play, actions }: ISongProps) {
   return (
     <SwipeActions.Root className="w-full">
-      <SwipeActions.Trigger className="w-full cursor-grab border-0 bg-background">
+      <SwipeActions.Trigger className="w-full border-0 bg-background">
         <div
           className="flex w-full flex-row flex-nowrap items-center space-x-3 py-2"
           onClick={play}

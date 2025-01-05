@@ -93,7 +93,7 @@ export default function Album() {
       <div className="flex w-full flex-col px-6 pt-2">
         {data?.Album.songs.map(song => (
           <SwipeActions.Root key={song.path} className="w-full">
-            <SwipeActions.Trigger className="w-full cursor-grab border-0 bg-background">
+            <SwipeActions.Trigger className="w-full border-0 bg-background">
               <div
                 className="flex cursor-pointer flex-col flex-nowrap items-start justify-center py-2.5"
                 onClick={() => PlaySong(song.path)}

@@ -52,4 +52,10 @@ public interface DatabaseService {
     Future<JsonObject> search(String keyword);
 
     Future<JsonObject> song(String path);
+
+    Future<List<String>> songPaths();
+
+    Future<Void> removeSongs(List<String> paths);
+
+    Future<Void> clearDatabase();
 }

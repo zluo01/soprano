@@ -30,6 +30,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
 import static enums.WorkerAction.SCAN_DIRECTORY;
+import static enums.WorkerAction.UPDATE_DIRECTORY;
 
 final class GraphQLInitializer {
     private static final Cache<String, PreparsedDocumentEntry> QUERY_CACHE = Caffeine.newBuilder().maximumSize(1000).build();
@@ -88,6 +89,11 @@ final class GraphQLInitializer {
             return databaseService.albumsForArtists(id).toCompletionStage();
         };
 
+        final DataFetcher<CompletionStage<Boolean>> update = environment -> {
+            eventBus.publish(UPDATE_DIRECTORY.name(), null);
+            return CompletableFuture.completedFuture(true);
+        };
+
         final DataFetcher<CompletionStage<Boolean>> build = environment -> {
             eventBus.publish(SCAN_DIRECTORY.name(), null);
             return CompletableFuture.completedFuture(true);
@@ -117,7 +123,7 @@ final class GraphQLInitializer {
                 .type("Query", builder -> builder.dataFetcher("Stats", stats))
                 .type("Query", builder -> builder.dataFetcher("Search", search))
                 .type("Mutation", builder -> builder.dataFetcher("Build", build))
-
+                .type("Mutation", builder -> builder.dataFetcher("Update", update))
                 .scalar(longScalar())
                 .build();
     }

@@ -38,6 +38,7 @@ import static config.ServerConfig.coverVariants;
 import static config.ServerConfig.musicDirectory;
 import static enums.WorkerAction.BUILD_DIRECTORY;
 import static enums.WorkerAction.SCAN_DIRECTORY;
+import static enums.WorkerAction.UPDATE_DIRECTORY;
 
 public final class AudioDataCollectorVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(AudioDataCollectorVerticle.class);
@@ -58,7 +59,9 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
 
         eventBus = vertx.eventBus();
 
-        eventBus.consumer(SCAN_DIRECTORY.name(), message -> scanDirectory(musicDirectory(config())));
+        eventBus.consumer(UPDATE_DIRECTORY.name(), message -> scanDirectory(musicDirectory(config()), true));
+
+        eventBus.consumer(SCAN_DIRECTORY.name(), message -> scanDirectory(musicDirectory(config()), false));
 
         eventBus.<String>consumer(BUILD_DIRECTORY.name(), message -> buildDatabase(message.body()));
     }
@@ -75,7 +78,7 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
         }
     }
 
-    private void scanDirectory(final String root) {
+    private void scanDirectory(final String root, final boolean update) {
         try {
             if (isRunning.get()) {
                 LOGGER.info("Already scanning the directory.");
@@ -84,8 +87,42 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
             LOGGER.info("Start scanning directory: {}", root);
             isRunning.set(true);
             final List<String> songPaths = retrieveSongPaths(root);
-            LOGGER.info("Start parsing {} song files.", songPaths.size());
-            parseSongData(songPaths);
+
+            if (update) {
+                databaseService.songPaths()
+                               .compose(songPathsFromDatabase -> {
+                                   final var songPathsNotInDB = songPaths.stream()
+                                                                         .filter(o -> !songPathsFromDatabase.contains(o))
+                                                                         .toList();
+
+                                   final var deletedSongPaths = songPathsFromDatabase.stream()
+                                                                                     .filter(o -> !songPaths.contains(o))
+                                                                                     .toList();
+                                   if (!deletedSongPaths.isEmpty()) {
+                                       LOGGER.info("{} song need to delete.", deletedSongPaths.size());
+                                       return databaseService.removeSongs(deletedSongPaths)
+                                                             .map(__ -> songPathsNotInDB);
+                                   }
+                                   return Future.succeededFuture(songPathsNotInDB);
+                               })
+                               .onSuccess(songPathsNotInDB -> {
+                                   if (!songPathsNotInDB.isEmpty()) {
+                                       LOGGER.info("{} songs to add.", songPathsNotInDB.size());
+                                       parseSongData(songPathsNotInDB);
+                                   } else {
+                                       isRunning.set(false);
+                                   }
+                               })
+                               .onFailure(LOGGER::error);
+            } else {
+                databaseService.clearDatabase()
+                               .onSuccess(__ -> {
+                                   LOGGER.info("Start parsing {} song files.", songPaths.size());
+                                   parseSongData(songPaths);
+                               })
+                               .onFailure(LOGGER::error);
+
+            }
         } catch (IOException e) {
             LOGGER.error("Failed to retrieve song paths from directory: {}", root, e);
         }

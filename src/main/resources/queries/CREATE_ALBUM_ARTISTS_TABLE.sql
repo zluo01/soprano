@@ -4,7 +4,8 @@ create table if not exists albumArtists
     name  TEXT    not null,
     album INTEGER not null
         constraint artists_albums_id_fk
-            references albums,
+            references albums
+            on delete cascade,
     constraint albumArtists_pk
         unique (id, album)
 );

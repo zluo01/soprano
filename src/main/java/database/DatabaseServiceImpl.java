@@ -209,6 +209,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<Void> scan(final List<AlbumData> albums) {
+        if (albums.isEmpty()) {
+            return Future.succeededFuture();
+        }
         final List<Tuple> albumQueryInput = new ArrayList<>();
         final List<Tuple> songQueryInput = new ArrayList<>();
         final List<Tuple> genreQueryInput = new ArrayList<>();
@@ -247,40 +250,21 @@ public class DatabaseServiceImpl implements DatabaseService {
             }
         }
         return pool.getConnection()
-                   .compose(connection -> connection.begin()
-                                                    .compose(transaction -> connection
-                                                            // clear old data
-                                                            .query(DatabaseAction.CLEAR_ALBUM_ARTISTS.query()).execute()
-                                                            .compose(__ -> connection
-                                                                    .query(DatabaseAction.CLEAR_ARTISTS.query())
-                                                                    .execute())
-                                                            .compose(__ -> connection
-                                                                    .query(DatabaseAction.CLEAR_GENRES.query())
-                                                                    .execute())
-                                                            .compose(__ -> connection
-                                                                    .query(DatabaseAction.CLEAR_SONGS.query())
-                                                                    .execute())
-                                                            .compose(__ -> connection
-                                                                    .query(DatabaseAction.CLEAR_ALBUMS.query())
-                                                                    .execute())
-                                                            // new data
-                                                            .compose(__ -> connection
-                                                                    .preparedQuery(DatabaseAction.INSERT_ALBUM.query())
-                                                                    .executeBatch(albumQueryInput))
-                                                            .compose(__ -> connection
-                                                                    .preparedQuery(DatabaseAction.INSERT_SONG.query())
-                                                                    .executeBatch(songQueryInput))
-                                                            .compose(__ -> connection
-                                                                    .preparedQuery(DatabaseAction.INSERT_GENRE.query())
-                                                                    .executeBatch(genreQueryInput))
-                                                            .compose(__ -> connection
-                                                                    .preparedQuery(DatabaseAction.INSERT_ARTIST.query())
-                                                                    .executeBatch(artistsQueryInput))
-                                                            .compose(__ -> connection
-                                                                    .preparedQuery(DatabaseAction.INSERT_ALBUM_ARTIST.query())
-                                                                    .executeBatch(albumArtistsQueryInput))
-                                                            .compose(__ -> transaction.commit()))
-                                                    .eventually((Supplier<Future<Void>>) connection::close));
+                   .compose(connection ->
+                                    connection.begin()
+                                              .compose(transaction ->
+                                                               Future.all(connection.preparedQuery(DatabaseAction.INSERT_ALBUM.query())
+                                                                                    .executeBatch(albumQueryInput),
+                                                                          connection.preparedQuery(DatabaseAction.INSERT_SONG.query())
+                                                                                    .executeBatch(songQueryInput),
+                                                                          connection.preparedQuery(DatabaseAction.INSERT_GENRE.query())
+                                                                                    .executeBatch(genreQueryInput),
+                                                                          connection.preparedQuery(DatabaseAction.INSERT_ARTIST.query())
+                                                                                    .executeBatch(artistsQueryInput),
+                                                                          connection.preparedQuery(DatabaseAction.INSERT_ALBUM_ARTIST.query())
+                                                                                    .executeBatch(albumArtistsQueryInput))
+                                                                     .compose(__ -> transaction.commit()))
+                                              .eventually((Supplier<Future<Void>>) connection::close));
     }
 
     @Override
@@ -321,6 +305,43 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Future<JsonObject> song(final String path) {
         return songsFromPath(List.of(path)).map(List::getFirst);
+    }
+
+    @Override
+    public Future<List<String>> songPaths() {
+        return pool.query("SELECT songs.path from songs")
+                   .execute()
+                   .map(rows -> {
+                       final List<String> songPaths = new ArrayList<>(rows.size());
+                       for (Row row : rows) {
+                           songPaths.add(row.getString("path"));
+                       }
+                       return songPaths;
+                   });
+    }
+
+    @Override
+    public Future<Void> removeSongs(final List<String> paths) {
+        final String payload = paths.stream().map(o -> "\"" + o + "\"").collect(Collectors.joining(","));
+        final String query = DatabaseAction.DELETE_SONGS_WITH_PATHS.query().replace("?", payload);
+        return pool.query(query)
+                   .execute()
+                   .flatMap(__ -> pool.query(DatabaseAction.CLEANUP_ALBUMS.query()).execute())
+                   .flatMap(__ -> Future.succeededFuture());
+    }
+
+    @Override
+    public Future<Void> clearDatabase() {
+        return pool.getConnection()
+                   .compose(connection -> connection.begin()
+                                                    .compose(transaction -> Future.all(
+                                                            connection.query(DatabaseAction.CLEAR_ALBUM_ARTISTS.query()).execute(),
+                                                            connection.query(DatabaseAction.CLEAR_ARTISTS.query()).execute(),
+                                                            connection.query(DatabaseAction.CLEAR_GENRES.query()).execute(),
+                                                            connection.query(DatabaseAction.CLEAR_SONGS.query()).execute(),
+                                                            connection.query(DatabaseAction.CLEAR_ALBUMS.query()).execute()
+                                                    ).compose(__ -> transaction.commit()))
+                                                    .eventually((Supplier<Future<Void>>) connection::close));
     }
 
     private Future<JsonObject> searchAlbums(final String keyword) {

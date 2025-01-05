@@ -12,16 +12,25 @@ import {
   usePlaybackQueueStore,
   usePlaybackStore,
 } from '@/lib/context';
+import { ToggleLoop } from '@/lib/queries';
 import { IPlaybackStatus } from '@/type';
-import {
-  HeartFilledIcon,
-  ListBulletIcon,
-  ShuffleIcon,
-} from '@radix-ui/react-icons';
+import { HeartFilledIcon, ListBulletIcon } from '@radix-ui/react-icons';
+import { Repeat, Repeat1 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 interface IPlaybackDrawerProps {
   status?: IPlaybackStatus;
+}
+
+function LoopIcon({ id }: { id: number }) {
+  switch (id) {
+    case 1:
+      return <Repeat className="size-6 dark:text-char" />;
+    case 2:
+      return <Repeat1 className="size-6 dark:text-char" />;
+    default:
+      return <Repeat className="size-6" />;
+  }
 }
 
 export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
@@ -42,7 +51,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
       onOpenChange={open => updatePlaybackModalState(open)}
     >
       <DrawerContent className="h-full pt-[env(safe-area-inset-top)]">
-        <div className="flex h-full flex-col items-center justify-between px-6 pb-20 pt-12">
+        <div className="flex h-full flex-col items-center justify-between px-6 py-12">
           <div className="flex w-full items-center justify-center">
             <Cover
               albumId={status?.song?.albumId}
@@ -52,7 +61,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
             />
           </div>
 
-          <div className="flex w-full select-none flex-col  flex-wrap  items-center gap-3 text-center">
+          <div className="flex min-h-16 w-full select-none flex-col flex-wrap items-center gap-3 text-center">
             <span className="w-full truncate text-xl font-extrabold">
               {status?.song?.name}
             </span>
@@ -71,8 +80,12 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
           <Control playing={status?.playing || false} />
         </div>
         <DrawerFooter className="bottom-0 flex flex-row flex-nowrap items-center justify-between px-6">
-          <Button variant="ghost" className="size-10 rounded-full p-1">
-            <ShuffleIcon className="size-6" />
+          <Button
+            variant="ghost"
+            className="size-10 rounded-full p-1"
+            onClick={() => ToggleLoop(status?.loopId)}
+          >
+            <LoopIcon id={status?.loopId || 0} />
           </Button>
           <Button
             variant="ghost"

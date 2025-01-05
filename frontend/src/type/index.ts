@@ -52,6 +52,7 @@ export interface IGeneralTag {
 export interface IPlaybackStatus {
   playing: boolean;
   elapsed: number;
+  loopId: number;
   song?: ISong;
 }
 

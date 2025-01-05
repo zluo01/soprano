@@ -7,6 +7,7 @@ const PlaybackStatusQueryDocument = /* GraphQL */ `
     PlaybackStatus {
       playing
       elapsed
+      loopId
       song {
         name
         path
@@ -120,6 +121,20 @@ const PrevSongMutationDocument = /* GraphQL */ `
 
 export async function PrevSong() {
   await request(PrevSongMutationDocument);
+}
+
+const ToggleLoopMutationDocument = /* GraphQL */ `
+  mutation ToggleLoop($id: Int!) {
+    ToggleLoop(id: $id)
+  }
+`;
+
+export async function ToggleLoop(currentId?: number) {
+  if (currentId === undefined) {
+    return;
+  }
+  const id = (currentId + 1) % 3;
+  await request(ToggleLoopMutationDocument, { id });
 }
 
 const PlaySongInAtPositionMutationDocument = /* GraphQL */ `

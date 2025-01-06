@@ -47,7 +47,7 @@ export default function Tabs() {
             className={cn(
               'cursor-pointer select-none whitespace-nowrap p-1.5 text font-bold opacity-30',
               location.pathname === path &&
-                'scale-105 opacity-100 border-b-4 dark:border-[#F04A4A]',
+                'scale-105 opacity-100 border-b-4 border-[#5f86c7] dark:border-[#F04A4A]',
             )}
           >
             {v.name}

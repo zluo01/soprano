@@ -49,7 +49,7 @@ function PlaylistPicker({ playlists, submit }: IPlaylistPicker) {
         <p className="font-medium">Choose a playlist</p>
         <Button
           variant="ghost"
-          className="dark:text-char"
+          className="text-blue dark:text-char"
           onClick={() => submit(value.playlist as string)}
         >
           Submit

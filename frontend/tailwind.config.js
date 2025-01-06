@@ -12,6 +12,7 @@ export default {
         add: 'rgb(181,186,155)',
       },
       textColor: {
+        blue: '#5f86c7',
         char: '#F04A4A',
       },
       borderRadius: {

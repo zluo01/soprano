@@ -33,6 +33,39 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Override
+    public Future<Void> validatePlaylists() {
+        return fileSystem.readDir(PLAYLIST_PATH, M3U_MATCH_REGEX)
+                         .compose(paths -> {
+                             final var futures = paths.stream()
+                                                      .map(this::verifyPlaylist)
+                                                      .toList();
+                             return Future.all(futures).compose(__ -> Future.succeededFuture());
+                         });
+    }
+
+    private Future<Void> verifyPlaylist(final String path) {
+        return fileSystem.readFile(path)
+                         .compose(content -> {
+                             final List<String> songPaths = Arrays.stream(content.toString(StandardCharsets.UTF_8)
+                                                                                 .trim()
+                                                                                 .split("\n"))
+                                                                  .filter(s -> !Strings.isBlank(s))
+                                                                  .toList();
+                             if (!songPaths.isEmpty()) {
+                                 return databaseService.songsFromPath(songPaths)
+                                                       .map(song -> song.size() == songPaths.size())
+                                                       .flatMap(valid -> {
+                                                           if (!valid) {
+                                                               return fileSystem.move(path, path + ".bak");
+                                                           }
+                                                           return Future.succeededFuture();
+                                                       });
+                             }
+                             return Future.succeededFuture();
+                         });
+    }
+
+    @Override
     public Future<List<JsonObject>> listPlaylists() {
         return fileSystem.readDir(PLAYLIST_PATH, M3U_MATCH_REGEX)
                          .compose(paths -> {

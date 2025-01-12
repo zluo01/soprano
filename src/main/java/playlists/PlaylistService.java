@@ -24,6 +24,8 @@ public interface PlaylistService {
         return new PlaylistServiceVertxEBProxy(vertx, address);
     }
 
+    Future<Void> validatePlaylists();
+
     Future<List<JsonObject>> listPlaylists();
 
     Future<List<JsonObject>> playlistSongs(String playlistName);

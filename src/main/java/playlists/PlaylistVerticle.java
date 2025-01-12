@@ -15,9 +15,13 @@ public class PlaylistVerticle extends AbstractVerticle {
         final DatabaseService databaseService = ServiceHelper.createServiceProxy(vertx, DatabaseVerticle.class, DatabaseService.class);
 
         final PlaylistService playlistService = PlaylistService.create(databaseService, fileSystem);
-        final ServiceBinder binder = new ServiceBinder(vertx);
-        binder.setAddress(PlaylistVerticle.class.getName())
-              .register(PlaylistService.class, playlistService);
-        promise.complete();
+
+        playlistService.validatePlaylists()
+                       .onSuccess(__ -> {
+                           final ServiceBinder binder = new ServiceBinder(vertx);
+                           binder.setAddress(PlaylistVerticle.class.getName())
+                                 .register(PlaylistService.class, playlistService);
+                           promise.complete();
+                       }).onFailure(promise::fail);
     }
 }

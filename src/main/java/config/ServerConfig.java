@@ -26,15 +26,15 @@ public final class ServerConfig {
 
     public static final String DATABASE_CONFIG = "DATABASE_CONFIG";
 
-    private static final String BASE_CONFIG_PATH = System.getProperty("user.home") + "/.config/soprano/";
+    private static final Path BASE_CONFIG_PATH = getConfigDataPath();
 
-    public static final String CONFIG_FILE_PATH = BASE_CONFIG_PATH + "soprano.properties";
+    public static final String CONFIG_FILE_PATH = BASE_CONFIG_PATH.resolve("soprano.properties").toString();
 
-    public static final String COVER_PATH = BASE_CONFIG_PATH + "cover";
+    public static final String COVER_PATH = BASE_CONFIG_PATH.resolve("cover").toString();
 
-    public static final String PLAYLIST_PATH = BASE_CONFIG_PATH + "playlists";
+    public static final String PLAYLIST_PATH = BASE_CONFIG_PATH.resolve("playlists").toString();
 
-    public static final String DATABASE_FILE_PATH = BASE_CONFIG_PATH + "main.sqlite";
+    public static final String DATABASE_FILE_PATH = BASE_CONFIG_PATH.resolve("main.sqlite").toString();
 
     // configuration keys
     public static final String MUSIC_DIRECTORY_CONFIG = "directory.music";
@@ -70,6 +70,10 @@ public final class ServerConfig {
         if (config.containsKey(COVER_VARIANT_DIMENSION) && !isValidVariantList(config.getString(COVER_VARIANT_DIMENSION))) {
             return Future.failedFuture("Cover variant should be a comma separated list of integer, but get "
                                        + config.getString(COVER_VARIANT_DIMENSION));
+        }
+
+        if (isWindows() && !config.containsKey(LIB_MPV_SOURCE_OVERRIDE)) {
+            return Future.failedFuture("Require libmpv source override to be set in Windows.");
         }
 
         // configure
@@ -131,5 +135,16 @@ public final class ServerConfig {
         final LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
         loggerConfig.setLevel(level);
         ctx.updateLoggers();
+    }
+
+    private static Path getConfigDataPath() {
+        if (isWindows()) {
+            return Path.of(System.getenv("APPDATA"), "soprano");
+        }
+        return Path.of(System.getProperty("user.home"), ".config", "soprano");
+    }
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("windows");
     }
 }

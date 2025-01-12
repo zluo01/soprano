@@ -1,7 +1,7 @@
 # Soprano
 
 Soprano is an all-in-one music player server.  It mainly constructs with three parts
- - WebUI with [PWA](https://en.wikipedia.org/wiki/Progressive_web_app) support.
+ - WebUI with [PWA](https://en.wikipedia.org/wiki/Progressive_web_app) support. ([screenshots](https://github.com/zluo01/soprano/tree/main/screenshots/mobile))
  - Music Management Server: written with graphql.
  - Playback server: integrated with MPV (internally use ffmpeg).
 

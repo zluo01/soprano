@@ -45,8 +45,6 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
 
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
-    private final ExecutorService imageOptimizationExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
     private DatabaseService databaseService;
     private EventBus eventBus;
     private FileSystem fileSystem;
@@ -64,18 +62,6 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
         eventBus.consumer(SCAN_DIRECTORY.name(), message -> scanDirectory(musicDirectory(config()), false));
 
         eventBus.<String>consumer(BUILD_DIRECTORY.name(), message -> buildDatabase(message.body()));
-    }
-
-    @Override
-    public void stop() {
-        imageOptimizationExecutor.shutdown();
-        try {
-            if (!imageOptimizationExecutor.awaitTermination(30, TimeUnit.MINUTES)) {
-                imageOptimizationExecutor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            imageOptimizationExecutor.shutdownNow();
-        }
     }
 
     private void scanDirectory(final String root, final boolean update) {
@@ -175,7 +161,22 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
             eventBus.publish(BUILD_DIRECTORY.name(), albumData);
 
             // optimize image
-            visitedAlbum.forEach((albumId, artwork) -> imageOptimizationExecutor.execute(() -> optimizeImage(albumId, artwork)));
+            try (ExecutorService imageOptimizationExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
+                visitedAlbum.forEach((albumId, artwork) -> imageOptimizationExecutor.execute(() -> optimizeImage(albumId, artwork)));
+
+                imageOptimizationExecutor.shutdown();
+                try {
+                    if (!imageOptimizationExecutor.awaitTermination(30, TimeUnit.MINUTES)) {
+                        imageOptimizationExecutor.shutdownNow();
+                    }
+                    LOGGER.info("Image optimization completed.");
+                } catch (InterruptedException e) {
+                    LOGGER.error("Fail to properly shutdown image optimization executor", e);
+                    imageOptimizationExecutor.shutdownNow();
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error happens during optimizing images", e);
+            }
         }).start();
     }
 

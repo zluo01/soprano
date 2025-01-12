@@ -274,11 +274,11 @@ public class DatabaseServiceImpl implements DatabaseService {
         return pool.query(query)
                    .execute()
                    .map(rows -> {
-                       final List<JsonObject> genres = new ArrayList<>();
+                       final List<JsonObject> songs = new ArrayList<>();
                        for (Row row : rows) {
-                           genres.add(row.toJson());
+                           songs.add(row.toJson());
                        }
-                       return genres;
+                       return songs;
                    });
     }
 
@@ -304,7 +304,12 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<JsonObject> song(final String path) {
-        return songsFromPath(List.of(path)).map(List::getFirst);
+        return songsFromPath(List.of(path)).map(songs -> {
+            if (songs.isEmpty()) {
+                return JsonObject.of();
+            }
+            return songs.getFirst();
+        });
     }
 
     @Override

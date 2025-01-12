@@ -1,7 +1,6 @@
 package playlists;
 
 import database.DatabaseService;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
@@ -42,7 +41,11 @@ public class PlaylistServiceImpl implements PlaylistService {
                                           .map(this::playlistDetail)
                                           .toList();
 
-                             return Future.all(futures).map(CompositeFuture::<JsonObject>list);
+                             return Future.all(futures)
+                                          .map(compositeFuture -> compositeFuture.<JsonObject>list()
+                                                                                 .stream()
+                                                                                 .filter(Objects::nonNull)
+                                                                                 .toList());
                          });
     }
 
@@ -60,16 +63,27 @@ public class PlaylistServiceImpl implements PlaylistService {
                               final int size = songPaths.size();
                               if (!songPaths.isEmpty()) {
                                   return databaseService.song(songPaths.getFirst())
-                                                 .map(song -> JsonObject.of("coverId", song.getInteger("albumId"),
-                                                                        "songCount", size));
+                                                        .map(song -> {
+                                                            if (song.isEmpty()) {
+                                                                return song;
+                                                            }
+                                                            return JsonObject.of("coverId", song.getInteger("albumId"),
+                                                                                 "songCount", size);
+                                                        });
                               }
                               return Future.succeededFuture(JsonObject.of("songCount", size));
                           })
         );
-        return Future.all(futures).map(compositeFuture -> {
-            compositeFuture.list().forEach(resp -> payload.mergeIn((JsonObject) resp));
-            return (payload);
-        });
+        return Future.all(futures)
+                     .map(compositeFuture -> {
+                         for (JsonObject resp : compositeFuture.<JsonObject>list()) {
+                             if (resp.isEmpty()) {
+                                 return null;
+                             }
+                             payload.mergeIn(resp);
+                         }
+                         return payload;
+                     });
     }
 
     @Override

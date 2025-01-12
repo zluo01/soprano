@@ -24,6 +24,7 @@ log.level=INFO
 # player
 
 # path for libmpv
+# Required on Windows
 # For windows, need to use double \ on path, i.e. C:\\mpv\\libmpv-2.dll
 # lib.mpv.source.override=
 

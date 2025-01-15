@@ -2,15 +2,15 @@ package player;
 
 import database.DatabaseService;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static helper.PathHelper.resolvePlaylistFilePath;
@@ -179,50 +179,59 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Future<List<JsonObject>> songsInQueue() {
-        final var playlistCountProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "playlist/count");
+        final var playlistSongsProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "playlist");
 
-        if (playlistCountProperty == null) {
-            return Future.failedFuture("Failed to find playlist count");
+        if (playlistSongsProperty == null) {
+            return Future.failedFuture("Failed to get playlist songs.");
         }
-        final Map<String, Integer> orderMap = new HashMap<>();
 
-        final int size = Integer.parseInt(playlistCountProperty.getString(0));
-        for (int i = 0; i < size; i++) {
-            final int idx = i;
-            final var playlistFileName = mpv.instance().mpv_get_property_string(mpv.handle(), "playlist/" + i + "/filename");
-            if (playlistFileName != null) {
-                orderMap.computeIfAbsent(playlistFileName.getString(0), s -> idx);
+        final JsonArray playlistSongs = new JsonArray(playlistSongsProperty.getString(0));
+
+        final Map<String, JsonObject> pathMap = new HashMap<>();
+
+        int currentPlayingIndex = -1;
+        for (int i = 0; i < playlistSongs.size(); i++) {
+            final JsonObject song = playlistSongs.getJsonObject(i);
+
+            final String path = song.getString("filename");
+            final int position = song.getInteger("id") - 1; // id is 1 base instead of 0
+            final boolean isCurrent = song.getBoolean("current", false);
+            final boolean isPlaying = song.getBoolean("playing", false);
+            pathMap.put(path, JsonObject.of(
+                    "position", position,
+                    "playing", isPlaying
+            ));
+
+            if (isCurrent) {
+                currentPlayingIndex = position;
             }
         }
 
-        final var playlistPosProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "playlist-pos");
-        if (playlistPosProperty == null) {
-            return Future.failedFuture("Failed to find playlist pos");
+        if (currentPlayingIndex == -1) {
+            return Future.failedFuture("Failed to get current playing index.");
         }
-        final int playlistPos = Integer.parseInt(playlistPosProperty.getString(0));
 
-        return databaseService.songsFromPath(new ArrayList<>(orderMap.keySet()))
-                              .map(songs -> {
-                                  // reorder result to match queue order
-                                  final JsonObject[] songData = new JsonObject[orderMap.size()];
+        final int cIndex = currentPlayingIndex;
+        return databaseService.songsFromPath(new ArrayList<>(pathMap.keySet()))
+                              .flatMap(songs -> {
+                                  if (songs.size() != pathMap.size()) {
+                                      return Future.failedFuture("Mismatch on response song size. Expected " + pathMap.size() + " but got " + songs.size());
+                                  }
+
                                   for (JsonObject song : songs) {
                                       final String path = song.getString("path");
-                                      final int position = orderMap.get(path);
-                                      final boolean isPlaying = playlistPos == position;
 
-                                      final JsonObject additionalSongInfo = JsonObject.of(
-                                              "position", position,
-                                              "playing", isPlaying
-                                      );
-
-                                      songData[orderMap.get(path)] = song.mergeIn(additionalSongInfo);
+                                      pathMap.computeIfPresent(path, (p, base) -> base.mergeIn(song));
                                   }
-                                  final var response = Arrays.stream(songData)
-                                                             .filter(Objects::nonNull)
-                                                             .collect(Collectors.toList());
 
-                                  Collections.rotate(response, songs.size() - playlistPos);
-                                  return response;
+                                  final var response =
+                                          pathMap.values()
+                                                 .stream()
+                                                 .sorted(Comparator.comparingInt(o -> o.getInteger("position")))
+                                                 .collect(Collectors.toList());
+
+                                  Collections.rotate(response, songs.size() - cIndex);
+                                  return Future.succeededFuture(response);
                               });
     }
 

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static config.ServerConfig.PLAYLIST_PATH;
 import static helper.PathHelper.resolvePlaylistFilePath;
@@ -175,10 +176,15 @@ public class PlaylistServiceImpl implements PlaylistService {
         final String filePath = resolvePlaylistFilePath(playlistName);
         return fileSystem.readFile(filePath)
                          .map(content -> {
-                             if (content.toString(StandardCharsets.UTF_8).contains(songPath)) {
+                             final List<String> songs = Arrays.stream(content.toString(StandardCharsets.UTF_8)
+                                                                             .trim()
+                                                                             .split("\n"))
+                                                              .collect(Collectors.toList());
+                             if (songs.contains(songPath)) {
                                  return Future.succeededFuture();
                              }
-                             final Buffer newContent = content.appendString(songPath).appendString("\n");
+                             songs.add(songPath);
+                             final Buffer newContent = Buffer.buffer(String.join("\n", songs));
                              return fileSystem.writeFile(filePath, newContent);
                          })
                          .map(__ -> true);
@@ -188,19 +194,11 @@ public class PlaylistServiceImpl implements PlaylistService {
     public Future<Boolean> deleteSongFromPlaylist(final String playlistName, final String songPath) {
         final String filePath = resolvePlaylistFilePath(playlistName);
         return fileSystem.readFile(filePath)
-                         .map(content -> {
-                             final String[] songs = content.toString(StandardCharsets.UTF_8)
-                                                           .trim()
-                                                           .split("\n");
-                             final StringBuilder sb = new StringBuilder();
-                             for (final String song : songs) {
-                                 if (song.equals(songPath)) {
-                                     continue;
-                                 }
-                                 sb.append(song).append("\n");
-                             }
-                             return sb.toString();
-                         })
+                         .map(content -> Arrays.stream(content.toString(StandardCharsets.UTF_8)
+                                                              .trim()
+                                                              .split("\n"))
+                                               .filter(path -> !path.equals(songPath))
+                                               .collect(Collectors.joining("\n")))
                          .map(content -> fileSystem.writeFile(filePath, Buffer.buffer(content)))
                          .map(__ -> true);
     }

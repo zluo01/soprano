@@ -34,7 +34,7 @@ export default function CreatePlaylistModal() {
   const valid = isValid(name, playlists);
 
   function submit() {
-    if (!valid)
+    if (valid)
       mutation.mutate({
         name,
       });

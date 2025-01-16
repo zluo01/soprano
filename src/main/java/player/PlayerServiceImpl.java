@@ -187,6 +187,10 @@ public class PlayerServiceImpl implements PlayerService {
 
         final JsonArray playlistSongs = new JsonArray(playlistSongsProperty.getString(0));
 
+        if (playlistSongs.isEmpty()) {
+            return Future.succeededFuture(List.of());
+        }
+
         final Map<String, JsonObject> pathMap = new HashMap<>();
 
         int currentPlayingIndex = -1;

@@ -207,7 +207,7 @@ public class PlayerServiceImpl implements PlayerService {
         }
 
         if (currentPlayingIndex == -1) {
-            return Future.failedFuture("Failed to get current playing index.");
+            return Future.failedFuture("Failed to get current playing index from playlists: " + playlistSongs.encode());
         }
 
         final int cIndex = currentPlayingIndex;

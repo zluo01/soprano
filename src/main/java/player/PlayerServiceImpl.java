@@ -194,16 +194,15 @@ public class PlayerServiceImpl implements PlayerService {
             final JsonObject song = playlistSongs.getJsonObject(i);
 
             final String path = song.getString("filename");
-            final int position = song.getInteger("id") - 1; // id is 1 base instead of 0
             final boolean isCurrent = song.getBoolean("current", false);
             final boolean isPlaying = song.getBoolean("playing", false);
             pathMap.put(path, JsonObject.of(
-                    "position", position,
+                    "position", i,
                     "playing", isPlaying
             ));
 
             if (isCurrent) {
-                currentPlayingIndex = position;
+                currentPlayingIndex = i;
             }
         }
 

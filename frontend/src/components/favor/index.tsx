@@ -1,10 +1,8 @@
-import { Picker, PickerColumn, PickerItem } from '@/components/picker';
-import { PickerValue } from '@/components/picker/Picker.tsx';
+import Picker from '@/components/picker';
 import { Button } from '@/components/ui/button.tsx';
 import { Sheet, SheetContent } from '@/components/ui/sheet.tsx';
 import { useFavorStore } from '@/lib/context';
 import { AddSongToPlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
-import { cn } from '@/lib/utils.ts';
 import { IPlaylist } from '@/type';
 import orderBy from 'lodash/orderBy';
 import { useState } from 'react';
@@ -24,7 +22,7 @@ export default function Favor() {
 
   return (
     <Sheet open={favorModalState.open} onOpenChange={closeFavorModal}>
-      <SheetContent className="max-h-[31.8%] rounded-2xl" side="bottom">
+      <SheetContent className="h-[31.8%] rounded-2xl" side="bottom">
         <div className="flex size-full flex-col flex-nowrap">
           <PlaylistPicker playlists={playlists} submit={submit} />
         </div>
@@ -39,9 +37,7 @@ interface IPlaylistPicker {
 }
 
 function PlaylistPicker({ playlists, submit }: IPlaylistPicker) {
-  const [value, setValue] = useState<PickerValue>({
-    playlist: playlists[0]?.name || '',
-  });
+  const [index, setIndex] = useState(0);
 
   return (
     <>
@@ -50,36 +46,12 @@ function PlaylistPicker({ playlists, submit }: IPlaylistPicker) {
         <Button
           variant="ghost"
           className="text-blue dark:text-char"
-          onClick={() => submit(value.playlist as string)}
+          onClick={() => submit(playlists[index].name)}
         >
           Submit
         </Button>
       </div>
-      <div className="flex h-full flex-col items-center justify-center">
-        <Picker
-          className="w-[61.8%] px-4"
-          value={value}
-          onChange={setValue}
-          wheelMode="natural"
-        >
-          <PickerColumn name="playlist">
-            {playlists.map(o => (
-              <PickerItem key={o.name} value={o.name}>
-                {({ selected }) => (
-                  <div
-                    className={cn(
-                      'opacity-35',
-                      selected && 'scale-105 opacity-100',
-                    )}
-                  >
-                    {o.name}
-                  </div>
-                )}
-              </PickerItem>
-            ))}
-          </PickerColumn>
-        </Picker>
-      </div>
+      <Picker slides={playlists.map(o => o.name)} select={setIndex} />
     </>
   );
 }

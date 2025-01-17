@@ -2,6 +2,8 @@ package player;
 
 import com.sun.jna.Native;
 import io.vertx.core.json.JsonObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +16,7 @@ import static config.ServerConfig.AUDIO_OPTIONS_OVERRIDE;
 import static config.ServerConfig.LIB_MPV_SOURCE_OVERRIDE;
 
 public record MPVInstance(MPV instance, long handle) {
+    private static final Logger LOGGER = LogManager.getLogger(MPVInstance.class);
 
     private static final Map<String, String> DEFAULT_MPV_OPTIONS = Map.of(
             "vo", "null",
@@ -66,6 +69,14 @@ public record MPVInstance(MPV instance, long handle) {
         error = instance.mpv_initialize(handle);
         if (error != 0) {
             throw new IllegalStateException("Failed to initialize options: " + error);
+        }
+
+        for (Map.Entry<String, String> entry : mpvOptions.entrySet()) {
+            final var option = instance.mpv_get_property_string(handle, entry.getKey());
+            if (option == null) {
+                throw new IllegalStateException("Failed to get" + entry.getKey() + "with error: " + error);
+            }
+            LOGGER.info("MPV setting: {} => {}", entry.getKey(), option.getString(0));
         }
 
         return handle;

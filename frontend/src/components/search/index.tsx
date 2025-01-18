@@ -2,7 +2,6 @@ import Cover from '@/components/cover';
 import { LoadingList } from '@/components/loading';
 import { GeneralTagItem } from '@/components/shares';
 import { Song } from '@/components/song';
-import { SwipeActions } from '@/components/swipe';
 import {
   Accordion,
   AccordionContent,
@@ -126,22 +125,18 @@ function SearchContent({ searchText }: { searchText: string }) {
                 key={o.path}
                 play={() => PlaySong(o.path)}
                 song={o}
-                actions={
-                  <>
-                    <SwipeActions.Action
-                      className="bg-add"
-                      onClick={() => AddSongsToQueue([o.path])}
-                    >
-                      <ListPlus className="size-6" />
-                    </SwipeActions.Action>
-                    <SwipeActions.Action
-                      className="bg-favor"
-                      onClick={() => openFavorModal(o.path)}
-                    >
-                      <HeartFilledIcon className="ml-1 size-6" />
-                    </SwipeActions.Action>
-                  </>
-                }
+                actions={[
+                  {
+                    className: 'bg-add',
+                    action: () => AddSongsToQueue([o.path]),
+                    children: <ListPlus className="size-6" />,
+                  },
+                  {
+                    className: 'bg-favor',
+                    action: () => openFavorModal(o.path),
+                    children: <HeartFilledIcon className="ml-1 size-6" />,
+                  },
+                ]}
               />
             ))}
           </AccordionContent>

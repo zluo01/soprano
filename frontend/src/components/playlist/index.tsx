@@ -1,7 +1,6 @@
 import { LoadingSongs } from '@/components/loading';
 import ScrollContainer from '@/components/scroll';
 import { Song } from '@/components/song';
-import { SwipeActions } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import {
@@ -67,24 +66,19 @@ export default function Playlist() {
               key={o.path}
               play={() => PlaySong(o.path)}
               song={o}
-              actions={
-                <>
-                  <SwipeActions.Action
-                    className="bg-delete"
-                    onClick={() =>
-                      mutation.mutate({ name: playlistName, songPath: o.path })
-                    }
-                  >
-                    <TrashIcon className="size-6" />
-                  </SwipeActions.Action>
-                  <SwipeActions.Action
-                    className="bg-add"
-                    onClick={() => AddSongsToQueue([o.path])}
-                  >
-                    <ListPlus className="ml-1.5 size-6" />
-                  </SwipeActions.Action>
-                </>
-              }
+              actions={[
+                {
+                  className: 'bg-delete',
+                  action: () =>
+                    mutation.mutate({ name: playlistName, songPath: o.path }),
+                  children: <TrashIcon className="size-6" />,
+                },
+                {
+                  className: 'bg-add',
+                  action: () => AddSongsToQueue([o.path]),
+                  children: <ListPlus className="ml-1.5 size-6" />,
+                },
+              ]}
             />
           ))}
         </div>

@@ -1,7 +1,7 @@
 import Cover from '@/components/cover';
 import { LoadingSongs } from '@/components/loading';
 import ScrollContainer from '@/components/scroll';
-import { SwipeActions } from '@/components/swipe';
+import { SwipeAction } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import { useCreatePlaylistStore, useRenamePlaylistStore } from '@/lib/context';
 import { DeletePlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
@@ -27,8 +27,9 @@ function PlaylistsView() {
     <div className="flex h-[calc(100%-100px)] w-full flex-col pt-2">
       <ScrollContainer className="size-full px-6">
         {data?.Playlists.map(o => (
-          <SwipeActions.Root key={o.name} className="w-full">
-            <SwipeActions.Trigger className="w-full border-0">
+          <SwipeAction
+            key={o.name}
+            main={
               <Link to={`/playlists/${o.name}`}>
                 <div className=" flex select-none flex-row flex-nowrap items-center space-x-3 bg-background py-2">
                   <Cover
@@ -49,22 +50,20 @@ function PlaylistsView() {
                   </div>
                 </div>
               </Link>
-            </SwipeActions.Trigger>
-            <SwipeActions.Actions>
-              <SwipeActions.Action
-                className="bg-delete"
-                onClick={() => mutation.mutate({ name: o.name })}
-              >
-                <TrashIcon className="size-6" />
-              </SwipeActions.Action>
-              <SwipeActions.Action
-                className="bg-edit"
-                onClick={() => openRenamePlaylistModal(o.name)}
-              >
-                <Pencil2Icon className="ml-0.5 size-6" />
-              </SwipeActions.Action>
-            </SwipeActions.Actions>
-          </SwipeActions.Root>
+            }
+            actions={[
+              {
+                className: 'bg-delete',
+                action: () => mutation.mutate({ name: o.name }),
+                children: <TrashIcon className="size-6" />,
+              },
+              {
+                className: 'bg-edit',
+                action: () => openRenamePlaylistModal(o.name),
+                children: <Pencil2Icon className="ml-0.5 size-6" />,
+              },
+            ]}
+          />
         ))}
       </ScrollContainer>
       <div className="static bottom-0 z-10 px-6 py-1.5">

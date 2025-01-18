@@ -1,6 +1,5 @@
 import { LoadingSongs } from '@/components/loading';
 import { Song } from '@/components/song';
-import { SwipeActions } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import {
   Drawer,
@@ -55,22 +54,18 @@ export default function PlaybackQueue() {
                 key={song.path}
                 play={() => PlaySongInAtPosition(song.position)}
                 song={song}
-                actions={
-                  <>
-                    <SwipeActions.Action
-                      className="bg-delete"
-                      onClick={() => RemoveSongFromQueue(song.position)}
-                    >
-                      <TrashIcon className="size-6" />
-                    </SwipeActions.Action>
-                    <SwipeActions.Action
-                      className="bg-favor"
-                      onClick={() => openFavorModal(song.path)}
-                    >
-                      <HeartFilledIcon className="ml-1 size-6" />
-                    </SwipeActions.Action>
-                  </>
-                }
+                actions={[
+                  {
+                    className: 'bg-delete',
+                    action: () => RemoveSongFromQueue(song.position),
+                    children: <TrashIcon className="size-6" />,
+                  },
+                  {
+                    className: 'bg-favor',
+                    action: () => openFavorModal(song.path),
+                    children: <HeartFilledIcon className="ml-1 size-6" />,
+                  },
+                ]}
               />
             ))
           )}

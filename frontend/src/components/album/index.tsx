@@ -1,6 +1,6 @@
 import Cover from '@/components/cover';
 import ScrollContainer from '@/components/scroll';
-import { SwipeActions } from '@/components/swipe';
+import { SwipeAction } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import { useFavorStore } from '@/lib/context';
@@ -92,8 +92,9 @@ export default function Album() {
 
       <div className="flex w-full flex-col px-6 pt-2">
         {data?.Album.songs.map(song => (
-          <SwipeActions.Root key={song.path} className="w-full">
-            <SwipeActions.Trigger className="w-full border-0 bg-background">
+          <SwipeAction
+            key={song.path}
+            main={
               <div
                 className="flex cursor-pointer flex-col flex-nowrap items-start justify-center py-2.5"
                 onClick={() => PlaySong(song.path)}
@@ -103,22 +104,20 @@ export default function Album() {
                   {song.artists}
                 </p>
               </div>
-            </SwipeActions.Trigger>
-            <SwipeActions.Actions>
-              <SwipeActions.Action
-                className="bg-add"
-                onClick={() => AddSongsToQueue([song.path])}
-              >
-                <ListPlus className="size-6" />
-              </SwipeActions.Action>
-              <SwipeActions.Action
-                className="bg-favor"
-                onClick={() => openFavorModal(song.path)}
-              >
-                <HeartFilledIcon className="size-6" />
-              </SwipeActions.Action>
-            </SwipeActions.Actions>
-          </SwipeActions.Root>
+            }
+            actions={[
+              {
+                className: 'bg-add',
+                action: () => AddSongsToQueue([song.path]),
+                children: <ListPlus className="size-6" />,
+              },
+              {
+                className: 'bg-favor',
+                action: () => openFavorModal(song.path),
+                children: <HeartFilledIcon className="size-6" />,
+              },
+            ]}
+          />
         ))}
       </div>
     </ScrollContainer>

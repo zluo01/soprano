@@ -19,7 +19,7 @@ public record MPVInstance(MPV instance, long handle) {
     private static final Logger LOGGER = LogManager.getLogger(MPVInstance.class);
 
     private static final Map<String, String> DEFAULT_MPV_OPTIONS = Map.of(
-            "vo", "null",
+            "vid", "no",
             "replaygain", "no",
             "audio-display", "no",
             "audio-file-auto", "no"
@@ -62,7 +62,7 @@ public record MPVInstance(MPV instance, long handle) {
         for (Map.Entry<String, String> entry : mpvOptions.entrySet()) {
             error = instance.mpv_set_option_string(handle, entry.getKey(), entry.getValue());
             if (error != 0) {
-                throw new IllegalStateException("Failed to set" + entry.getKey() + "with error: " + error);
+                throw new IllegalStateException("Failed to set " + entry.getKey() + " with error: " + error);
             }
         }
 

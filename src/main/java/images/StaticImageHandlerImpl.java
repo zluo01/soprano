@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class StaticImageHandlerImpl implements StaticImageHandler {
     private static final Logger LOGGER = LogManager.getLogger(StaticImageHandlerImpl.class);
 
-    private static final Pattern IMAGE_PATH_PATTERN = Pattern.compile("^/covers/(undefined|-?\\d+)(_\\d+x\\d+)?\\.webp$");
+    private static final Pattern IMAGE_PATH_PATTERN = Pattern.compile("^/covers/(undefined|null|-?\\d+)(_\\d+x\\d+)?\\.webp$");
 
     private static final Buffer FALLBACK_IMAGE;
 

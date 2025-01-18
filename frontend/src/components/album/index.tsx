@@ -22,7 +22,7 @@ export default function Album() {
   const { openFavorModal } = useFavorStore();
 
   return (
-    <ScrollContainer className="h-[calc(100%-45px)] w-full">
+    <ScrollContainer className="h-[calc(100%-45px)] w-full duration-200 animate-in slide-in-from-right-1/2 sm:animate-none">
       <div className="w-full px-6 py-3">
         <Separator />
       </div>

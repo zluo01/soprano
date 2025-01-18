@@ -60,7 +60,7 @@ export default function Playlist() {
       {isLoading ? (
         <LoadingSongs />
       ) : (
-        <div className="flex size-full flex-col px-6">
+        <div className="flex size-full flex-col px-6 duration-200 animate-in slide-in-from-right-1/2 sm:animate-none">
           {data?.PlaylistSongs.map(o => (
             <Song
               key={o.path}

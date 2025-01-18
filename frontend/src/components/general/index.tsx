@@ -34,7 +34,7 @@ export function GeneralTagAlbumsView({ tag }: IGeneralTagViewProps) {
       {isLoading ? (
         <LoadingAlbums />
       ) : (
-        <ScrollContainer className="h-[calc(100%-70px)] w-full pt-2">
+        <ScrollContainer className="h-[calc(100%-70px)] w-full pt-2 duration-200 animate-in slide-in-from-right-1/2 sm:animate-none">
           <AlbumGridView albums={data!} />
         </ScrollContainer>
       )}

@@ -44,7 +44,7 @@
   "devDependencies": {
     "@eslint/js": "9.19.0",
     "@tanstack/eslint-plugin-query": "5.64.2",
-    "@trivago/prettier-plugin-sort-imports": "5.2.1",
+    "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/lodash": "4.17.15",
     "@types/node": "22.13.0",
     "@types/react": "19.0.8",

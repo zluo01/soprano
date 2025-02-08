@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -149,14 +150,26 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Future<Integer> addSongsToQueue(final List<String> songPaths) {
-        int error = MPVError.MPV_ERROR_SUCCESS.ordinal();
-        for (String songPath : songPaths) {
-            error = mpv.instance().mpv_command(mpv.handle(), new String[]{"loadfile", songPath, "append-play"});
-            if (error != 0) {
-                return Future.failedFuture("Failed to add song to queue: " + MPVError.getError(error));
+        return playlistSongs().compose(playlistSongs -> {
+            final var existingSongs = new HashSet<>(playlistSongs.size());
+            for (int i = 0; i < playlistSongs.size(); i++) {
+                final JsonObject song = playlistSongs.getJsonObject(i);
+                final String path = song.getString("filename");
+                existingSongs.add(path);
             }
-        }
-        return Future.succeededFuture(error);
+
+            int error = MPVError.MPV_ERROR_SUCCESS.ordinal();
+            for (String songPath : songPaths) {
+                if (existingSongs.contains(songPath)) {
+                    continue;
+                }
+                error = mpv.instance().mpv_command(mpv.handle(), new String[]{"loadfile", songPath, "append-play"});
+                if (error != 0) {
+                    return Future.failedFuture("Failed to add song to queue: " + MPVError.getError(error));
+                }
+            }
+            return Future.succeededFuture(error);
+        });
     }
 
     @Override
@@ -179,63 +192,57 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Future<List<JsonObject>> songsInQueue() {
-        final var playlistSongsProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "playlist");
-
-        if (playlistSongsProperty == null) {
-            return Future.failedFuture("Failed to get playlist songs.");
-        }
-
-        final JsonArray playlistSongs = new JsonArray(playlistSongsProperty.getString(0));
-
-        if (playlistSongs.isEmpty()) {
-            return Future.succeededFuture(List.of());
-        }
-
-        final Map<String, JsonObject> pathMap = new HashMap<>();
-
-        int currentPlayingIndex = -1;
-        for (int i = 0; i < playlistSongs.size(); i++) {
-            final JsonObject song = playlistSongs.getJsonObject(i);
-
-            final String path = song.getString("filename");
-            final boolean isCurrent = song.getBoolean("current", false);
-            final boolean isPlaying = song.getBoolean("playing", false);
-            pathMap.put(path, JsonObject.of(
-                    "position", i,
-                    "playing", isPlaying
-            ));
-
-            if (isCurrent) {
-                currentPlayingIndex = i;
+        return playlistSongs().compose(playlistSongs -> {
+            if (playlistSongs.isEmpty()) {
+                return Future.succeededFuture(List.of());
             }
-        }
 
-        if (currentPlayingIndex == -1) {
-            return Future.failedFuture("Failed to get current playing index from playlists: " + playlistSongs.encode());
-        }
+            final Map<String, JsonObject> pathMap = new HashMap<>();
 
-        final int cIndex = currentPlayingIndex;
-        return databaseService.songsFromPath(new ArrayList<>(pathMap.keySet()))
-                              .flatMap(songs -> {
-                                  if (songs.size() != pathMap.size()) {
-                                      return Future.failedFuture("Mismatch on response song size. Expected " + pathMap.size() + " but got " + songs.size());
-                                  }
+            int currentPlayingIndex = -1;
+            for (int i = 0; i < playlistSongs.size(); i++) {
+                final JsonObject song = playlistSongs.getJsonObject(i);
 
-                                  for (JsonObject song : songs) {
-                                      final String path = song.getString("path");
+                final String path = song.getString("filename");
+                final boolean isCurrent = song.getBoolean("current", false);
+                final boolean isPlaying = song.getBoolean("playing", false);
+                pathMap.put(path, JsonObject.of(
+                        "position", i,
+                        "playing", isPlaying
+                ));
 
-                                      pathMap.computeIfPresent(path, (p, base) -> base.mergeIn(song));
-                                  }
+                if (isCurrent) {
+                    currentPlayingIndex = i;
+                }
+            }
 
-                                  final var response =
-                                          pathMap.values()
-                                                 .stream()
-                                                 .sorted(Comparator.comparingInt(o -> o.getInteger("position")))
-                                                 .collect(Collectors.toList());
+            if (currentPlayingIndex == -1) {
+                return Future.failedFuture("Failed to get current playing index from playlists: " + playlistSongs.encode());
+            }
 
-                                  Collections.rotate(response, songs.size() - cIndex);
-                                  return Future.succeededFuture(response);
-                              });
+            final int cIndex = currentPlayingIndex;
+            return databaseService.songsFromPath(new ArrayList<>(pathMap.keySet()))
+                                  .flatMap(songs -> {
+                                      if (songs.size() != pathMap.size()) {
+                                          return Future.failedFuture("Mismatch on response song size. Expected " + pathMap.size() + " but got " + songs.size());
+                                      }
+
+                                      for (JsonObject song : songs) {
+                                          final String path = song.getString("path");
+
+                                          pathMap.computeIfPresent(path, (p, base) -> base.mergeIn(song));
+                                      }
+
+                                      final var response =
+                                              pathMap.values()
+                                                     .stream()
+                                                     .sorted(Comparator.comparingInt(o -> o.getInteger("position")))
+                                                     .collect(Collectors.toList());
+
+                                      Collections.rotate(response, songs.size() - cIndex);
+                                      return Future.succeededFuture(response);
+                                  });
+        });
     }
 
     @Override
@@ -300,5 +307,15 @@ public class PlayerServiceImpl implements PlayerService {
         }
 
         return 2;
+    }
+
+    private Future<JsonArray> playlistSongs() {
+        final var playlistSongsProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "playlist");
+
+        if (playlistSongsProperty == null) {
+            return Future.failedFuture("Failed to get playlist songs.");
+        }
+
+        return Future.succeededFuture(new JsonArray(playlistSongsProperty.getString(0)));
     }
 }

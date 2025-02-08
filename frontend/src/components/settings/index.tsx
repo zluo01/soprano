@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/drawer';
 import { Label } from '@/components/ui/label.tsx';
 import { useSettingStore } from '@/lib/context';
-import { BuildDatabase, GetStatsQuery, UpdateDatabase } from '@/lib/queries';
-import { ReloadIcon, UpdateIcon } from '@radix-ui/react-icons';
+import { GetStatsQuery, UpdateDatabase } from '@/lib/queries';
+import { UpdateIcon } from '@radix-ui/react-icons';
 
 export default function Settings() {
   const { settingModalState, updateSettingModalState } = useSettingStore();
@@ -58,16 +58,6 @@ export default function Settings() {
           </div>
         </div>
         <DrawerFooter className="flex flex-row justify-around">
-          <div className="flex flex-col items-center space-y-1.5">
-            <Button
-              variant="outline"
-              className="size-12 rounded-full p-2"
-              onClick={BuildDatabase}
-            >
-              <ReloadIcon className="size-[1.2rem]" />
-            </Button>
-            <Label>Build</Label>
-          </div>
           <div className="flex flex-col items-center space-y-1.5">
             <Button
               variant="outline"

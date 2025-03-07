@@ -22,7 +22,9 @@ public record MPVInstance(MPV instance, long handle) {
             "vid", "no",
             "replaygain", "no",
             "audio-display", "no",
-            "audio-file-auto", "no"
+            "audio-file-auto", "no",
+            "loop-playlist", "inf",
+            "loop", "no"
     );
 
     public static MPVInstance create(final JsonObject config) {

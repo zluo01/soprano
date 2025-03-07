@@ -15,7 +15,7 @@ export default function Preview() {
       <div className="w-full shadow-md sm:hidden">
         <div className="mx-2 my-1 flex h-fit flex-row flex-nowrap rounded-lg border py-1.5 shadow-2xl">
           <div
-            className="flex size-full cursor-pointer select-none flex-row flex-nowrap items-center gap-3 px-4"
+            className="flex size-full cursor-pointer flex-row flex-nowrap items-center gap-3 px-4 select-none"
             onClick={() => updatePlaybackModalState(true)}
           >
             <Cover
@@ -29,7 +29,7 @@ export default function Preview() {
               <p className="w-full truncate">
                 {data?.PlaybackStatus.song?.name || ''}
               </p>
-              <div className="overflow-hidden truncate text-sm">
+              <div className="truncate overflow-hidden text-sm">
                 {data?.PlaybackStatus.song?.artists || ''}
               </div>
             </div>

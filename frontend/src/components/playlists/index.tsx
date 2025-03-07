@@ -31,7 +31,7 @@ function PlaylistsView() {
             key={o.name}
             main={
               <Link to={`/playlists/${o.name}`}>
-                <div className=" flex select-none flex-row flex-nowrap items-center space-x-3 bg-background py-2">
+                <div className="flex flex-row flex-nowrap items-center space-x-3 bg-background py-2 select-none">
                   <Cover
                     albumId={o.coverId}
                     height={50}
@@ -39,7 +39,7 @@ function PlaylistsView() {
                     alt={o.name}
                     style={'rounded'}
                   />
-                  <div className="flex w-[calc(100%-60px)] cursor-pointer select-none flex-col justify-center space-y-1">
+                  <div className="flex w-[calc(100%-60px)] cursor-pointer flex-col justify-center space-y-1 select-none">
                     <p className="truncate font-medium">{o.name}</p>
                     <div className="flex flex-row flex-nowrap items-center gap-1.5 text-sm opacity-35">
                       <Music2 className="size-3" />

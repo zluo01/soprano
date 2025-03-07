@@ -5,7 +5,7 @@ import pluginPromise from 'eslint-plugin-promise';
 import pluginReact from 'eslint-plugin-react';
 import pluginReactHooks from 'eslint-plugin-react-hooks';
 import pluginReactRefresh from 'eslint-plugin-react-refresh';
-import tailwind from 'eslint-plugin-tailwindcss';
+// import tailwind from 'eslint-plugin-tailwindcss';
 import globals from 'globals';
 import ts from 'typescript-eslint';
 
@@ -19,7 +19,7 @@ export default [
   },
   js.configs.recommended,
   ...ts.configs.recommended,
-  ...tailwind.configs['flat/recommended'],
+  // ...tailwind.configs['flat/recommended'],
   pluginReact.configs.flat.recommended,
   pluginPromise.configs['flat/recommended'],
   ...pluginQuery.configs['flat/recommended'],

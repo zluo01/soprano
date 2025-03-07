@@ -43,7 +43,7 @@ export default function Album() {
         <p className="w-full truncate font-bold">{data?.Album.artist}</p>
       </div>
 
-      <div className="sticky top-0 z-20  px-6">
+      <div className="sticky top-0 z-20 px-6">
         <div className="flex w-full flex-row flex-nowrap items-center justify-between bg-background py-3">
           <div className="flex flex-col flex-nowrap text-sm opacity-35">
             <span>Album</span>

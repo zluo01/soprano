@@ -33,7 +33,7 @@ function SearchAlbumItem({ id, name, artist }: IAlbum) {
 
   return (
     <div
-      className="flex w-full cursor-pointer select-none flex-row flex-nowrap items-center space-x-3 py-2"
+      className="flex w-full cursor-pointer flex-row flex-nowrap items-center space-x-3 py-2 select-none"
       onClick={route}
     >
       <Cover albumId={id} height={50} width={50} alt={name} style={'rounded'} />
@@ -167,9 +167,9 @@ export default function Search() {
       onOpenChange={open => updateSearchModalState(open)}
     >
       <SheetContent className="max-h-screen w-full overflow-y-scroll px-0 pt-0">
-        <SheetHeader className="sticky top-0 z-20 border-b-2 bg-primary-foreground px-6 pb-0.5 pt-[calc(env(safe-area-inset-top)+12px)]">
+        <SheetHeader className="sticky top-0 z-20 border-b-2 bg-primary-foreground px-6 pt-[calc(env(safe-area-inset-top)+12px)] pb-0.5">
           <div className="relative space-x-1">
-            <MagnifyingGlassIcon className="absolute left-2 top-2.5 size-5 text-muted-foreground" />
+            <MagnifyingGlassIcon className="absolute top-2.5 left-2 size-5 text-muted-foreground" />
             <Input
               autoFocus
               placeholder="Search Albums, Artists, Songs..."

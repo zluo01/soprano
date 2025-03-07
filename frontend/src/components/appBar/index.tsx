@@ -19,7 +19,7 @@ function SecondaryHeader({ header }: ISecondaryHeader) {
   const navigate = useNavigate();
 
   return (
-    <div className="flex w-full max-w-[61.2%] select-none flex-row flex-nowrap items-center space-x-1 overflow-hidden">
+    <div className="flex w-full max-w-[61.2%] flex-row flex-nowrap items-center space-x-1 overflow-hidden select-none">
       <Button
         variant="ghost"
         size="icon"
@@ -54,7 +54,7 @@ export default function AppBar() {
       return <SecondaryHeader header={''} />;
     }
     return (
-      <p className="cursor-pointer select-none font-mono text-2xl font-semibold">
+      <p className="cursor-pointer font-mono text-2xl font-semibold select-none">
         <Link to="/">Soprano</Link>
       </p>
     );

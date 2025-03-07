@@ -36,7 +36,7 @@ export default function Tabs() {
   return (
     <div
       className={cn(
-        'no-scrollbar flex w-full flex-row items-center space-x-2 overflow-x-scroll overflow-y-hidden px-6 py-3 sm:hidden h-full min-h-14 max-h-14',
+        'no-scrollbar flex h-full max-h-14 min-h-14 w-full flex-row items-center space-x-2 overflow-x-scroll overflow-y-hidden px-6 py-3 sm:hidden',
         !ALLOW_PATHS.has(location.pathname) && 'hidden',
       )}
     >
@@ -45,9 +45,9 @@ export default function Tabs() {
           <span
             id={`tab-${index}`}
             className={cn(
-              'cursor-pointer select-none whitespace-nowrap p-1.5 text font-bold opacity-30',
+              'text cursor-pointer p-1.5 font-bold whitespace-nowrap opacity-30 select-none',
               location.pathname === path &&
-                'scale-105 opacity-100 border-b-4 border-[#5f86c7] dark:border-[#F04A4A]',
+                'scale-105 border-b-4 border-[#5f86c7] opacity-100 dark:border-[#F04A4A]',
             )}
           >
             {v.name}

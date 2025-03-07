@@ -33,7 +33,7 @@ export function SwipeAction({ main, actions, className }: SwipeActionsProps) {
       <CarouselContent className={cn('gap-0', className)}>
         <CarouselItem className="w-full">{main}</CarouselItem>
         {actions && (
-          <CarouselItem className="flex basis-auto flex-row flex-nowrap items-center justify-end overflow-hidden">
+          <CarouselItem className="flex basis-1/3 flex-row flex-nowrap items-center justify-end overflow-hidden pl-0">
             {actions.map(({ action, children, className }, index) => (
               <Action
                 key={index}
@@ -65,9 +65,9 @@ const Action = ({
   return (
     <Button
       className={cn(
-        'border-0 text-white rounded-none rounded-r-md',
-        'flex aspect-square h-full flex-col items-center justify-center z-[1]',
-        'last:-ml-1.5 last:z-0',
+        'rounded-none rounded-r-md border-0 text-white',
+        'z-1 flex aspect-square h-full flex-col items-center justify-center',
+        'last:z-0 last:-ml-1.5',
         className,
       )}
       onClick={e => {

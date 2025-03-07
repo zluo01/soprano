@@ -151,18 +151,13 @@ export default function PickerItems({ slides, select }: IPicketItemProps) {
         ref={rootNodeRef}
       >
         <div
-          className="h-8 w-full touch-none select-none"
-          style={{ perspective: 1000 }} // only available in tailwind 4 beta
+          className="h-8 w-full touch-none select-none perspective-distant"
           ref={ref}
         >
-          <div
-            className="size-full will-change-transform"
-            style={{ transformStyle: 'preserve-3d' }} // only available in tailwind 4 beta
-          >
+          <div className="will-change-transformc size-full transform-3d">
             {slides.map((name, index) => (
               <div
-                className="flex size-full items-center justify-center text-center text-lg opacity-0"
-                style={{ backfaceVisibility: 'hidden' }} // only available in tailwind 4 beta
+                className="flex size-full items-center justify-center text-center text-lg opacity-0 backface-hidden"
                 key={index}
               >
                 {name}

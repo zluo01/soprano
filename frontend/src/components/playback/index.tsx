@@ -50,7 +50,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
       open={playbackModalState}
       onOpenChange={open => updatePlaybackModalState(open)}
     >
-      <DrawerContent className="h-full pt-[env(safe-area-inset-top)]">
+      <DrawerContent className="h-full pt-[env(safe-area-inset-top)] data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-screen">
         <div className="flex h-full flex-col items-center justify-between px-6 py-12">
           <div className="flex w-full items-center justify-center">
             <Cover
@@ -61,7 +61,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
             />
           </div>
 
-          <div className="flex min-h-16 w-full select-none flex-col flex-wrap items-center gap-3 text-center">
+          <div className="flex min-h-16 w-full flex-col flex-wrap items-center gap-3 text-center select-none">
             <span className="w-full truncate text-xl font-extrabold">
               {status?.song?.name}
             </span>

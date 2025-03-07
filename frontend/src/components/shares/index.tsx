@@ -68,7 +68,7 @@ export function GeneralTagItem({
   }
 
   return (
-    <div className="cursor-pointer select-none space-y-1 py-2" onClick={route}>
+    <div className="cursor-pointer space-y-1 py-2 select-none" onClick={route}>
       <p className="truncate font-medium">{name}</p>
       <div className="flex flex-row flex-nowrap items-center gap-1.5 text-sm opacity-35">
         <DiscIcon />

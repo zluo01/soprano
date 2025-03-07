@@ -8,7 +8,7 @@ export const QUERY_CLIENT = new QueryClient();
 export const IMMUTABLE_REQUEST = {
   staleTime: Infinity,
   refetchOnWindowFocus: false,
-  refetchOnReconnect: false,
+  refetchOnReconnect: true,
 };
 
 export async function request<T>(

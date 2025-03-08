@@ -6,6 +6,7 @@ import { AddSongToPlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
 import { IPlaylist } from '@/type';
 import orderBy from 'lodash/orderBy';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function Favor() {
   const mutation = AddSongToPlaylistMutation();
@@ -17,6 +18,7 @@ export default function Favor() {
 
   async function submit(playlistName: string) {
     mutation.mutate({ name: playlistName, songPath: favorModalState.songPath });
+    toast(`Successfully add song to ${playlistName}.`);
     closeFavorModal();
   }
 

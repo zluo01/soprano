@@ -10,6 +10,7 @@ import {
 import { useSettingStore } from '@/lib/context';
 import { GetStatsQuery, UpdateDatabase } from '@/lib/queries';
 import { UpdateIcon } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
 
 export default function Settings() {
   const { settingModalState, updateSettingModalState } = useSettingStore();
@@ -60,7 +61,9 @@ export default function Settings() {
           <Button
             variant="outline"
             className="size-12 rounded-full p-2"
-            onClick={UpdateDatabase}
+            onClick={() =>
+              UpdateDatabase().then(() => toast('Updating database.'))
+            }
           >
             <UpdateIcon className="size-[1.2rem]" />
           </Button>

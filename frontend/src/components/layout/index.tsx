@@ -1,5 +1,6 @@
 import AppBar from '@/components/appBar';
 import Tabs from '@/components/tabs';
+import { Toaster } from '@/components/ui/sonner';
 import { lazy, Suspense } from 'react';
 import { Outlet } from 'react-router';
 import Preview from 'src/components/preview';
@@ -24,6 +25,7 @@ export default function Layout() {
         <Favor />
         <PlaybackQueue />
       </Suspense>
+      <Toaster position="top-center" expand={false} />
     </>
   );
 }

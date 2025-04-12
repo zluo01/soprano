@@ -23,7 +23,7 @@
 
         <main.class>MainVerticle</main.class>
 
-        <guava.version>33.4.6-jre</guava.version>
+        <guava.version>33.4.7-jre</guava.version>
         <vertx.version>4.5.14</vertx.version>
         <log4j.version>2.24.3</log4j.version>
         <jackson.version>2.18.3</jackson.version>

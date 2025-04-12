@@ -3,7 +3,7 @@ import { QueryClient } from '@tanstack/react-query';
 const BASE_URL =
   import.meta.env.MODE === 'development' ? 'http://localhost:6868' : '';
 
-export const QUERY_CLIENT = new QueryClient();
+export const queryClient = new QueryClient();
 
 export const IMMUTABLE_REQUEST = {
   staleTime: Infinity,

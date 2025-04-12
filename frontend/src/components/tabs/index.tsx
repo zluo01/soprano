@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils.ts';
+import { Link, useLocation } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { Link, useLocation } from 'react-router';
 
 interface ITab {
   name: string;

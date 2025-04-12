@@ -4,17 +4,36 @@ import ScrollContainer from '@/components/scroll';
 import { SwipeAction } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import { useCreatePlaylistStore, useRenamePlaylistStore } from '@/lib/context';
-import { DeletePlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
+import { DeletePlaylistMutation, playlistQueryOptions } from '@/lib/queries';
 import { Pencil2Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Music2 } from 'lucide-react';
 import { lazy, Suspense } from 'react';
-import { Link } from 'react-router';
 
 const CreatePlaylistModal = lazy(() => import('@/components/create'));
 const RenamePlaylist = lazy(() => import('@/components/rename'));
 
+export const Route = createFileRoute('/playlists/')({
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(playlistQueryOptions),
+  component: Playlists,
+});
+
+function Playlists() {
+  return (
+    <>
+      <PlaylistsView />
+      <Suspense>
+        <CreatePlaylistModal />
+        <RenamePlaylist />
+      </Suspense>
+    </>
+  );
+}
+
 function PlaylistsView() {
-  const { data, isLoading } = GetPlaylistsQuery();
+  const { data, isLoading } = useSuspenseQuery(playlistQueryOptions);
   const mutation = DeletePlaylistMutation();
 
   const { openRenamePlaylistModal } = useRenamePlaylistStore();
@@ -30,7 +49,7 @@ function PlaylistsView() {
           <SwipeAction
             key={o.name}
             main={
-              <Link to={`/playlists/${o.name}`}>
+              <Link to="/playlists/$name" params={{ name: o.name }}>
                 <div className="flex flex-row flex-nowrap items-center space-x-3 bg-background py-2 select-none">
                   <Cover
                     albumId={o.coverId}
@@ -76,17 +95,5 @@ function PlaylistsView() {
         </Button>
       </div>
     </div>
-  );
-}
-
-export default function Playlists() {
-  return (
-    <>
-      <PlaylistsView />
-      <Suspense>
-        <CreatePlaylistModal />
-        <RenamePlaylist />
-      </Suspense>
-    </>
   );
 }

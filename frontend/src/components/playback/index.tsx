@@ -15,8 +15,8 @@ import {
 import { ToggleLoop } from '@/lib/queries';
 import { IPlaybackStatus } from '@/type';
 import { HeartFilledIcon, ListBulletIcon } from '@radix-ui/react-icons';
+import { useNavigate } from '@tanstack/react-router';
 import { Repeat, Repeat1 } from 'lucide-react';
-import { useNavigate } from 'react-router';
 
 interface IPlaybackDrawerProps {
   status?: IPlaybackStatus;
@@ -41,7 +41,13 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
   const { openFavorModal } = useFavorStore();
 
   async function toAlbumPage() {
-    await navigate(`/albums/${status?.song?.albumId}`);
+    if (!status?.song) {
+      return;
+    }
+    await navigate({
+      to: '/albums/$id',
+      params: { id: status.song.albumId.toString() },
+    });
     updatePlaybackModalState(false);
   }
 

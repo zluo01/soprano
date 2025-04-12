@@ -6,17 +6,27 @@ import { Separator } from '@/components/ui/separator.tsx';
 import {
   AddSongsToQueue,
   DeleteSongFromPlaylistMutation,
-  GetSongsForPlaylistQuery,
   PlayPlaylist,
   PlaySong,
+  songsInPlaylistQueryOptions,
 } from '@/lib/queries';
 import { PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { ListPlus } from 'lucide-react';
-import { useParams } from 'react-router';
 
-export default function Playlist() {
-  const { playlistName } = useParams();
-  const { data, isLoading } = GetSongsForPlaylistQuery(playlistName!);
+export const Route = createFileRoute('/playlists/$name')({
+  loader: ({ context: { queryClient }, params: { name } }) => {
+    return queryClient.ensureQueryData(songsInPlaylistQueryOptions(name));
+  },
+  component: Playlist,
+});
+
+function Playlist() {
+  const name = Route.useParams().name;
+  const { data, isLoading } = useSuspenseQuery(
+    songsInPlaylistQueryOptions(name),
+  );
 
   const mutation = DeleteSongFromPlaylistMutation();
 
@@ -39,7 +49,7 @@ export default function Playlist() {
           <Button
             size={'icon'}
             className="rounded-full"
-            onClick={() => PlayPlaylist(playlistName)}
+            onClick={() => PlayPlaylist(name)}
             disabled={!data}
           >
             <svg
@@ -69,8 +79,7 @@ export default function Playlist() {
               actions={[
                 {
                   className: 'bg-delete',
-                  action: () =>
-                    mutation.mutate({ name: playlistName, songPath: o.path }),
+                  action: () => mutation.mutate({ name, songPath: o.path }),
                   children: <TrashIcon className="size-6" />,
                 },
                 {

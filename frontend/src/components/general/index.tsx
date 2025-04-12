@@ -2,16 +2,19 @@ import { LoadingAlbums, LoadingList } from '@/components/loading';
 import ScrollContainer from '@/components/scroll';
 import { AlbumGridView, GeneralTagItems } from '@/components/shares';
 import { Separator } from '@/components/ui/separator.tsx';
-import { GetGeneralTagAlbumsQuery, GetGeneralTagQuery } from '@/lib/queries';
+import {
+  generalTagAlbumsQueryOptions,
+  generalTagQueryOptions,
+} from '@/lib/queries';
 import { GeneralTag } from '@/type';
-import { useParams } from 'react-router';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
-export interface IGeneralTagViewProps {
+interface IGeneralTagViewProps {
   tag: GeneralTag;
 }
 
 export function GeneralTagView({ tag }: IGeneralTagViewProps) {
-  const { data, isLoading } = GetGeneralTagQuery(tag);
+  const { data, isLoading } = useSuspenseQuery(generalTagQueryOptions(tag));
   if (isLoading) {
     return <LoadingList />;
   }
@@ -22,9 +25,14 @@ export function GeneralTagView({ tag }: IGeneralTagViewProps) {
   );
 }
 
-export function GeneralTagAlbumsView({ tag }: IGeneralTagViewProps) {
-  const { id } = useParams();
-  const { data, isLoading } = GetGeneralTagAlbumsQuery(tag, id);
+interface IGeneralTagAlbumViewProps extends IGeneralTagViewProps {
+  id: string;
+}
+
+export function GeneralTagAlbumsView({ tag, id }: IGeneralTagAlbumViewProps) {
+  const { data, isLoading } = useSuspenseQuery(
+    generalTagAlbumsQueryOptions(tag, id),
+  );
 
   return (
     <>

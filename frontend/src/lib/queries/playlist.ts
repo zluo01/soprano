@@ -1,6 +1,6 @@
-import { QUERY_CLIENT } from '@/lib/queries/index.ts';
+import { queryClient } from '@/lib/queries/index.ts';
 import { IPlaylist, ISong } from '@/type';
-import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
 import { IMMUTABLE_REQUEST, request } from './utils.ts';
 
@@ -14,6 +14,13 @@ const PlaylistsQueryDocument = /*GraphQL*/ `
         }
     }
 `;
+
+export const playlistQueryOptions = queryOptions({
+  queryKey: [PlaylistsQueryDocument],
+  queryFn: async () =>
+    request<{ Playlists: IPlaylist[] }>(PlaylistsQueryDocument),
+  ...IMMUTABLE_REQUEST,
+});
 
 export function GetPlaylistsQuery() {
   return useQuery({
@@ -36,18 +43,15 @@ const SongsForPlaylistQueryDocument = /*GraphQL*/ `
     }
 `;
 
-export function GetSongsForPlaylistQuery(name?: string) {
-  return useQuery({
+export const songsInPlaylistQueryOptions = (name: string) =>
+  queryOptions({
     queryKey: [SongsForPlaylistQueryDocument, name],
-    queryFn: name
-      ? async () =>
-          request<{ PlaylistSongs: ISong[] }>(SongsForPlaylistQueryDocument, {
-            name,
-          })
-      : skipToken,
+    queryFn: async () =>
+      request<{ PlaylistSongs: ISong[] }>(SongsForPlaylistQueryDocument, {
+        name,
+      }),
     ...IMMUTABLE_REQUEST,
   });
-}
 
 const CreatePlaylistMutationDocument = /* GraphQL */ `
   mutation CreatePlaylist($name: String!) {
@@ -64,7 +68,7 @@ export function CreatePlaylistMutation() {
       await request(CreatePlaylistMutationDocument, { name });
     },
     onSuccess: () => {
-      QUERY_CLIENT.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
     },
   });
 }
@@ -87,7 +91,7 @@ export function DeletePlaylistMutation() {
       });
     },
     onSuccess: () => {
-      QUERY_CLIENT.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
     },
   });
 }
@@ -114,7 +118,7 @@ export function RenamePlaylistMutation() {
       await request(RenamePlaylistMutationDocument, { name, newName });
     },
     onSuccess: () => {
-      QUERY_CLIENT.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
     },
   });
 }
@@ -144,8 +148,8 @@ export function AddSongToPlaylistMutation() {
       });
     },
     onSuccess: (_data, variables, _context) => {
-      QUERY_CLIENT.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
-      QUERY_CLIENT.invalidateQueries({
+      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+      queryClient.invalidateQueries({
         queryKey: [SongsForPlaylistQueryDocument, variables.name],
       });
     },
@@ -177,8 +181,8 @@ export function DeleteSongFromPlaylistMutation() {
       });
     },
     onSuccess: (_data, variables, _context) => {
-      QUERY_CLIENT.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
-      QUERY_CLIENT.invalidateQueries({
+      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+      queryClient.invalidateQueries({
         queryKey: [SongsForPlaylistQueryDocument, variables.name],
       });
     },

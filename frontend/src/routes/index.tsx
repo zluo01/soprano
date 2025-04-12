@@ -1,11 +1,19 @@
 import { LoadingAlbums } from '@/components/loading';
 import ScrollContainer from '@/components/scroll';
 import { AlbumGridView } from '@/components/shares';
-import { GetDisplayAlbumsQuery } from '@/lib/queries';
+import { displayAlbumsQueryOptions } from '@/lib/queries';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import orderBy from 'lodash/orderBy';
 
-export default function RecentlyAdded() {
-  const { data, isLoading } = GetDisplayAlbumsQuery();
+export const Route = createFileRoute('/')({
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(displayAlbumsQueryOptions),
+  component: RecentlyAdded,
+});
+
+function RecentlyAdded() {
+  const { data, isLoading } = useSuspenseQuery(displayAlbumsQueryOptions);
 
   if (isLoading) {
     return <LoadingAlbums />;

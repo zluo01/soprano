@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import pluginQuery from '@tanstack/eslint-plugin-query';
+import pluginRouter from '@tanstack/eslint-plugin-router';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import pluginPromise from 'eslint-plugin-promise';
 import pluginReact from 'eslint-plugin-react';
@@ -22,6 +23,7 @@ export default [
   // ...tailwind.configs['flat/recommended'],
   pluginReact.configs.flat.recommended,
   pluginPromise.configs['flat/recommended'],
+  ...pluginRouter.configs['flat/recommended'],
   ...pluginQuery.configs['flat/recommended'],
   eslintConfigPrettier,
   {

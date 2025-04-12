@@ -1,6 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area.tsx';
+import { useLocation } from '@tanstack/react-router';
 import { ReactNode, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router';
 
 interface IScrollProps {
   className: string;

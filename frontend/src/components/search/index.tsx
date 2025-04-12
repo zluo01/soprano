@@ -15,19 +15,19 @@ import { useFavorStore, useSearchStore } from '@/lib/context';
 import { AddSongsToQueue, GetSearchQuery, PlaySong } from '@/lib/queries';
 import { GeneralTag, IAlbum } from '@/type';
 import { HeartFilledIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { useNavigate } from '@tanstack/react-router';
 import isEmpty from 'lodash/isEmpty';
 import { ListPlus } from 'lucide-react';
 import { motion, PanInfo } from 'motion/react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
 
 function SearchAlbumItem({ id, name, artist }: IAlbum) {
   const navigate = useNavigate();
 
   const { updateSearchModalState } = useSearchStore();
 
-  function route() {
-    navigate(`/albums/${id}`);
+  async function route() {
+    await navigate({ to: '/albums/$id', params: { id: id.toString() } });
     updateSearchModalState(false);
   }
 

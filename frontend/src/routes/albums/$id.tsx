@@ -6,18 +6,26 @@ import { Separator } from '@/components/ui/separator.tsx';
 import { useFavorStore } from '@/lib/context';
 import {
   AddSongsToQueue,
-  GetAlbumDetailQuery,
+  albumDetailQueryOptions,
   PlayAlbum,
   PlaySong,
 } from '@/lib/queries';
 import { formatTime } from '@/lib/utils.ts';
 import { HeartFilledIcon, PlusIcon } from '@radix-ui/react-icons';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { ListPlus } from 'lucide-react';
-import { useParams } from 'react-router';
 
-export default function Album() {
-  const { id } = useParams();
-  const { data } = GetAlbumDetailQuery(id);
+export const Route = createFileRoute('/albums/$id')({
+  loader: ({ context: { queryClient }, params: { id } }) => {
+    return queryClient.ensureQueryData(albumDetailQueryOptions(id));
+  },
+  component: Album,
+});
+
+function Album() {
+  const id = Route.useParams().id;
+  const { data } = useSuspenseQuery(albumDetailQueryOptions(id));
 
   const { openFavorModal } = useFavorStore();
 

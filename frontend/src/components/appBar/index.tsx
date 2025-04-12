@@ -5,8 +5,13 @@ import {
   GearIcon,
   MagnifyingGlassIcon,
 } from '@radix-ui/react-icons';
+import {
+  Link,
+  useLocation,
+  useParams,
+  useRouter,
+} from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 const Search = lazy(() => import('@/components/search'));
 const Settings = lazy(() => import('@/components/settings'));
@@ -16,14 +21,14 @@ interface ISecondaryHeader {
 }
 
 function SecondaryHeader({ header }: ISecondaryHeader) {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <div className="flex w-full max-w-[61.2%] flex-row flex-nowrap items-center space-x-1 overflow-hidden select-none">
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => navigate(-1)}
+        onClick={() => router.history.back()}
         className="p-0"
       >
         <CaretLeftIcon className="size-6 stroke-1 dark:stroke-white [&>path]:stroke-inherit" />
@@ -35,16 +40,15 @@ function SecondaryHeader({ header }: ISecondaryHeader) {
 
 export default function AppBar() {
   const location = useLocation();
-  const { playlistName, name } = useParams();
+  const { name } = useParams({ strict: false });
 
   const { updateSearchModalState } = useSearchStore();
   const { updateSettingModalState } = useSettingStore();
 
   function Header() {
     const pathname = location.pathname;
-    if (pathname.startsWith('/playlists/')) {
-      return <SecondaryHeader header={playlistName} />;
-    } else if (
+    if (
+      pathname.startsWith('/playlists/') ||
       pathname.startsWith('/genres/') ||
       pathname.startsWith('/artists/') ||
       pathname.startsWith('/albumArtists/')

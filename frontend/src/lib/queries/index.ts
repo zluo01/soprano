@@ -5,7 +5,7 @@ import {
   ISearchResponse,
   IStats,
 } from '@/type';
-import { skipToken, useQuery } from '@tanstack/react-query';
+import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
 import isEmpty from 'lodash/isEmpty';
 
 import { IMMUTABLE_REQUEST, request } from './utils';
@@ -22,13 +22,11 @@ const AlbumsQueryDocument = /*GraphQL*/ `
     }
 `;
 
-export function GetDisplayAlbumsQuery() {
-  return useQuery({
-    queryKey: [AlbumsQueryDocument],
-    queryFn: async () => request<{ Albums: IAlbum[] }>(AlbumsQueryDocument),
-    ...IMMUTABLE_REQUEST,
-  });
-}
+export const displayAlbumsQueryOptions = queryOptions({
+  queryKey: [AlbumsQueryDocument],
+  queryFn: async () => request<{ Albums: IAlbum[] }>(AlbumsQueryDocument),
+  ...IMMUTABLE_REQUEST,
+});
 
 const AlbumDetailQueryDocument = /*GraphQL*/ `
     query AlbumDetail($id: Int!) {
@@ -47,18 +45,15 @@ const AlbumDetailQueryDocument = /*GraphQL*/ `
     }
 `;
 
-export function GetAlbumDetailQuery(albumId?: string) {
-  return useQuery({
+export const albumDetailQueryOptions = (albumId: string) =>
+  queryOptions({
     queryKey: [AlbumDetailQueryDocument, albumId],
-    queryFn: !isEmpty(albumId)
-      ? async () =>
-          request<{ Album: IAlbum }>(AlbumDetailQueryDocument, {
-            id: parseInt(albumId!),
-          })
-      : skipToken,
+    queryFn: async () =>
+      request<{ Album: IAlbum }>(AlbumDetailQueryDocument, {
+        id: parseInt(albumId!),
+      }),
     ...IMMUTABLE_REQUEST,
   });
-}
 
 const GenreQueryDocument = /*GraphQL*/ `
     query {
@@ -101,42 +96,30 @@ function generalTagQuery(tag: GeneralTag): string {
   }
 }
 
-interface GetGeneralTagQueryResponse {
-  data?: IGeneralTag[];
-  isLoading: boolean;
-}
-
-export function GetGeneralTagQuery(
-  tag: GeneralTag,
-): GetGeneralTagQueryResponse {
+export const generalTagQueryOptions = (tag: GeneralTag) => {
   const query = generalTagQuery(tag);
-  const { data, isLoading } = useQuery({
+  return queryOptions({
     queryKey: [query],
     queryFn: async () =>
       request<{
         Genres?: IGeneralTag[];
         Artists?: IGeneralTag[];
         AlbumArtists?: IGeneralTag[];
-      }>(query),
+      }>(query).then(response => {
+        switch (tag) {
+          case GeneralTag.GENRE:
+            return response.Genres;
+          case GeneralTag.ARTIST:
+            return response.Artists;
+          case GeneralTag.ALBUM_ARTIST:
+            return response.AlbumArtists;
+          default:
+            throw Error('Unknown tag: ' + tag);
+        }
+      }),
     ...IMMUTABLE_REQUEST,
   });
-
-  const response = (() => {
-    switch (tag) {
-      case GeneralTag.GENRE:
-        return data?.Genres;
-      case GeneralTag.ARTIST:
-        return data?.Artists;
-      case GeneralTag.ALBUM_ARTIST:
-        return data?.AlbumArtists;
-    }
-  })();
-
-  return {
-    data: response,
-    isLoading: isLoading,
-  };
-}
+};
 
 const AlbumForGenreQueryDocument = /*GraphQL*/ `
     query AlbumForGenre($id: Int!) {
@@ -185,37 +168,30 @@ function albumsForTagQuery(tag: GeneralTag): string {
   }
 }
 
-export function GetGeneralTagAlbumsQuery(tag: GeneralTag, id?: string) {
+export const generalTagAlbumsQueryOptions = (tag: GeneralTag, id: string) => {
   const query = albumsForTagQuery(tag);
-  const { data, isLoading } = useQuery({
+  return queryOptions({
     queryKey: [query, id],
-    queryFn: id
-      ? async () =>
-          request<{
-            GenreAlbums?: IAlbum[];
-            ArtistAlbums?: IAlbum[];
-            AlbumArtistAlbums?: IAlbum[];
-          }>(query, { id })
-      : skipToken,
+    queryFn: async () =>
+      request<{
+        GenreAlbums?: IAlbum[];
+        ArtistAlbums?: IAlbum[];
+        AlbumArtistAlbums?: IAlbum[];
+      }>(query, { id }).then(response => {
+        switch (tag) {
+          case GeneralTag.GENRE:
+            return response.GenreAlbums;
+          case GeneralTag.ARTIST:
+            return response.ArtistAlbums;
+          case GeneralTag.ALBUM_ARTIST:
+            return response.AlbumArtistAlbums;
+          default:
+            throw Error('Unknown tag: ' + tag);
+        }
+      }),
     ...IMMUTABLE_REQUEST,
   });
-
-  const response = (() => {
-    switch (tag) {
-      case GeneralTag.GENRE:
-        return data?.GenreAlbums;
-      case GeneralTag.ARTIST:
-        return data?.ArtistAlbums;
-      case GeneralTag.ALBUM_ARTIST:
-        return data?.AlbumArtistAlbums;
-    }
-  })();
-
-  return {
-    data: response,
-    isLoading,
-  };
-}
+};
 
 const StatsQueryDocument = /* GraphQL */ `
   query {
@@ -274,4 +250,4 @@ export function GetSearchQuery(searchText: string) {
 export * from './playback.ts';
 export * from './playlist.ts';
 export * from './database-mutation.ts';
-export { constructImg, QUERY_CLIENT } from './utils.ts';
+export { constructImg, queryClient } from './utils.ts';

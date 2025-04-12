@@ -3,7 +3,7 @@ import { useSearchStore } from '@/lib/context';
 import { cn } from '@/lib/utils.ts';
 import { GeneralTag, IAlbum, IGeneralTag } from '@/type';
 import { DiscIcon } from '@radix-ui/react-icons';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 interface IAlbumGridView {
   albums: IAlbum[];
@@ -19,7 +19,11 @@ export function AlbumGridView({ albums }: IAlbumGridView) {
       )}
     >
       {albums.map(album => (
-        <Link key={album.id} to={`/albums/${album.id}`}>
+        <Link
+          key={album.id}
+          to="/albums/$id"
+          params={{ id: album.id.toString() }}
+        >
           <div className="relative isolate w-full cursor-pointer">
             <Cover
               albumId={album?.id}
@@ -52,16 +56,25 @@ export function GeneralTagItem({
 
   const navigate = useNavigate();
 
-  function route() {
+  async function route() {
     switch (tag) {
       case GeneralTag.GENRE:
-        navigate(`/genres/${id}/${name}`);
+        await navigate({
+          to: '/genres/$id/$name',
+          params: { id: id.toString(), name },
+        });
         break;
       case GeneralTag.ARTIST:
-        navigate(`/artists/${id}/${name}`);
+        await navigate({
+          to: '/artists/$id/$name',
+          params: { id: id.toString(), name },
+        });
         break;
       case GeneralTag.ALBUM_ARTIST:
-        navigate(`/albumArtists/${id}/${name}`);
+        await navigate({
+          to: '/albumArtists/$id/$name',
+          params: { id: id.toString(), name },
+        });
         break;
     }
     updateSearchModalState(false);

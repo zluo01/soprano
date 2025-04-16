@@ -9,15 +9,12 @@ import orderBy from 'lodash/orderBy';
 export const Route = createFileRoute('/')({
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(displayAlbumsQueryOptions),
+  pendingComponent: LoadingAlbums,
   component: RecentlyAdded,
 });
 
 function RecentlyAdded() {
-  const { data, isLoading } = useSuspenseQuery(displayAlbumsQueryOptions);
-
-  if (isLoading) {
-    return <LoadingAlbums />;
-  }
+  const { data } = useSuspenseQuery(displayAlbumsQueryOptions);
 
   const recentAddedAlbums = orderBy(data!.Albums, ['addTime'], 'desc').slice(
     0,

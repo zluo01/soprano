@@ -9,15 +9,12 @@ import sortBy from 'lodash/sortBy';
 export const Route = createFileRoute('/albums/')({
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(displayAlbumsQueryOptions),
+  pendingComponent: LoadingAlbums,
   component: Albums,
 });
 
 function Albums() {
-  const { data, isLoading } = useSuspenseQuery(displayAlbumsQueryOptions);
-
-  if (isLoading) {
-    return <LoadingAlbums />;
-  }
+  const { data } = useSuspenseQuery(displayAlbumsQueryOptions);
   return (
     <ScrollContainer className="h-[calc(100%-100px)] w-full pt-2">
       <AlbumGridView albums={sortBy(data!.Albums, ['name'])} />

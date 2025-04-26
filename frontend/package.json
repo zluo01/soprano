@@ -52,7 +52,7 @@
     "@tanstack/router-plugin": "1.117.2",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/lodash": "4.17.16",
-    "@types/node": "22.14.1",
+    "@types/node": "22.15.2",
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.2",
     "@vite-pwa/assets-generator": "1.0.0",

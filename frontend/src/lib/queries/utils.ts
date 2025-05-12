@@ -20,6 +20,7 @@ export async function request<T>(
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/graphql-response+json',
+      'Accept-Encoding': 'gzip',
     },
     body: JSON.stringify({
       query,

@@ -2,7 +2,7 @@ package database;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.vertx.jdbcclient.JDBCPool;
+import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 import models.Album;
@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 
 public class DatabaseServiceImpl implements DatabaseService {
 
-    private final JDBCPool pool;
+    private final Pool pool;
 
-    public DatabaseServiceImpl(final JDBCPool pool) {
+    public DatabaseServiceImpl(final Pool pool) {
         this.pool = pool;
     }
 

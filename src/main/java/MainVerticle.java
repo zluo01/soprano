@@ -4,11 +4,10 @@ import database.DatabaseVerticle;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.ThreadingModel;
+import io.vertx.core.VerticleBase;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.file.FileSystem;
@@ -23,7 +22,7 @@ import java.util.logging.Level;
 
 import static config.ServerConfig.verifyAndSetupConfig;
 
-public final class MainVerticle extends AbstractVerticle {
+public final class MainVerticle extends VerticleBase {
     private static final Logger LOGGER = LogManager.getLogger(MainVerticle.class);
 
     static {
@@ -33,10 +32,8 @@ public final class MainVerticle extends AbstractVerticle {
 
     public static void main(final String[] args) {
         final Vertx vertx = Vertx.vertx(new VertxOptions().setPreferNativeTransport(true));
-
         vertx.exceptionHandler(throwable -> LOGGER.fatal("Unhandled exception", throwable));
         vertx.deployVerticle(new MainVerticle())
-             .onSuccess(deploymentId -> LOGGER.info("Deployment id for {} is: {}", MainVerticle.class, deploymentId))
              .onFailure(error -> {
                  LOGGER.fatal(error);
                  vertx.close();
@@ -44,25 +41,26 @@ public final class MainVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void start(final Promise<Void> promise) {
+    public Future<?> start() {
         final var configRetriever = configRetriever();
-        validateSetup().compose(__ -> configRetriever.getConfig())
-                       .compose(ServerConfig::verifyAndSetupConfig)
-                       .compose(config -> deployEventLoopVertical(DatabaseVerticle.class, config)
-                               .compose(__ -> Future.all(deployEventLoopVertical(WebServerVerticle.class, config),
-                                                         deployEventLoopVertical(PlaylistVerticle.class, config),
-                                                         deployVerticle(PlayerVerticle.class,
-                                                                        new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                                               .setConfig(config)),
-                                                         deployVerticle(AudioDataCollectorVerticle.class,
-                                                                        new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                                               .setConfig(config)))))
-                       .onSuccess(compositeFuture -> promise.complete())
-                       .onFailure(promise::fail);
+        final var startFuture = validateSetup()
+                .compose(__ -> configRetriever.getConfig())
+                .compose(ServerConfig::verifyAndSetupConfig)
+                .compose(config -> deployEventLoopVertical(DatabaseVerticle.class, config)
+                        .compose(__ -> Future.all(deployEventLoopVertical(WebServerVerticle.class, config),
+                                                  deployEventLoopVertical(PlaylistVerticle.class, config),
+                                                  deployVerticle(PlayerVerticle.class,
+                                                                 new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
+                                                                                        .setConfig(config)),
+                                                  deployVerticle(AudioDataCollectorVerticle.class,
+                                                                 new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
+                                                                                        .setConfig(config)))));
 
         configRetriever.listen(change -> verifyAndSetupConfig(change.getNewConfiguration())
                 .onSuccess(newConfig -> config().mergeIn(newConfig))
                 .onFailure(LOGGER::error));
+
+        return startFuture;
     }
 
     private Future<Void> deployEventLoopVertical(final Class<?> verticleClass, final JsonObject config) {

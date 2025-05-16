@@ -6,7 +6,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.jdbcclient.JDBCPool;
+import io.vertx.sqlclient.Pool;
 import models.Album;
 import models.AlbumData;
 
@@ -16,7 +16,7 @@ import java.util.List;
 @VertxGen
 public interface DatabaseService {
     @GenIgnore
-    static DatabaseService create(JDBCPool pool) {
+    static DatabaseService create(Pool pool) {
         return new DatabaseServiceImpl(pool);
     }
 

@@ -3,25 +3,25 @@ package playlists;
 import database.DatabaseService;
 import database.DatabaseVerticle;
 import helper.ServiceHelper;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
+import io.vertx.core.Future;
+import io.vertx.core.VerticleBase;
 import io.vertx.core.file.FileSystem;
 import io.vertx.serviceproxy.ServiceBinder;
 
-public class PlaylistVerticle extends AbstractVerticle {
+public class PlaylistVerticle extends VerticleBase {
     @Override
-    public void start(final Promise<Void> promise) {
+    public Future<?> start() {
         final FileSystem fileSystem = vertx.fileSystem();
         final DatabaseService databaseService = ServiceHelper.createServiceProxy(vertx, DatabaseVerticle.class, DatabaseService.class);
 
         final PlaylistService playlistService = PlaylistService.create(databaseService, fileSystem);
 
-        playlistService.validatePlaylists()
-                       .onSuccess(__ -> {
-                           final ServiceBinder binder = new ServiceBinder(vertx);
-                           binder.setAddress(PlaylistVerticle.class.getName())
-                                 .register(PlaylistService.class, playlistService);
-                           promise.complete();
-                       }).onFailure(promise::fail);
+        return playlistService.validatePlaylists()
+                              .compose(__ -> {
+                                  final ServiceBinder binder = new ServiceBinder(vertx);
+                                  binder.setAddress(PlaylistVerticle.class.getName())
+                                        .register(PlaylistService.class, playlistService);
+                                  return Future.succeededFuture();
+                              });
     }
 }

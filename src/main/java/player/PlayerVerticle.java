@@ -3,13 +3,13 @@ package player;
 import database.DatabaseService;
 import database.DatabaseVerticle;
 import helper.ServiceHelper;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
+import io.vertx.core.Future;
+import io.vertx.core.VerticleBase;
 import io.vertx.serviceproxy.ServiceBinder;
 
-public class PlayerVerticle extends AbstractVerticle {
+public class PlayerVerticle extends VerticleBase {
     @Override
-    public void start(final Promise<Void> promise) {
+    public Future<?> start() {
         final MPVInstance instance = MPVInstance.create(config());
 
         final DatabaseService databaseService = ServiceHelper.createServiceProxy(vertx, DatabaseVerticle.class, DatabaseService.class);
@@ -18,6 +18,6 @@ public class PlayerVerticle extends AbstractVerticle {
         final ServiceBinder binder = new ServiceBinder(vertx);
         binder.setAddress(PlayerVerticle.class.getName())
               .register(PlayerService.class, playlistService);
-        promise.complete();
+        return Future.succeededFuture();
     }
 }

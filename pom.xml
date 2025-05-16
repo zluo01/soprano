@@ -24,7 +24,7 @@
         <main.class>MainVerticle</main.class>
 
         <guava.version>33.4.8-jre</guava.version>
-        <vertx.version>4.5.14</vertx.version>
+        <vertx.version>5.0.0</vertx.version>
         <log4j.version>2.24.3</log4j.version>
         <jackson.version>2.19.0</jackson.version>
         <sqlite.version>3.49.1.0</sqlite.version>
@@ -222,6 +222,11 @@
             <artifactId>vertx-web-graphql</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-extended-scalars</artifactId>
+            <version>22.0</version>
+        </dependency>
+        <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-service-proxy</artifactId>
         </dependency>
@@ -229,6 +234,7 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-codegen</artifactId>
             <classifier>processor</classifier>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>

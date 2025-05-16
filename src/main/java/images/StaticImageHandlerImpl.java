@@ -6,8 +6,7 @@ import io.vertx.core.file.FileSystem;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.impl.HttpUtils;
-import io.vertx.core.net.impl.URIDecoder;
+import io.vertx.core.internal.net.RFC3986;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.impl.Utils;
 import org.apache.logging.log4j.LogManager;
@@ -46,14 +45,8 @@ public class StaticImageHandlerImpl implements StaticImageHandler {
         if (request.method() != HttpMethod.GET && request.method() != HttpMethod.HEAD) {
             context.response().setStatusCode(HttpResponseStatus.METHOD_NOT_ALLOWED.code()).end();
         } else {
-            final String uriDecodedPath = URIDecoder.decodeURIComponent(context.normalizedPath(), false);
-            if (uriDecodedPath == null) {
-                LOGGER.warn("Invalid path: {}", context.request().path());
-                context.response().setStatusCode(HttpResponseStatus.BAD_REQUEST.code()).end();
-                return;
-            }
-
-            final String path = HttpUtils.removeDots(uriDecodedPath.replace('\\', '/'));
+            final String uriDecodedPath = RFC3986.decodeURIComponent(context.normalizedPath(), false);
+            final String path = RFC3986.removeDotSegments(uriDecodedPath.replace('\\', '/'));
             if (IMAGE_PATH_PATTERN.matcher(path).matches()) {
                 final FileSystem fs = context.vertx().fileSystem();
                 sendImageFile(context, fs, path);

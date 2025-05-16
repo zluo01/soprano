@@ -2,18 +2,15 @@ package server;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.sun.jdi.IntegerValue;
 import database.DatabaseService;
 import graphql.GraphQL;
-import graphql.GraphQLException;
 import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.execution.instrumentation.Instrumentation;
 import graphql.execution.preparsed.PreparsedDocumentEntry;
 import graphql.execution.preparsed.PreparsedDocumentProvider;
-import graphql.schema.Coercing;
+import graphql.scalars.ExtendedScalars;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
@@ -29,6 +26,7 @@ import player.PlayerService;
 import playlists.PlaylistService;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import static enums.WorkerAction.SCAN_DIRECTORY;
@@ -47,7 +45,7 @@ final class GraphQLInitializer {
                                 final EventBus eventBus) {
         final PreparsedDocumentProvider preparsedCache = (executionInput, computeFunction) -> {
             Function<String, PreparsedDocumentEntry> mapCompute = key -> computeFunction.apply(executionInput);
-            return QUERY_CACHE.get(executionInput.getQuery(), mapCompute);
+            return CompletableFuture.completedFuture(QUERY_CACHE.get(executionInput.getQuery(), mapCompute));
         };
 
         final TypeDefinitionRegistry registry = new SchemaParser().parse(schema);
@@ -129,44 +127,10 @@ final class GraphQLInitializer {
                 .type("Query", builder -> builder.dataFetcher("Search", search))
                 .type("Mutation", builder -> builder.dataFetcher("Build", build))
                 .type("Mutation", builder -> builder.dataFetcher("Update", update))
-                .scalar(longScalar())
+                .scalar(ExtendedScalars.GraphQLLong)
                 .build();
     }
 
-    private static GraphQLScalarType longScalar() {
-        return GraphQLScalarType.newScalar()
-                                .name("Long")
-                                .description("Java Long as scalar.")
-                                .coercing(new LongScalar())
-                                .build();
-    }
-
-    private static class LongScalar implements Coercing<Long, Long> {
-
-        @Override
-        public Long serialize(final Object input) {
-            if (input instanceof Long) {
-                return (Long) input;
-            }
-            throw new GraphQLException("Expected Long but got " + input.getClass().getSimpleName());
-        }
-
-        @Override
-        public Long parseValue(final Object input) {
-            if (input instanceof Number) {
-                return ((Number) input).longValue();
-            }
-            throw new GraphQLException("Expected Long but got " + input.getClass().getSimpleName());
-        }
-
-        @Override
-        public Long parseLiteral(final Object input) {
-            if (input instanceof IntegerValue) {
-                return ((IntegerValue) input).longValue();
-            }
-            throw new GraphQLException("Expected Long but got " + input.getClass().getSimpleName());
-        }
-    }
 
     private static void initializeSongOperations(final RuntimeWiring.Builder wiringBuilder, final DatabaseService databaseService) {
         final DataFetcher<Future<JsonObject>> song = environment -> {

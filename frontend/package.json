@@ -48,7 +48,7 @@
     "@tanstack/eslint-plugin-query": "5.74.7",
     "@tanstack/eslint-plugin-router": "1.115.0",
     "@tanstack/react-query-devtools": "5.76.1",
-    "@tanstack/react-router-devtools": "1.120.5",
+    "@tanstack/react-router-devtools": "1.120.6",
     "@tanstack/router-plugin": "1.120.5",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/lodash": "4.17.16",

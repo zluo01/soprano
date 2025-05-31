@@ -115,18 +115,18 @@ final class GraphQLInitializer {
         initializePlaylistOperations(wiringBuilder, playlistService);
         initializePlayerOperations(wiringBuilder, playerService);
         return wiringBuilder
-                .type("Query", builder -> builder.dataFetcher("Albums", albums))
-                .type("Query", builder -> builder.dataFetcher("Album", album))
-                .type("Query", builder -> builder.dataFetcher("Genres", genres))
-                .type("Query", builder -> builder.dataFetcher("GenreAlbums", albumsForGenre))
-                .type("Query", builder -> builder.dataFetcher("AlbumArtists", albumArtists))
-                .type("Query", builder -> builder.dataFetcher("AlbumArtistAlbums", albumsForAlbumArtists))
-                .type("Query", builder -> builder.dataFetcher("Artists", artists))
-                .type("Query", builder -> builder.dataFetcher("ArtistAlbums", albumsForArtist))
-                .type("Query", builder -> builder.dataFetcher("Stats", stats))
-                .type("Query", builder -> builder.dataFetcher("Search", search))
-                .type("Mutation", builder -> builder.dataFetcher("Build", build))
-                .type("Mutation", builder -> builder.dataFetcher("Update", update))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Albums", albums))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Album", album))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Genres", genres))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("GenreAlbums", albumsForGenre))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("AlbumArtists", albumArtists))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("AlbumArtistAlbums", albumsForAlbumArtists))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Artists", artists))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("ArtistAlbums", albumsForArtist))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Stats", stats))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Search", search))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("Build", build))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("Update", update))
                 .scalar(ExtendedScalars.GraphQLLong)
                 .build();
     }
@@ -143,8 +143,8 @@ final class GraphQLInitializer {
             return databaseService.songsFromPath(paths);
         };
 
-        wiringBuilder.type("Query", builder -> builder.dataFetcher("Song", song))
-                     .type("Query", builder -> builder.dataFetcher("Songs", songs));
+        wiringBuilder.type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Song", song))
+                     .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Songs", songs));
     }
 
     private static void initializePlaylistOperations(final RuntimeWiring.Builder wiringBuilder,
@@ -185,13 +185,13 @@ final class GraphQLInitializer {
         };
 
         wiringBuilder
-                .type("Query", builder -> builder.dataFetcher("Playlists", playlists))
-                .type("Query", builder -> builder.dataFetcher("PlaylistSongs", playlistSongs))
-                .type("Mutation", builder -> builder.dataFetcher("CreatePlaylist", createPlaylist))
-                .type("Mutation", builder -> builder.dataFetcher("DeletePlaylist", deletePlaylist))
-                .type("Mutation", builder -> builder.dataFetcher("RenamePlaylist", renamePlaylist))
-                .type("Mutation", builder -> builder.dataFetcher("AddSongToPlaylist", addSongToPlaylist))
-                .type("Mutation", builder -> builder.dataFetcher("DeleteSongFromPlaylist", deleteSongFromPlaylist));
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Playlists", playlists))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("PlaylistSongs", playlistSongs))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("CreatePlaylist", createPlaylist))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("DeletePlaylist", deletePlaylist))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("RenamePlaylist", renamePlaylist))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("AddSongToPlaylist", addSongToPlaylist))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("DeleteSongFromPlaylist", deleteSongFromPlaylist));
     }
 
     private static void initializePlayerOperations(final RuntimeWiring.Builder wiringBuilder,
@@ -243,19 +243,19 @@ final class GraphQLInitializer {
         final DataFetcher<Future<Integer>> clearQueue = environment -> playerService.clearQueue();
 
         wiringBuilder
-                .type("Query", builder -> builder.dataFetcher("SongsInQueue", songsInQueue))
-                .type("Query", builder -> builder.dataFetcher("PlaybackStatus", playbackStatus))
-                .type("Mutation", builder -> builder.dataFetcher("PlaySong", playSong))
-                .type("Mutation", builder -> builder.dataFetcher("PlayPlaylist", playPlaylist))
-                .type("Mutation", builder -> builder.dataFetcher("PlayAlbum", playAlbum))
-                .type("Mutation", builder -> builder.dataFetcher("PauseSong", pauseSong))
-                .type("Mutation", builder -> builder.dataFetcher("NextSong", nextSong))
-                .type("Mutation", builder -> builder.dataFetcher("PrevSong", prevSong))
-                .type("Mutation", builder -> builder.dataFetcher("ToggleLoop", toggleLoop))
-                .type("Mutation", builder -> builder.dataFetcher("PlaySongInQueueAtPosition", playSongInQueueAtPosition))
-                .type("Mutation", builder -> builder.dataFetcher("AddSongsToQueue", addSongsToQueue))
-                .type("Mutation", builder -> builder.dataFetcher("RemoveSongFromQueue", removeSongFromQueue))
-                .type("Mutation", builder -> builder.dataFetcher("ClearQueue", clearQueue));
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("SongsInQueue", songsInQueue))
+                .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("PlaybackStatus", playbackStatus))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("PlaySong", playSong))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("PlayPlaylist", playPlaylist))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("PlayAlbum", playAlbum))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("PauseSong", pauseSong))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("NextSong", nextSong))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("PrevSong", prevSong))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("ToggleLoop", toggleLoop))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("PlaySongInQueueAtPosition", playSongInQueueAtPosition))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("AddSongsToQueue", addSongsToQueue))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("RemoveSongFromQueue", removeSongFromQueue))
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("ClearQueue", clearQueue));
     }
 
     private static <T> T extractField(final DataFetchingEnvironment env, final String key) {
@@ -264,5 +264,11 @@ final class GraphQLInitializer {
             throw new IllegalArgumentException(key + " is required.");
         }
         return field;
+    }
+
+    enum GraphqlOperationType {
+        Query,
+        Mutation,
+        Subscription
     }
 }

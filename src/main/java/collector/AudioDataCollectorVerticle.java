@@ -76,7 +76,7 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
 
             if (update) {
                 databaseService.songPaths()
-                               .compose(songPathsFromDatabase -> {
+                               .flatMap(songPathsFromDatabase -> {
                                    final var songPathsNotInDB = songPaths.stream()
                                                                          .filter(o -> !songPathsFromDatabase.contains(o))
                                                                          .toList();

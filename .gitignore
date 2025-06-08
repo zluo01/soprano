@@ -118,3 +118,4 @@ $RECYCLE.BIN/
 .DS_Store
 *.sqlite
 /dependency-reduced-pom.xml
+!/src/test/resources/test.sqlite

@@ -37,11 +37,11 @@ public interface DatabaseService {
 
     Future<List<JsonObject>> albumArtists();
 
-    Future<List<JsonObject>> albumsForAlbumArtists(int id);
+    Future<List<JsonObject>> albumsForAlbumArtist(int id);
 
     Future<List<JsonObject>> artists();
 
-    Future<List<JsonObject>> albumsForArtists(int id);
+    Future<List<JsonObject>> albumsForArtist(int id);
 
     Future<Void> scan(List<AlbumData> albums);
 

@@ -82,14 +82,14 @@ final class GraphQLInitializer {
 
         final DataFetcher<Future<List<JsonObject>>> albumsForAlbumArtists = environment -> {
             final int id = extractField(environment, "id");
-            return databaseService.albumsForAlbumArtists(id);
+            return databaseService.albumsForAlbumArtist(id);
         };
 
         final DataFetcher<Future<List<JsonObject>>> artists = environment -> databaseService.artists();
 
         final DataFetcher<Future<List<JsonObject>>> albumsForArtist = environment -> {
             final int id = extractField(environment, "id");
-            return databaseService.albumsForArtists(id);
+            return databaseService.albumsForArtist(id);
         };
 
         final DataFetcher<Future<Boolean>> update = environment -> {

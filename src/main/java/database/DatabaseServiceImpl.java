@@ -169,7 +169,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<List<JsonObject>> albumsForAlbumArtists(final int id) {
+    public Future<List<JsonObject>> albumsForAlbumArtist(final int id) {
         return pool.preparedQuery(DatabaseAction.GET_ALBUMS_FOR_ALBUM_ARTIST.query())
                    .execute(Tuple.of(id))
                    .map(rows -> {
@@ -195,7 +195,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<List<JsonObject>> albumsForArtists(final int id) {
+    public Future<List<JsonObject>> albumsForArtist(final int id) {
         return pool.preparedQuery(DatabaseAction.GET_ALBUMS_FOR_ARTIST.query())
                    .execute(Tuple.of(id))
                    .map(rows -> {

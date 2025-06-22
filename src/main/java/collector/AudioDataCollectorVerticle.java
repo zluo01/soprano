@@ -5,11 +5,7 @@ import database.DatabaseService;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.file.FileSystem;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import models.AlbumData;
 import models.SongData;
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +30,6 @@ import static collector.ImageOptimizer.optimize;
 import static config.ServerConfig.coverSourceDimension;
 import static config.ServerConfig.coverVariants;
 import static config.ServerConfig.musicDirectory;
-import static enums.WorkerAction.BUILD_DIRECTORY;
 import static enums.WorkerAction.SCAN_DIRECTORY;
 import static enums.WorkerAction.UPDATE_DIRECTORY;
 
@@ -45,7 +40,6 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
 
     private final DatabaseService databaseService;
 
-    private EventBus eventBus;
     private FileSystem fileSystem;
 
     public AudioDataCollectorVerticle(final DatabaseService databaseService) {
@@ -56,13 +50,11 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
     public void start() {
         fileSystem = vertx.fileSystem();
 
-        eventBus = vertx.eventBus();
+        final var eventBus = vertx.eventBus();
 
-        eventBus.consumer(UPDATE_DIRECTORY.name(), message -> scanDirectory(musicDirectory(config()), true));
+        eventBus.consumer(UPDATE_DIRECTORY.name(), __ -> scanDirectory(musicDirectory(config()), true));
 
-        eventBus.consumer(SCAN_DIRECTORY.name(), message -> scanDirectory(musicDirectory(config()), false));
-
-        eventBus.<String>consumer(BUILD_DIRECTORY.name(), message -> buildDatabase(message.body()));
+        eventBus.consumer(SCAN_DIRECTORY.name(), __ -> scanDirectory(musicDirectory(config()), false));
     }
 
     private void scanDirectory(final String root, final boolean update) {
@@ -155,11 +147,14 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
                 }
             }
 
-            final String albumData = Json.encode(sourceMap.values()
-                                                          .stream()
-                                                          .map(AlbumData::toJson)
-                                                          .toList());
-            eventBus.publish(BUILD_DIRECTORY.name(), albumData);
+            databaseService.scan(List.copyOf(sourceMap.values()))
+                           .onSuccess(__ -> LOGGER.info("Successfully update the database"))
+                           .onFailure(throwable -> LOGGER.error("Fail to build directory", throwable))
+                           .eventually(() -> {
+                               isRunning.set(false);
+                               return Future.succeededFuture();
+                           })
+                           .await();
 
             // optimize image
             try (ExecutorService imageOptimizationExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
@@ -179,20 +174,6 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
                 LOGGER.error("Error happens during optimizing images", e);
             }
         }).start();
-    }
-
-    private void buildDatabase(final String payload) {
-        final List<AlbumData> albumData = ((JsonArray) Json.decodeValue(payload))
-                .stream()
-                .map(o -> new AlbumData((JsonObject) o))
-                .toList();
-        databaseService.scan(albumData)
-                       .onSuccess(__ -> LOGGER.info("Successfully update the database"))
-                       .onFailure(throwable -> LOGGER.error("Fail to build directory", throwable))
-                       .eventually(() -> {
-                           isRunning.set(false);
-                           return Future.succeededFuture();
-                       });
     }
 
     private void optimizeImage(final int albumId, final Artwork artwork) {

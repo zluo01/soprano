@@ -16,7 +16,7 @@ import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import player.PlayerVerticle;
-import playlists.PlaylistVerticle;
+import playlists.PlaylistService;
 import server.WebServerVerticle;
 
 import java.util.logging.Level;
@@ -49,8 +49,8 @@ public final class MainVerticle extends VerticleBase {
                 .compose(ServerConfig::verifyAndSetupConfig)
                 .compose(config -> {
                     final DatabaseService databaseService = DatabaseService.create(vertx, config);
-                    return Future.all(deployEventLoopVertical(new WebServerVerticle(databaseService), config),
-                                      deployEventLoopVertical(new PlaylistVerticle(databaseService), config),
+                    final PlaylistService playlistService = PlaylistService.create(vertx, databaseService);
+                    return Future.all(deployEventLoopVertical(new WebServerVerticle(databaseService, playlistService), config),
                                       deployVerticle(new PlayerVerticle(databaseService),
                                                      new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
                                                                             .setConfig(config)),

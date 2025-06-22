@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import player.PlayerService;
 import player.PlayerVerticle;
 import playlists.PlaylistService;
-import playlists.PlaylistVerticle;
 
 import static config.ServerConfig.enableGraphQLDebug;
 import static config.ServerConfig.isWebUiEnabled;
@@ -31,12 +30,13 @@ public final class WebServerVerticle extends VerticleBase {
     private static final int DEFAULT_PORT = 6868;
 
     private final DatabaseService databaseService;
-    private PlaylistService playlistService;
+    private final PlaylistService playlistService;
     private PlayerService playerService;
     private Router router;
 
-    public WebServerVerticle(final DatabaseService databaseService) {
+    public WebServerVerticle(final DatabaseService databaseService, final PlaylistService playlistService) {
         this.databaseService = databaseService;
+        this.playlistService = playlistService;
     }
 
     @Override
@@ -52,7 +52,6 @@ public final class WebServerVerticle extends VerticleBase {
     }
 
     private Future<StartupContext> setupServices(final StartupContext startup) {
-        playlistService = ServiceHelper.createServiceProxy(vertx, PlaylistVerticle.class, PlaylistService.class);
         playerService = ServiceHelper.createServiceProxy(vertx, PlayerVerticle.class, PlayerService.class);
         router = Router.router(vertx);
         return Future.succeededFuture(startup);

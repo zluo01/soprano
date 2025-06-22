@@ -19,11 +19,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-public class DatabaseServiceImpl implements DatabaseService {
+class DatabaseServiceImpl implements DatabaseService {
 
     private final Pool pool;
 
-    public DatabaseServiceImpl(final Pool pool) {
+    DatabaseServiceImpl(final Pool pool) {
         this.pool = pool;
     }
 

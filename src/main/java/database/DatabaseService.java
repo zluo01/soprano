@@ -1,28 +1,29 @@
 package database;
 
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.ProxyGen;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.jdbcclient.JDBCConnectOptions;
+import io.vertx.jdbcclient.JDBCPool;
 import io.vertx.sqlclient.Pool;
+import io.vertx.sqlclient.PoolOptions;
 import models.Album;
 import models.AlbumData;
 
 import java.util.List;
 
-@ProxyGen
-@VertxGen
-public interface DatabaseService {
-    @GenIgnore
-    static DatabaseService create(Pool pool) {
-        return new DatabaseServiceImpl(pool);
-    }
+import static config.ServerConfig.DATABASE_CONFIG;
+import static config.ServerConfig.DATABASE_FILE_PATH;
 
-    @GenIgnore
-    static DatabaseService createProxy(Vertx vertx, String address) {
-        return new DatabaseServiceVertxEBProxy(vertx, address);
+
+public interface DatabaseService {
+    static DatabaseService create(final Vertx vertx, final JsonObject config) {
+        final String url = config.getString(DATABASE_CONFIG, DATABASE_FILE_PATH);
+
+        final JDBCConnectOptions connectOptions = new JDBCConnectOptions()
+                .setJdbcUrl("jdbc:sqlite:" + url);
+        final Pool client = JDBCPool.pool(vertx, connectOptions, new PoolOptions());
+        return new DatabaseServiceImpl(client);
     }
 
     Future<Void> initialization();

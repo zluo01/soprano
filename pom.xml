@@ -141,7 +141,8 @@
                                         <Main-Verticle>${main.class}</Main-Verticle>
                                     </manifestEntries>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                             <outputFile>
                                 ${project.build.directory}/${project.artifactId}-main.jar

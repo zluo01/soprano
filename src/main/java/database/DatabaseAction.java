@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 
-public enum DatabaseAction {
+enum DatabaseAction {
     CLEAR_ALBUM_ARTISTS,
     CLEAR_ALBUMS,
     CLEAR_ARTISTS,
@@ -62,7 +62,7 @@ public enum DatabaseAction {
         }
     }
 
-    public String query() {
+    String query() {
         if (QUERY_MAP.containsKey(this)) {
             return QUERY_MAP.get(this);
         }

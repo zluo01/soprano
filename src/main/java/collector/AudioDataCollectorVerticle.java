@@ -2,8 +2,6 @@ package collector;
 
 import config.ServerConfig;
 import database.DatabaseService;
-import database.DatabaseVerticle;
-import helper.ServiceHelper;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
@@ -45,14 +43,17 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
 
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
-    private DatabaseService databaseService;
+    private final DatabaseService databaseService;
+
     private EventBus eventBus;
     private FileSystem fileSystem;
 
+    public AudioDataCollectorVerticle(final DatabaseService databaseService) {
+        this.databaseService = databaseService;
+    }
+
     @Override
     public void start() {
-        databaseService = ServiceHelper.createServiceProxy(vertx, DatabaseVerticle.class, DatabaseService.class);
-
         fileSystem = vertx.fileSystem();
 
         eventBus = vertx.eventBus();
@@ -77,13 +78,13 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
             if (update) {
                 databaseService.songPaths()
                                .flatMap(songPathsFromDatabase -> {
-                                   final var songPathsNotInDB = songPaths.stream()
-                                                                         .filter(o -> !songPathsFromDatabase.contains(o))
-                                                                         .toList();
+                                   final List<String> songPathsNotInDB = songPaths.stream()
+                                                                                  .filter(o -> !songPathsFromDatabase.contains(o))
+                                                                                  .toList();
 
-                                   final var deletedSongPaths = songPathsFromDatabase.stream()
-                                                                                     .filter(o -> !songPaths.contains(o))
-                                                                                     .toList();
+                                   final List<String> deletedSongPaths = songPathsFromDatabase.stream()
+                                                                                              .filter(o -> !songPaths.contains(o))
+                                                                                              .toList();
                                    if (!deletedSongPaths.isEmpty()) {
                                        LOGGER.info("{} song need to delete.", deletedSongPaths.size());
                                        return databaseService.removeSongs(deletedSongPaths)

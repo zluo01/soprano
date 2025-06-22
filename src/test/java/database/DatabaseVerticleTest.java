@@ -1,7 +1,5 @@
 package database;
 
-import helper.ServiceHelper;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
@@ -30,7 +28,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static config.ServerConfig.DATABASE_CONFIG;
-import static helper.TestUtils.readFileAsBuffer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -49,12 +46,8 @@ class DatabaseVerticleTest {
 
         final JsonObject config = new JsonObject().put(DATABASE_CONFIG, tempDbPath.toString());
 
-        vertx.deployVerticle(new DatabaseVerticle(), new DeploymentOptions().setConfig(config))
-             .onSuccess(__ -> {
-                 databaseService = ServiceHelper.createServiceProxy(vertx, DatabaseVerticle.class, DatabaseService.class);
-                 context.completeNow();
-             })
-             .onFailure(context::failNow);
+        databaseService = DatabaseService.create(vertx, config);
+        context.completeNow();
     }
 
 
@@ -70,7 +63,7 @@ class DatabaseVerticleTest {
         databaseService.albums()
                        .onSuccess(result -> context.verify(() -> {
                            assertEquals(11, result.size());
-                           assertEquals(readFileAsBuffer("fixtures/db/albums.json").toString().trim(),
+                           assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/albums.json").toString().trim(),
                                         new JsonArray(result.stream()
                                                             .map(Album::toJson)
                                                             .toList())
@@ -84,7 +77,7 @@ class DatabaseVerticleTest {
     void verifyGetAlbum(Vertx vertx, VertxTestContext context) {
         databaseService.album(2037516188)
                        .onSuccess(album -> context.verify(() -> {
-                           assertEquals(readFileAsBuffer("fixtures/db/album.json").toString().trim(),
+                           assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/album.json").toString().trim(),
                                         album.toJson().encode());
                            context.completeNow();
                        }))
@@ -96,7 +89,7 @@ class DatabaseVerticleTest {
         databaseService.genres()
                        .onSuccess(result -> context.verify(() -> {
                            assertEquals(7, result.size());
-                           assertEquals(readFileAsBuffer("fixtures/db/genres.json").toString().trim(),
+                           assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/genres.json").toString().trim(),
                                         new JsonArray(result).encode());
                            context.completeNow();
                        }))
@@ -108,7 +101,7 @@ class DatabaseVerticleTest {
         databaseService.albumArtists()
                        .onSuccess(result -> context.verify(() -> {
                            assertEquals(5, result.size());
-                           assertEquals(readFileAsBuffer("fixtures/db/albumArtists.json").toString().trim(),
+                           assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/albumArtists.json").toString().trim(),
                                         new JsonArray(result).encode());
                            context.completeNow();
                        }))
@@ -120,7 +113,7 @@ class DatabaseVerticleTest {
         databaseService.artists()
                        .onSuccess(result -> context.verify(() -> {
                            assertEquals(6, result.size());
-                           assertEquals(readFileAsBuffer("fixtures/db/artists.json").toString().trim(),
+                           assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/artists.json").toString().trim(),
                                         new JsonArray(result).encode());
                            context.completeNow();
                        }))
@@ -132,7 +125,7 @@ class DatabaseVerticleTest {
         databaseService.albumsForGenre(1471074189)
                        .onSuccess(result -> context.verify(() -> {
                            assertEquals(1, result.size());
-                           assertEquals(readFileAsBuffer("fixtures/db/albumsForGenre.json").toString().trim(),
+                           assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/albumsForGenre.json").toString().trim(),
                                         new JsonArray(result).encode());
                            context.completeNow();
                        }))
@@ -144,7 +137,7 @@ class DatabaseVerticleTest {
         databaseService.albumsForAlbumArtist(1034325051)
                        .onSuccess(result -> context.verify(() -> {
                            assertEquals(6, result.size());
-                           assertEquals(readFileAsBuffer("fixtures/db/albumsForAlbumArtist.json").toString().trim(),
+                           assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/albumsForAlbumArtist.json").toString().trim(),
                                         new JsonArray(result).encode());
                            context.completeNow();
                        }))
@@ -156,7 +149,7 @@ class DatabaseVerticleTest {
         databaseService.albumsForArtist(-1817732934)
                        .onSuccess(result -> context.verify(() -> {
                            assertEquals(2, result.size());
-                           assertEquals(readFileAsBuffer("fixtures/db/albumsForArtist.json").toString().trim(),
+                           assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/albumsForArtist.json").toString().trim(),
                                         new JsonArray(result).encode());
                            context.completeNow();
                        }))
@@ -210,7 +203,7 @@ class DatabaseVerticleTest {
     void verifySearch(Vertx vertx, VertxTestContext context) {
         databaseService.search("mu")
                        .onSuccess(result -> context.verify(() -> {
-                           assertEquals(readFileAsBuffer("fixtures/db/search.json").toJsonObject(), result);
+                           assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/search.json").toJsonObject(), result);
                            context.completeNow();
                        }))
                        .onFailure(context::failNow);

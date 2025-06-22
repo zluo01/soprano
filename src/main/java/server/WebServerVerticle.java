@@ -2,7 +2,6 @@ package server;
 
 import config.ServerConfig;
 import database.DatabaseService;
-import database.DatabaseVerticle;
 import graphql.GraphQL;
 import helper.ServiceHelper;
 import images.StaticImageHandler;
@@ -31,10 +30,14 @@ public final class WebServerVerticle extends VerticleBase {
 
     private static final int DEFAULT_PORT = 6868;
 
-    private DatabaseService databaseService;
+    private final DatabaseService databaseService;
     private PlaylistService playlistService;
     private PlayerService playerService;
     private Router router;
+
+    public WebServerVerticle(final DatabaseService databaseService) {
+        this.databaseService = databaseService;
+    }
 
     @Override
     public Future<?> start() {
@@ -49,7 +52,6 @@ public final class WebServerVerticle extends VerticleBase {
     }
 
     private Future<StartupContext> setupServices(final StartupContext startup) {
-        databaseService = ServiceHelper.createServiceProxy(vertx, DatabaseVerticle.class, DatabaseService.class);
         playlistService = ServiceHelper.createServiceProxy(vertx, PlaylistVerticle.class, PlaylistService.class);
         playerService = ServiceHelper.createServiceProxy(vertx, PlayerVerticle.class, PlayerService.class);
         router = Router.router(vertx);

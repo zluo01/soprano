@@ -1,9 +1,10 @@
 import collector.AudioDataCollectorVerticle;
 import config.ServerConfig;
-import database.DatabaseVerticle;
+import database.DatabaseService;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
+import io.vertx.core.Deployable;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.ThreadingModel;
@@ -46,15 +47,17 @@ public final class MainVerticle extends VerticleBase {
         final var startFuture = validateSetup()
                 .compose(__ -> configRetriever.getConfig())
                 .compose(ServerConfig::verifyAndSetupConfig)
-                .compose(config -> deployEventLoopVertical(DatabaseVerticle.class, config)
-                        .compose(__ -> Future.all(deployEventLoopVertical(WebServerVerticle.class, config),
-                                                  deployEventLoopVertical(PlaylistVerticle.class, config),
-                                                  deployVerticle(PlayerVerticle.class,
-                                                                 new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                                        .setConfig(config)),
-                                                  deployVerticle(AudioDataCollectorVerticle.class,
-                                                                 new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                                        .setConfig(config)))));
+                .compose(config -> {
+                    final DatabaseService databaseService = DatabaseService.create(vertx, config);
+                    return Future.all(deployEventLoopVertical(new WebServerVerticle(databaseService), config),
+                                      deployEventLoopVertical(new PlaylistVerticle(databaseService), config),
+                                      deployVerticle(new PlayerVerticle(databaseService),
+                                                     new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
+                                                                            .setConfig(config)),
+                                      deployVerticle(new AudioDataCollectorVerticle(databaseService),
+                                                     new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
+                                                                            .setConfig(config)));
+                });
 
         configRetriever.listen(change -> verifyAndSetupConfig(change.getNewConfiguration())
                 .onSuccess(newConfig -> config().mergeIn(newConfig))
@@ -63,13 +66,13 @@ public final class MainVerticle extends VerticleBase {
         return startFuture;
     }
 
-    private Future<Void> deployEventLoopVertical(final Class<?> verticleClass, final JsonObject config) {
-        return deployVerticle(verticleClass, new DeploymentOptions().setConfig(config));
+    private Future<Void> deployEventLoopVertical(final Deployable deployable, final JsonObject config) {
+        return deployVerticle(deployable, new DeploymentOptions().setConfig(config));
     }
 
-    private Future<Void> deployVerticle(final Class<?> verticleClass,
+    private Future<Void> deployVerticle(final Deployable deployable,
                                         final DeploymentOptions deploymentOptions) {
-        return vertx.deployVerticle(verticleClass.getName(), deploymentOptions)
+        return vertx.deployVerticle(deployable, deploymentOptions)
                     .flatMap(__ -> Future.succeededFuture());
     }
 

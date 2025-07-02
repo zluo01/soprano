@@ -1,9 +1,10 @@
 package collector;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import config.ServerConfig;
 import database.DatabaseService;
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.VerticleBase;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 import models.AlbumData;
@@ -19,9 +20,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static collector.AlbumScannerHelper.parseTag;
@@ -33,10 +36,17 @@ import static config.ServerConfig.musicDirectory;
 import static enums.WorkerAction.SCAN_DIRECTORY;
 import static enums.WorkerAction.UPDATE_DIRECTORY;
 
-public final class AudioDataCollectorVerticle extends AbstractVerticle {
+public final class AudioDataCollectorVerticle extends VerticleBase {
     private static final Logger LOGGER = LogManager.getLogger(AudioDataCollectorVerticle.class);
 
-    private final AtomicBoolean isRunning = new AtomicBoolean(false);
+    private static final ExecutorService IMAGE_OPTIMIZATION_EXECUTOR =
+            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
+                                         new ThreadFactoryBuilder()
+                                                 .setNameFormat("image-optimization-%d")
+                                                 .setDaemon(true)
+                                                 .build());
+
+    private static final AtomicBoolean IS_RUNNING = new AtomicBoolean(false);
 
     private final DatabaseService databaseService;
 
@@ -47,7 +57,7 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void start() {
+    public Future<?> start() {
         fileSystem = vertx.fileSystem();
 
         final var eventBus = vertx.eventBus();
@@ -55,16 +65,31 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
         eventBus.consumer(UPDATE_DIRECTORY.name(), __ -> scanDirectory(musicDirectory(config()), true));
 
         eventBus.consumer(SCAN_DIRECTORY.name(), __ -> scanDirectory(musicDirectory(config()), false));
+
+        return Future.succeededFuture();
+    }
+
+    @Override
+    public Future<?> stop() throws Exception {
+        IMAGE_OPTIMIZATION_EXECUTOR.shutdown();
+        try {
+            if (!IMAGE_OPTIMIZATION_EXECUTOR.awaitTermination(30, TimeUnit.MINUTES)) {
+                IMAGE_OPTIMIZATION_EXECUTOR.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            IMAGE_OPTIMIZATION_EXECUTOR.shutdownNow();
+        }
+        return super.stop();
     }
 
     private void scanDirectory(final String root, final boolean update) {
         try {
-            if (isRunning.get()) {
+            if (IS_RUNNING.get()) {
                 LOGGER.info("Already scanning the directory.");
                 return;
             }
             LOGGER.info("Start scanning directory: {}", root);
-            isRunning.set(true);
+            IS_RUNNING.set(true);
             final List<String> songPaths = retrieveSongPaths(root);
 
             if (update) {
@@ -89,7 +114,7 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
                                        LOGGER.info("{} songs to add.", songPathsNotInDB.size());
                                        parseSongData(songPathsNotInDB);
                                    } else {
-                                       isRunning.set(false);
+                                       IS_RUNNING.set(false);
                                    }
                                })
                                .onFailure(LOGGER::error);
@@ -108,72 +133,79 @@ public final class AudioDataCollectorVerticle extends AbstractVerticle {
     }
 
     private void parseSongData(final List<String> songPaths) {
-        new Thread(() -> {
-            final Map<Integer, AlbumData> sourceMap = new HashMap<>();
-            final Map<Integer, Artwork> visitedAlbum = new HashMap<>();
+        final Map<Integer, AlbumData> sourceMap = new HashMap<>();
+        final Map<Integer, Artwork> visitedAlbum = new HashMap<>();
 
-            for (final String path : songPaths) {
-                try {
-                    LOGGER.info("Parsing song: {}", path);
-                    final SongPayload songPayload = parseTag(path);
+        for (final String path : songPaths) {
+            try {
+                LOGGER.info("Parsing song: {}", path);
+                final SongPayload songPayload = parseTag(path);
 
-                    final SongData song = songPayload.song();
-                    final String albumArtist = song.albumArtist();
-                    final int key = Objects.hash(song.album(), song.albumArtist());
+                final SongData song = songPayload.song();
+                final String albumArtist = song.albumArtist();
+                final int key = Objects.hash(song.album(), song.albumArtist());
 
-                    sourceMap.compute(key, (k, albumData) -> {
-                        if (albumData == null) {
-                            albumData = AlbumData.builder()
-                                                 .name(song.album())
-                                                 .artist(albumArtist.isEmpty() ? song.artist() : albumArtist)
-                                                 .date(song.date())
-                                                 .totalDuration(song.duration())
-                                                 .songs(new ArrayList<>())
-                                                 .atime(song.atime())
-                                                 .mtime(song.mtime())
-                                                 .build();
-                        }
-                        albumData.addSong(song);
-                        albumData.incrementTotalDuration(song.duration());
-                        albumData.updateAddTime(song.atime());
-                        albumData.updateModifiedTime(song.mtime());
-                        return albumData;
-                    });
-
-                    // aggregate album artwork
-                    visitedAlbum.computeIfAbsent(key, k -> songPayload.artwork());
-                } catch (Exception e) {
-                    LOGGER.error("Fail to parse song data", e);
-                }
-            }
-
-            databaseService.scan(List.copyOf(sourceMap.values()))
-                           .onSuccess(__ -> LOGGER.info("Successfully update the database"))
-                           .onFailure(throwable -> LOGGER.error("Fail to build directory", throwable))
-                           .eventually(() -> {
-                               isRunning.set(false);
-                               return Future.succeededFuture();
-                           })
-                           .await();
-
-            // optimize image
-            try (ExecutorService imageOptimizationExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
-                visitedAlbum.forEach((albumId, artwork) -> imageOptimizationExecutor.execute(() -> optimizeImage(albumId, artwork)));
-
-                imageOptimizationExecutor.shutdown();
-                try {
-                    if (!imageOptimizationExecutor.awaitTermination(30, TimeUnit.MINUTES)) {
-                        imageOptimizationExecutor.shutdownNow();
+                sourceMap.compute(key, (k, albumData) -> {
+                    if (albumData == null) {
+                        albumData = AlbumData.builder()
+                                             .name(song.album())
+                                             .artist(albumArtist.isEmpty() ? song.artist() : albumArtist)
+                                             .date(song.date())
+                                             .totalDuration(song.duration())
+                                             .songs(new ArrayList<>())
+                                             .atime(song.atime())
+                                             .mtime(song.mtime())
+                                             .build();
                     }
-                    LOGGER.info("Image optimization completed.");
-                } catch (InterruptedException e) {
-                    LOGGER.error("Fail to properly shutdown image optimization executor", e);
-                    imageOptimizationExecutor.shutdownNow();
-                }
+                    albumData.addSong(song);
+                    albumData.incrementTotalDuration(song.duration());
+                    albumData.updateAddTime(song.atime());
+                    albumData.updateModifiedTime(song.mtime());
+                    return albumData;
+                });
+
+                // aggregate album artwork
+                visitedAlbum.computeIfAbsent(key, k -> songPayload.artwork());
             } catch (Exception e) {
-                LOGGER.error("Error happens during optimizing images", e);
+                LOGGER.error("Fail to parse song data", e);
             }
-        }).start();
+        }
+
+        databaseService.scan(List.copyOf(sourceMap.values()))
+                       .compose(__ -> {
+                           LOGGER.info("Successfully update the database");
+                           optimizeImages(visitedAlbum);
+                           return Future.succeededFuture();
+                       })
+                       .onSuccess(__ -> LOGGER.info("Finish scanning the directory."))
+                       .onFailure(throwable -> LOGGER.error("Fail to build directory", throwable))
+                       .eventually(() -> {
+                           IS_RUNNING.set(false);
+                           return Future.succeededFuture();
+                       });
+    }
+
+    private void optimizeImages(final Map<Integer, Artwork> coverMap) {
+        if (coverMap.isEmpty()) {
+            LOGGER.info("All images have been optimized.");
+            return;
+        }
+
+        final var futures = coverMap.entrySet()
+                                    .stream()
+                                    .map(entry -> CompletableFuture.runAsync(
+                                            () -> optimizeImage(entry.getKey(), entry.getValue()),
+                                            IMAGE_OPTIMIZATION_EXECUTOR))
+                                    .toList();
+        try {
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(30, TimeUnit.MINUTES);
+            LOGGER.info("Image optimization completed.");
+        } catch (TimeoutException e) {
+            LOGGER.error("Image optimization timed out after 30 minutes", e);
+            futures.forEach(f -> f.cancel(true));
+        } catch (Exception e) {
+            LOGGER.error("Error happens during optimizing images", e);
+        }
     }
 
     private void optimizeImage(final int albumId, final Artwork artwork) {

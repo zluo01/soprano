@@ -98,7 +98,7 @@ class DatabaseServiceImpl implements DatabaseService {
         return pool.preparedQuery(DatabaseAction.GET_ALBUM.query())
                    .execute(Tuple.of(id))
                    .map(rows -> {
-                       Album.AlbumBuilder albumBuilder = null;
+                       Album.Builder albumBuilder = null;
                        final List<Song> songs = new ArrayList<>();
                        for (Row row : rows) {
                            if (albumBuilder == null) {

@@ -2,11 +2,11 @@ package database;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import models.Album;
 import models.AlbumData;
 import models.SongData;
 import org.junit.jupiter.api.AfterEach;
@@ -64,10 +64,7 @@ class DatabaseVerticleTest {
                        .onSuccess(result -> context.verify(() -> {
                            assertEquals(11, result.size());
                            assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/albums.json").toString().trim(),
-                                        new JsonArray(result.stream()
-                                                            .map(Album::toJson)
-                                                            .toList())
-                                                .encode());
+                                        Json.encode(result));
                            context.completeNow();
                        }))
                        .onFailure(context::failNow);
@@ -78,7 +75,7 @@ class DatabaseVerticleTest {
         databaseService.album(2037516188)
                        .onSuccess(album -> context.verify(() -> {
                            assertEquals(vertx.fileSystem().readFileBlocking("fixtures/db/album.json").toString().trim(),
-                                        album.toJson().encode());
+                                        Json.encode(album));
                            context.completeNow();
                        }))
                        .onFailure(context::failNow);

@@ -19,6 +19,7 @@ import player.PlayerVerticle;
 import playlists.PlaylistService;
 import server.WebServerVerticle;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import static config.ServerConfig.verifyAndSetupConfig;
@@ -50,13 +51,20 @@ public final class MainVerticle extends VerticleBase {
                 .compose(config -> {
                     final DatabaseService databaseService = DatabaseService.create(vertx, config);
                     final PlaylistService playlistService = PlaylistService.create(vertx, databaseService);
-                    return Future.all(deployEventLoopVertical(new WebServerVerticle(databaseService, playlistService), config),
-                                      deployVerticle(new PlayerVerticle(databaseService),
-                                                     new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                            .setConfig(config)),
-                                      deployVerticle(new AudioDataCollectorVerticle(databaseService),
-                                                     new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                            .setConfig(config)));
+                    return databaseService.initialization()
+                                          .compose(__ -> playlistService.validatePlaylists())
+                                          .compose(__ -> Future.all(deployEventLoopVertical(new WebServerVerticle(databaseService, playlistService), config),
+                                                                    deployVerticle(new PlayerVerticle(databaseService),
+                                                                                   new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
+                                                                                                          .setWorkerPoolName("Player")
+                                                                                                          .setConfig(config)),
+                                                                    deployVerticle(new AudioDataCollectorVerticle(databaseService),
+                                                                                   new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
+                                                                                                          .setWorkerPoolName("Collector")
+                                                                                                          .setMaxWorkerExecuteTime(1)
+                                                                                                          .setMaxWorkerExecuteTimeUnit(TimeUnit.HOURS)
+                                                                                                          .setWorkerPoolSize(1)
+                                                                                                          .setConfig(config))));
                 });
 
         configRetriever.listen(change -> verifyAndSetupConfig(change.getNewConfiguration())

@@ -31,7 +31,7 @@
         <sqlite.version>3.50.2.0</sqlite.version>
         <commons-io.version>2.19.0</commons-io.version>
         <jaudiotagger.version>3.0.1</jaudiotagger.version>
-        <caffeine.version>3.2.1</caffeine.version>
+        <caffeine.version>3.2.2</caffeine.version>
         <jna-platform.version>5.17.0</jna-platform.version>
 
         <junit-jupiter.version>5.13.3</junit-jupiter.version>

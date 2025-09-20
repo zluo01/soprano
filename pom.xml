@@ -24,7 +24,7 @@
         <main.class>MainVerticle</main.class>
         <launcher.class>io.vertx.launcher.application.VertxApplication</launcher.class>
 
-        <guava.version>33.4.8-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
         <vertx.version>5.0.4</vertx.version>
         <log4j.version>2.25.1</log4j.version>
         <jackson.version>2.19.2</jackson.version>

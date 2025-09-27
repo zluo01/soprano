@@ -32,7 +32,7 @@
         <commons-io.version>2.20.0</commons-io.version>
         <jaudiotagger.version>3.0.1</jaudiotagger.version>
         <caffeine.version>3.2.2</caffeine.version>
-        <jna-platform.version>5.17.0</jna-platform.version>
+        <jna-platform.version>5.18.0</jna-platform.version>
 
         <junit-jupiter.version>5.13.4</junit-jupiter.version>
         <mockito.version>5.20.0</mockito.version>

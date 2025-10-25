@@ -58,7 +58,7 @@ jobs:
         run: mvn package -f pom.xml
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: soprano
           path: target/soprano-main.jar

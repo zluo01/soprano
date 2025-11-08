@@ -101,7 +101,9 @@ interface IGeneralTagItemsPros {
 export function GeneralTagItems({ tag, data }: IGeneralTagItemsPros) {
   return (
     <div className="w-full px-6">
-      {data?.map(t => <GeneralTagItem key={t.id} tag={tag} {...t} />)}
+      {data?.map(t => (
+        <GeneralTagItem key={t.id} tag={tag} {...t} />
+      ))}
     </div>
   );
 }

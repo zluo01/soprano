@@ -29,7 +29,7 @@
         <log4j.version>2.25.2</log4j.version>
         <jackson.version>2.20.1</jackson.version>
         <sqlite.version>3.50.3.0</sqlite.version>
-        <commons-io.version>2.20.0</commons-io.version>
+        <commons-io.version>2.21.0</commons-io.version>
         <jaudiotagger.version>3.0.1</jaudiotagger.version>
         <caffeine.version>3.2.3</caffeine.version>
         <jna-platform.version>5.18.1</jna-platform.version>

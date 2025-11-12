@@ -16,27 +16,6 @@ import { lazy, Suspense } from 'react';
 const Search = lazy(() => import('@/components/search'));
 const Settings = lazy(() => import('@/components/settings'));
 
-function Header() {
-  const location = useLocation();
-  const { name } = useParams({ strict: false });
-  const pathname = location.pathname;
-  if (
-    pathname.startsWith('/playlists/') ||
-    pathname.startsWith('/genres/') ||
-    pathname.startsWith('/artists/') ||
-    pathname.startsWith('/albumArtists/')
-  ) {
-    return <SecondaryHeader header={name} />;
-  } else if (pathname.startsWith('/albums/')) {
-    return <SecondaryHeader header={''} />;
-  }
-  return (
-    <p className="cursor-pointer font-mono text-2xl font-semibold select-none">
-      <Link to="/">Soprano</Link>
-    </p>
-  );
-}
-
 interface ISecondaryHeader {
   header?: string;
 }
@@ -60,8 +39,30 @@ function SecondaryHeader({ header }: ISecondaryHeader) {
 }
 
 export default function AppBar() {
+  const location = useLocation();
+  const { name } = useParams({ strict: false });
+
   const { updateSearchModalState } = useSearchStore();
   const { updateSettingModalState } = useSettingStore();
+
+  function Header() {
+    const pathname = location.pathname;
+    if (
+      pathname.startsWith('/playlists/') ||
+      pathname.startsWith('/genres/') ||
+      pathname.startsWith('/artists/') ||
+      pathname.startsWith('/albumArtists/')
+    ) {
+      return <SecondaryHeader header={name} />;
+    } else if (pathname.startsWith('/albums/')) {
+      return <SecondaryHeader header={''} />;
+    }
+    return (
+      <p className="cursor-pointer font-mono text-2xl font-semibold select-none">
+        <Link to="/">Soprano</Link>
+      </p>
+    );
+  }
 
   return (
     <>

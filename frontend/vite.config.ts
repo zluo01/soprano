@@ -1,6 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
-import { tanstackRouter } from '@tanstack/router-plugin/vite';
-import react from '@vitejs/plugin-react';
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
+import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { defineConfig } from 'vite';
 import { VitePWA, VitePWAOptions } from 'vite-plugin-pwa';
@@ -59,12 +59,8 @@ const manifestForPlugIn: Partial<VitePWAOptions> = {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    tanstackRouter({ target: 'react', autoCodeSplitting: true }),
-    react({
-      babel: {
-        plugins: ['babel-plugin-react-compiler'],
-      },
-    }),
+    TanStackRouterVite({ target: 'react', autoCodeSplitting: true }),
+    react(),
     tailwindcss(),
     tsconfigPaths(),
     VitePWA(manifestForPlugIn),

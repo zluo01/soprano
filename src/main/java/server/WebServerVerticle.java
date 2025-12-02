@@ -15,6 +15,7 @@ import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.graphql.GraphQLHandler;
 import io.vertx.ext.web.handler.graphql.GraphiQLHandler;
 import io.vertx.ext.web.handler.graphql.GraphiQLHandlerOptions;
+import io.vertx.ext.web.handler.graphql.ws.GraphQLWSHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import player.PlayerService;
@@ -75,7 +76,9 @@ public final class WebServerVerticle extends VerticleBase {
 
         router.route("/covers/*").handler(StaticImageHandler.create(ServerConfig.COVER_PATH));
 
-        router.route("/graphql").handler(GraphQLHandler.create(graphQL));
+        router.route("/graphql")
+              .handler(GraphQLWSHandler.create(graphQL))
+              .handler(GraphQLHandler.create(graphQL));
 
         final GraphiQLHandlerOptions options = new GraphiQLHandlerOptions()
                 .setEnabled(enableDebugConsole);

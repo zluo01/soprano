@@ -22,15 +22,13 @@ export default [
   ...ts.configs.recommended,
   // ...tailwind.configs['flat/recommended'],
   pluginReact.configs.flat.recommended,
+  pluginReactHooks.configs.flat.recommended,
+  pluginReactRefresh.configs.recommended,
   pluginPromise.configs['flat/recommended'],
   ...pluginRouter.configs['flat/recommended'],
   ...pluginQuery.configs['flat/recommended'],
   eslintConfigPrettier,
   {
-    plugins: {
-      'react-hooks': pluginReactHooks,
-      'react-refresh': pluginReactRefresh,
-    },
     rules: {
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
@@ -44,7 +42,6 @@ export default [
         },
       ],
       'no-console': 'error',
-      ...pluginReactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

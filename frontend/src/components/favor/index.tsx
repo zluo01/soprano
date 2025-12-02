@@ -4,7 +4,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet.tsx';
 import { useFavorStore } from '@/lib/context';
 import { AddSongToPlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
 import { IPlaylist } from '@/type';
-import orderBy from 'lodash/orderBy';
+import orderBy from 'lodash-es/orderBy';
 import { useState } from 'react';
 import { toast } from 'sonner';
 

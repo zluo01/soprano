@@ -4,7 +4,7 @@ import { AlbumGridView } from '@/components/shares';
 import { displayAlbumsQueryOptions } from '@/lib/queries';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import orderBy from 'lodash/orderBy';
+import orderBy from 'lodash-es/orderBy';
 
 export const Route = createFileRoute('/')({
   loader: ({ context: { queryClient } }) =>

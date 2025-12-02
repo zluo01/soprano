@@ -14,8 +14,8 @@ import {
   RemoveSongFromQueue,
 } from '@/lib/queries';
 import { HeartFilledIcon, TrashIcon } from '@radix-ui/react-icons';
-import isEmpty from 'lodash/isEmpty';
-import slice from 'lodash/slice';
+import isEmpty from 'lodash-es/isEmpty';
+import slice from 'lodash-es/slice';
 
 export default function PlaybackQueue() {
   const { playbackQueueModalState, updatePlaybackQueueModalState } =

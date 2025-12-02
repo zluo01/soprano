@@ -16,7 +16,7 @@ import { AddSongsToQueue, GetSearchQuery, PlaySong } from '@/lib/queries';
 import { GeneralTag, IAlbum } from '@/type';
 import { HeartFilledIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { useNavigate } from '@tanstack/react-router';
-import isEmpty from 'lodash/isEmpty';
+import isEmpty from 'lodash-es/isEmpty';
 import { ListPlus } from 'lucide-react';
 import { motion, PanInfo } from 'motion/react';
 import { useState } from 'react';

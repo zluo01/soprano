@@ -6,7 +6,7 @@ import {
   IStats,
 } from '@/type';
 import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
+import isEmpty from 'lodash-es/isEmpty';
 
 import { IMMUTABLE_REQUEST, request } from './utils';
 

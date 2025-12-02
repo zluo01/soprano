@@ -4,10 +4,10 @@ import { Song } from '@/components/song';
 import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import {
-  AddSongsToQueue,
-  DeleteSongFromPlaylistMutation,
-  PlayPlaylist,
-  PlaySong,
+  addSongsToQueue,
+  useDeleteSongFromPlaylistMutation,
+  playPlaylist,
+  playSong,
   songsInPlaylistQueryOptions,
 } from '@/lib/queries';
 import { PlusIcon, TrashIcon } from '@radix-ui/react-icons';
@@ -28,7 +28,7 @@ function Playlist() {
     songsInPlaylistQueryOptions(name),
   );
 
-  const mutation = DeleteSongFromPlaylistMutation();
+  const mutation = useDeleteSongFromPlaylistMutation();
 
   return (
     <ScrollContainer className="h-[calc(100%-45px)] w-full pt-2">
@@ -40,7 +40,7 @@ function Playlist() {
             size={'icon'}
             className="rounded-full"
             onClick={() =>
-              AddSongsToQueue(data?.PlaylistSongs?.map(o => o.path) || [])
+              addSongsToQueue(data?.PlaylistSongs?.map(o => o.path) || [])
             }
             disabled={!data}
           >
@@ -49,7 +49,7 @@ function Playlist() {
           <Button
             size={'icon'}
             className="rounded-full"
-            onClick={() => PlayPlaylist(name)}
+            onClick={() => playPlaylist(name)}
             disabled={!data}
           >
             <svg
@@ -74,7 +74,7 @@ function Playlist() {
           {data?.PlaylistSongs.map(o => (
             <Song
               key={o.path}
-              play={() => PlaySong(o.path)}
+              play={() => playSong(o.path)}
               song={o}
               actions={[
                 {
@@ -84,7 +84,7 @@ function Playlist() {
                 },
                 {
                   className: 'bg-add',
-                  action: () => AddSongsToQueue([o.path]),
+                  action: () => addSongsToQueue([o.path]),
                   children: <ListPlus className="ml-1.5 size-6" />,
                 },
               ]}

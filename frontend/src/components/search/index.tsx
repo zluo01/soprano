@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input.tsx';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet.tsx';
 import { useDebounce } from '@/hooks/useDebounce.ts';
 import { useFavorStore, useSearchStore } from '@/lib/context';
-import { AddSongsToQueue, GetSearchQuery, PlaySong } from '@/lib/queries';
+import { addSongsToQueue, useGetSearchQuery, playSong } from '@/lib/queries';
 import { GeneralTag, IAlbum } from '@/type';
 import { HeartFilledIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { useNavigate } from '@tanstack/react-router';
@@ -46,7 +46,7 @@ function SearchAlbumItem({ id, name, artist }: IAlbum) {
 }
 
 function SearchContent({ searchText }: { searchText: string }) {
-  const { data, isLoading } = GetSearchQuery(searchText);
+  const { data, isLoading } = useGetSearchQuery(searchText);
   const { openFavorModal } = useFavorStore();
 
   function isSearchResultEmpty(): boolean {
@@ -123,12 +123,12 @@ function SearchContent({ searchText }: { searchText: string }) {
             {data?.Search.songs.map(o => (
               <Song
                 key={o.path}
-                play={() => PlaySong(o.path)}
+                play={() => playSong(o.path)}
                 song={o}
                 actions={[
                   {
                     className: 'bg-add',
-                    action: () => AddSongsToQueue([o.path]),
+                    action: () => addSongsToQueue([o.path]),
                     children: <ListPlus className="size-6" />,
                   },
                   {

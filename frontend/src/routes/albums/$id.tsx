@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import { useFavorStore } from '@/lib/context';
 import {
-  AddSongsToQueue,
+  addSongsToQueue,
   albumDetailQueryOptions,
-  PlayAlbum,
-  PlaySong,
+  playAlbum,
+  playSong,
 } from '@/lib/queries';
 import { formatTime } from '@/lib/utils.ts';
 import { HeartFilledIcon, PlusIcon } from '@radix-ui/react-icons';
@@ -68,7 +68,7 @@ function Album() {
               size={'icon'}
               className="rounded-full"
               onClick={() =>
-                AddSongsToQueue(data?.Album?.songs.map(o => o.path) || [])
+                addSongsToQueue(data?.Album?.songs.map(o => o.path) || [])
               }
               disabled={!data}
             >
@@ -77,7 +77,7 @@ function Album() {
             <Button
               size={'icon'}
               className="size-12 rounded-full"
-              onClick={() => PlayAlbum(data?.Album.id)}
+              onClick={() => playAlbum(data?.Album.id)}
               disabled={!data}
             >
               <svg
@@ -105,7 +105,7 @@ function Album() {
             main={
               <div
                 className="flex cursor-pointer flex-col flex-nowrap items-start justify-center py-2.5"
-                onClick={() => PlaySong(song.path)}
+                onClick={() => playSong(song.path)}
               >
                 <p className="w-full truncate font-medium">{song.name}</p>
                 <p className="w-full truncate text-sm opacity-35">
@@ -116,7 +116,7 @@ function Album() {
             actions={[
               {
                 className: 'bg-add',
-                action: () => AddSongsToQueue([song.path]),
+                action: () => addSongsToQueue([song.path]),
                 children: <ListPlus className="size-6" />,
               },
               {

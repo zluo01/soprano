@@ -5,7 +5,7 @@ import {
   ISearchResponse,
   IStats,
 } from '@/type';
-import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
+import { queryOptions, useQuery } from '@tanstack/react-query';
 import isEmpty from 'lodash-es/isEmpty';
 
 import { IMMUTABLE_REQUEST, request } from './utils';
@@ -203,7 +203,7 @@ const StatsQueryDocument = /* GraphQL */ `
   }
 `;
 
-export function GetStatsQuery() {
+export function useGetStatsQuery() {
   return useQuery({
     queryKey: [StatsQueryDocument],
     queryFn: async () => request<{ Stats: IStats }>(StatsQueryDocument),
@@ -235,15 +235,14 @@ const SearchQueryDocument = /* GraphQL */ `
   }
 `;
 
-export function GetSearchQuery(searchText: string) {
+export function useGetSearchQuery(searchText: string) {
   return useQuery({
     queryKey: [SearchQueryDocument, searchText],
-    queryFn: !isEmpty(searchText)
-      ? async () =>
-          request<{
-            Search: ISearchResponse;
-          }>(SearchQueryDocument, { searchText })
-      : skipToken,
+    queryFn: async () =>
+      request<{
+        Search: ISearchResponse;
+      }>(SearchQueryDocument, { searchText }),
+    enabled: !isEmpty(searchText),
   });
 }
 

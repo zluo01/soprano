@@ -20,7 +20,7 @@ const PlaybackStatusQueryDocument = /* GraphQL */ `
   }
 `;
 
-export function GetPlaybackStatusQuery() {
+export function useGetPlaybackStatusQuery() {
   return useQuery({
     queryKey: [PlaybackStatusQueryDocument],
     queryFn: async () =>
@@ -45,7 +45,7 @@ const SongsInQueueQueryDocument = /* GraphQL */ `
   }
 `;
 
-export function GetSongInQueueQuery() {
+export function useGetSongInQueueQuery() {
   return useQuery({
     queryKey: [SongsInQueueQueryDocument],
     queryFn: async () =>
@@ -63,7 +63,7 @@ const PlaySongMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function PlaySong(songPath: string) {
+export async function playSong(songPath: string) {
   await request(PlaySongMutationDocument, { songPath });
 }
 
@@ -73,7 +73,7 @@ const PlayPlaylistMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function PlayPlaylist(playlistName?: string) {
+export async function playPlaylist(playlistName?: string) {
   if (!playlistName) {
     return;
   }
@@ -86,7 +86,7 @@ const PlayAlbumMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function PlayAlbum(id?: number) {
+export async function playAlbum(id?: number) {
   if (!id) {
     return;
   }
@@ -99,7 +99,7 @@ const PauseSongMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function PauseSong() {
+export async function pauseSong() {
   await request(PauseSongMutationDocument);
 }
 
@@ -109,7 +109,7 @@ const NextSongMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function NextSong() {
+export async function nextSong() {
   await request(NextSongMutationDocument);
 }
 
@@ -119,7 +119,7 @@ const PrevSongMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function PrevSong() {
+export async function prevSong() {
   await request(PrevSongMutationDocument);
 }
 
@@ -129,7 +129,7 @@ const ToggleLoopMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function ToggleLoop(currentId?: number) {
+export async function toggleLoop(currentId?: number) {
   if (currentId === undefined) {
     return;
   }
@@ -143,7 +143,7 @@ const PlaySongInAtPositionMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function PlaySongInAtPosition(position?: number) {
+export async function playSongInAtPosition(position?: number) {
   if (!position) {
     return;
   }
@@ -156,7 +156,7 @@ const AddSongsToQueueMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function AddSongsToQueue(songPaths: string[]) {
+export async function addSongsToQueue(songPaths: string[]) {
   await request(AddSongsToQueueMutationDocument, { songPaths });
 }
 
@@ -166,7 +166,7 @@ const RemoveSongFromQueueMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function RemoveSongFromQueue(position?: number) {
+export async function removeSongFromQueue(position?: number) {
   if (!position) {
     return;
   }
@@ -179,6 +179,6 @@ const ClearQueueMutationDocument = /* GraphQL */ `
   }
 `;
 
-export async function ClearQueue() {
+export async function clearQueue() {
   await request(ClearQueueMutationDocument);
 }

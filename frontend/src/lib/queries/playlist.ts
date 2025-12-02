@@ -22,7 +22,7 @@ export const playlistQueryOptions = queryOptions({
   ...IMMUTABLE_REQUEST,
 });
 
-export function GetPlaylistsQuery() {
+export function useGetPlaylistsQuery() {
   return useQuery({
     queryKey: [PlaylistsQueryDocument],
     queryFn: async () =>
@@ -59,7 +59,7 @@ const CreatePlaylistMutationDocument = /* GraphQL */ `
   }
 `;
 
-export function CreatePlaylistMutation() {
+export function useCreatePlaylistMutation() {
   return useMutation({
     mutationFn: async ({ name }: { name?: string }) => {
       if (!name) {
@@ -79,7 +79,7 @@ const DeletePlaylistMutationDocument = /* GraphQL */ `
   }
 `;
 
-export function DeletePlaylistMutation() {
+export function useDeletePlaylistMutation() {
   return useMutation({
     mutationFn: async ({ name }: { name?: string }) => {
       if (!name) {
@@ -102,7 +102,7 @@ const RenamePlaylistMutationDocument = /* GraphQL */ `
   }
 `;
 
-export function RenamePlaylistMutation() {
+export function useRenamePlaylistMutation() {
   return useMutation({
     mutationFn: async ({
       name,
@@ -129,7 +129,7 @@ const AddSongToPlaylistMutationDocument = /* GraphQL */ `
   }
 `;
 
-export function AddSongToPlaylistMutation() {
+export function useAddSongToPlaylistMutation() {
   return useMutation({
     mutationFn: async ({
       name,
@@ -162,7 +162,7 @@ const DeleteSongFromPlaylistMutationDocument = /* GraphQL */ `
   }
 `;
 
-export function DeleteSongFromPlaylistMutation() {
+export function useDeleteSongFromPlaylistMutation() {
   return useMutation({
     mutationFn: async ({
       name,

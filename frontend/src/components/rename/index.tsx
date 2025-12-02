@@ -8,20 +8,20 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input.tsx';
 import { useRenamePlaylistStore } from '@/lib/context';
-import { GetPlaylistsQuery, RenamePlaylistMutation } from '@/lib/queries';
+import { useGetPlaylistsQuery, useRenamePlaylistMutation } from '@/lib/queries';
 import { cn } from '@/lib/utils.ts';
 
 export default function RenamePlaylistModal() {
   const { renamePlaylistModalState, closeRenamePlaylistModal, updateName } =
     useRenamePlaylistStore();
 
-  const { data } = GetPlaylistsQuery();
+  const { data } = useGetPlaylistsQuery();
 
   const playlists = data?.Playlists.map(o => o.name).filter(
     o => o !== renamePlaylistModalState.prevName,
   );
 
-  const mutation = RenamePlaylistMutation();
+  const mutation = useRenamePlaylistMutation();
 
   function isValid(name: string | undefined, playlists: string[] | undefined) {
     if (playlists === undefined || !name) {

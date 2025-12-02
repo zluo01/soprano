@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button.tsx';
-import { NextSong, PauseSong, PrevSong } from '@/lib/queries';
+import { nextSong, pauseSong, prevSong } from '@/lib/queries';
 import { TrackNextIcon, TrackPreviousIcon } from '@radix-ui/react-icons';
 
 interface IControlProps {
@@ -12,14 +12,14 @@ export default function Control({ playing }: IControlProps) {
       <Button
         variant="ghost"
         className="size-10 rounded-full p-0"
-        onClick={PrevSong}
+        onClick={prevSong}
       >
         <TrackPreviousIcon className="size-6" />
       </Button>
       <Button
         variant="ghost"
         className="size-16 rounded-full p-0"
-        onClick={PauseSong}
+        onClick={pauseSong}
       >
         {playing ? (
           <svg
@@ -52,7 +52,7 @@ export default function Control({ playing }: IControlProps) {
       <Button
         variant="ghost"
         className="size-10 rounded-full p-0"
-        onClick={NextSong}
+        onClick={nextSong}
       >
         <TrackNextIcon className="size-6" />
       </Button>

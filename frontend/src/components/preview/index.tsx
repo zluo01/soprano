@@ -1,12 +1,12 @@
 import Cover from '@/components/cover';
 import { usePlaybackStore } from '@/lib/context';
-import { GetPlaybackStatusQuery } from '@/lib/queries';
+import { useGetPlaybackStatusQuery } from '@/lib/queries';
 import { lazy, Suspense } from 'react';
 
 const PlaybackDrawer = lazy(() => import('src/components/playback'));
 
 export default function Preview() {
-  const { data } = GetPlaybackStatusQuery();
+  const { data } = useGetPlaybackStatusQuery();
 
   const { updatePlaybackModalState } = usePlaybackStore();
 

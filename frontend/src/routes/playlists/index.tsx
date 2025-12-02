@@ -4,7 +4,7 @@ import ScrollContainer from '@/components/scroll';
 import { SwipeAction } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import { useCreatePlaylistStore, useRenamePlaylistStore } from '@/lib/context';
-import { DeletePlaylistMutation, playlistQueryOptions } from '@/lib/queries';
+import { useDeletePlaylistMutation, playlistQueryOptions } from '@/lib/queries';
 import { Pencil2Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -34,7 +34,7 @@ function Playlists() {
 
 function PlaylistsView() {
   const { data, isLoading } = useSuspenseQuery(playlistQueryOptions);
-  const mutation = DeletePlaylistMutation();
+  const mutation = useDeletePlaylistMutation();
 
   const { openRenamePlaylistModal } = useRenamePlaylistStore();
   const { updateCreatePlaylistModalState } = useCreatePlaylistStore();

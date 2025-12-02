@@ -2,17 +2,20 @@ import Picker from '@/components/picker';
 import { Button } from '@/components/ui/button.tsx';
 import { Sheet, SheetContent } from '@/components/ui/sheet.tsx';
 import { useFavorStore } from '@/lib/context';
-import { AddSongToPlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
+import {
+  useAddSongToPlaylistMutation,
+  useGetPlaylistsQuery,
+} from '@/lib/queries';
 import { IPlaylist } from '@/type';
 import orderBy from 'lodash-es/orderBy';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function Favor() {
-  const mutation = AddSongToPlaylistMutation();
+  const mutation = useAddSongToPlaylistMutation();
   const { favorModalState, closeFavorModal } = useFavorStore();
 
-  const { data } = GetPlaylistsQuery();
+  const { data } = useGetPlaylistsQuery();
 
   const playlists = orderBy(data?.Playlists, ['modifiedTime'], 'desc');
 

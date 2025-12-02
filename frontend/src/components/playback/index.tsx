@@ -12,7 +12,7 @@ import {
   usePlaybackQueueStore,
   usePlaybackStore,
 } from '@/lib/context';
-import { ToggleLoop } from '@/lib/queries';
+import { toggleLoop } from '@/lib/queries';
 import { IPlaybackStatus } from '@/type';
 import { HeartFilledIcon, ListBulletIcon } from '@radix-ui/react-icons';
 import { useNavigate } from '@tanstack/react-router';
@@ -89,7 +89,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
           <Button
             variant="ghost"
             className="size-10 rounded-full p-1"
-            onClick={() => ToggleLoop(status?.loopId)}
+            onClick={() => toggleLoop(status?.loopId)}
           >
             <LoopIcon id={status?.loopId || 0} />
           </Button>

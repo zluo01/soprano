@@ -8,12 +8,12 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input.tsx';
 import { useCreatePlaylistStore } from '@/lib/context';
-import { CreatePlaylistMutation, GetPlaylistsQuery } from '@/lib/queries';
+import { useCreatePlaylistMutation, useGetPlaylistsQuery } from '@/lib/queries';
 import { cn } from '@/lib/utils.ts';
 import { useState } from 'react';
 
 export default function CreatePlaylistModal() {
-  const { data } = GetPlaylistsQuery();
+  const { data } = useGetPlaylistsQuery();
 
   const playlists = data?.Playlists.map(o => o.name);
 
@@ -22,7 +22,7 @@ export default function CreatePlaylistModal() {
   const { createPlaylistModalState, updateCreatePlaylistModalState } =
     useCreatePlaylistStore();
 
-  const mutation = CreatePlaylistMutation();
+  const mutation = useCreatePlaylistMutation();
 
   function isValid(name: string, playlists: string[] | undefined) {
     if (playlists === undefined) {

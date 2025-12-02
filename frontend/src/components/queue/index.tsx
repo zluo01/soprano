@@ -8,10 +8,10 @@ import {
 } from '@/components/ui/drawer.tsx';
 import { useFavorStore, usePlaybackQueueStore } from '@/lib/context';
 import {
-  ClearQueue,
-  GetSongInQueueQuery,
-  PlaySongInAtPosition,
-  RemoveSongFromQueue,
+  clearQueue,
+  useGetSongInQueueQuery,
+  playSongInAtPosition,
+  removeSongFromQueue,
 } from '@/lib/queries';
 import { HeartFilledIcon, TrashIcon } from '@radix-ui/react-icons';
 import isEmpty from 'lodash-es/isEmpty';
@@ -22,7 +22,7 @@ export default function PlaybackQueue() {
     usePlaybackQueueStore();
   const { openFavorModal } = useFavorStore();
 
-  const { data, isLoading } = GetSongInQueueQuery();
+  const { data, isLoading } = useGetSongInQueueQuery();
 
   const isPlaying = data?.SongsInQueue[0]
     ? data?.SongsInQueue[0].playing
@@ -38,7 +38,7 @@ export default function PlaybackQueue() {
           <p className="font-bold">Now Playing</p>
           {isPlaying ? (
             <Song
-              play={() => PlaySongInAtPosition(data!.SongsInQueue[0].position)}
+              play={() => playSongInAtPosition(data!.SongsInQueue[0].position)}
               song={data!.SongsInQueue[0]}
             />
           ) : (
@@ -52,12 +52,12 @@ export default function PlaybackQueue() {
             slice(data?.SongsInQueue, isPlaying ? 1 : 0).map(song => (
               <Song
                 key={song.path}
-                play={() => PlaySongInAtPosition(song.position)}
+                play={() => playSongInAtPosition(song.position)}
                 song={song}
                 actions={[
                   {
                     className: 'bg-delete',
-                    action: () => RemoveSongFromQueue(song.position),
+                    action: () => removeSongFromQueue(song.position),
                     children: <TrashIcon className="size-6" />,
                   },
                   {
@@ -74,7 +74,7 @@ export default function PlaybackQueue() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={ClearQueue}
+            onClick={clearQueue}
             disabled={isEmpty(data?.SongsInQueue)}
             className="size-10 rounded-full p-1.5"
           >

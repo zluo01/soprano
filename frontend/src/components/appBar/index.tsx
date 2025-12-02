@@ -38,6 +38,24 @@ function SecondaryHeader({ header }: ISecondaryHeader) {
   );
 }
 
+function Header({ name, pathname }: { name?: string; pathname: string }) {
+  if (
+    pathname.startsWith('/playlists/') ||
+    pathname.startsWith('/genres/') ||
+    pathname.startsWith('/artists/') ||
+    pathname.startsWith('/albumArtists/')
+  ) {
+    return <SecondaryHeader header={name} />;
+  } else if (pathname.startsWith('/albums/')) {
+    return <SecondaryHeader header={''} />;
+  }
+  return (
+    <p className="cursor-pointer font-mono text-2xl font-semibold select-none">
+      <Link to="/">Soprano</Link>
+    </p>
+  );
+}
+
 export default function AppBar() {
   const location = useLocation();
   const { name } = useParams({ strict: false });
@@ -45,29 +63,10 @@ export default function AppBar() {
   const { updateSearchModalState } = useSearchStore();
   const { updateSettingModalState } = useSettingStore();
 
-  function Header() {
-    const pathname = location.pathname;
-    if (
-      pathname.startsWith('/playlists/') ||
-      pathname.startsWith('/genres/') ||
-      pathname.startsWith('/artists/') ||
-      pathname.startsWith('/albumArtists/')
-    ) {
-      return <SecondaryHeader header={name} />;
-    } else if (pathname.startsWith('/albums/')) {
-      return <SecondaryHeader header={''} />;
-    }
-    return (
-      <p className="cursor-pointer font-mono text-2xl font-semibold select-none">
-        <Link to="/">Soprano</Link>
-      </p>
-    );
-  }
-
   return (
     <>
       <div className="flex max-h-11 flex-row flex-nowrap items-center px-6 pt-3 sm:hidden">
-        <Header />
+        <Header name={name} pathname={location.pathname} />
         <div className="flex-1" />
         <Button
           variant="ghost"

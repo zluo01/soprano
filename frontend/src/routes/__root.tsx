@@ -15,14 +15,14 @@ export const Route = createRootRouteWithContext<{
 }>()({
   component: () => (
     <>
-      <div className="h-full w-screen scroll-smooth pt-[env(safe-area-inset-top)] select-none">
+      <div className="h-full w-screen scroll-smooth select-none">
         <div className="h-full pb-[72px]">
           <AppBar />
           <Tabs />
           <Outlet />
         </div>
       </div>
-      <div className="fixed bottom-0 z-20 w-full">
+      <div className="fixed bottom-0 z-20 w-full pb-[env(safe-area-inset-bottom)]">
         <Preview />
       </div>
       <Suspense>

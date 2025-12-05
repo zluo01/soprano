@@ -134,6 +134,9 @@
     @apply bg-background text-foreground;
     height: 100vh;
 
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+
     /* mobile viewport bug fix */
     /* https://allthingssmitty.com/2020/05/11/css-fix-for-100vh-in-mobile-webkit/ */
     min-height: 100vh;

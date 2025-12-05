@@ -56,7 +56,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
       open={playbackModalState}
       onOpenChange={open => updatePlaybackModalState(open)}
     >
-      <DrawerContent className="h-full pt-[env(safe-area-inset-top)] data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-screen">
+      <DrawerContent className="h-full data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-screen">
         <div className="flex h-full flex-col items-center justify-between px-6 py-12">
           <div className="flex w-full items-center justify-center">
             <Cover

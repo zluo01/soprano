@@ -119,3 +119,4 @@ $RECYCLE.BIN/
 *.sqlite
 /dependency-reduced-pom.xml
 !/src/test/resources/test.sqlite
+**/.tanstack/

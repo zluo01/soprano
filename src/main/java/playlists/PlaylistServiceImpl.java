@@ -6,12 +6,15 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Strings;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,8 +24,9 @@ import static config.ServerConfig.PLAYLIST_PATH;
 import static helper.PathHelper.resolvePlaylistFilePath;
 
 public class PlaylistServiceImpl implements PlaylistService {
-    private static final String M3U_MATCH_REGEX = "^(?!\\.).*\\.m3u$";
+    private static final Logger LOGGER = LogManager.getLogger(PlaylistServiceImpl.class);
 
+    private static final String M3U_MATCH_REGEX = "^(?!\\.).*\\.m3u$";
 
     private final DatabaseService databaseService;
     private final FileSystem fileSystem;
@@ -50,13 +54,17 @@ public class PlaylistServiceImpl implements PlaylistService {
                              final List<String> songPaths = Arrays.stream(content.toString(StandardCharsets.UTF_8)
                                                                                  .trim()
                                                                                  .split("\n"))
-                                                                  .filter(s -> !Strings.isBlank(s))
+                                                                  .filter(s -> !Strings.isBlank(s.trim()))
                                                                   .toList();
                              if (!songPaths.isEmpty()) {
                                  return databaseService.songsFromPath(songPaths)
-                                                       .map(song -> song.size() == songPaths.size())
-                                                       .flatMap(valid -> {
-                                                           if (!valid) {
+                                                       .flatMap(songs -> {
+                                                           if (songs.size() != songPaths.size()) {
+                                                               final var songsSet = new HashSet<>(songPaths);
+                                                               songsSet.removeAll(songs.stream()
+                                                                                       .map(o -> o.getString("path"))
+                                                                                       .collect(Collectors.toSet()));
+                                                               LOGGER.warn("Missing song in database {}", songsSet);
                                                                return fileSystem.move(path, path + ".bak");
                                                            }
                                                            return Future.succeededFuture();

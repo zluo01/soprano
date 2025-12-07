@@ -1,10 +1,10 @@
 import Cover from '@/components/cover';
 import { usePlaybackStore } from '@/lib/context';
 import {
+  graphQLWSClient,
   OnPlaybackSongUpdateDocument,
   useGetPlaybackSongQuery,
 } from '@/lib/queries';
-import { graphQLWSClient } from '@/lib/queries/utils.ts';
 import { useEffect } from 'react';
 
 export default function Preview() {

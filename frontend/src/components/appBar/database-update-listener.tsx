@@ -1,5 +1,7 @@
-import { OnDatabaseUpdateSubscriptionDocument } from '@/lib/queries';
-import { graphQLWSClient } from '@/lib/queries/utils.ts';
+import {
+  graphQLWSClient,
+  OnDatabaseUpdateSubscriptionDocument,
+} from '@/lib/queries';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { toast } from 'sonner';

@@ -1,4 +1,4 @@
-package player;
+package player.mpv;
 
 import com.sun.jna.Native;
 import io.vertx.core.json.JsonObject;
@@ -23,7 +23,7 @@ public record MPVInstance(MPV instance, long handle) {
             "replaygain", "no",
             "audio-display", "no",
             "audio-file-auto", "no",
-            "loop-playlist", "inf",
+            "loop-playlist", "no",
             "loop", "no"
     );
 

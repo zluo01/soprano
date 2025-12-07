@@ -25,9 +25,9 @@ interface IPlaybackDrawerProps {
 function LoopIcon({ id }: { id: number }) {
   switch (id) {
     case 1:
-      return <Repeat className="size-6 text-blue dark:text-char" />;
-    case 2:
       return <Repeat1 className="size-6 text-blue dark:text-char" />;
+    case 2:
+      return <Repeat className="size-6 text-blue dark:text-char" />;
     default:
       return <Repeat className="size-6" />;
   }

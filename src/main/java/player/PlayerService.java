@@ -7,6 +7,8 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import player.base.AudioPlayer;
+import playlists.PlaylistService;
 
 import java.util.List;
 
@@ -14,8 +16,10 @@ import java.util.List;
 @VertxGen
 public interface PlayerService {
     @GenIgnore
-    static PlayerService create(final DatabaseService databaseService, final MPVInstance instance) {
-        return new PlayerServiceImpl(databaseService, instance);
+    static PlayerService create(final DatabaseService databaseService,
+                                final PlaylistService playlistService,
+                                final AudioPlayer player) {
+        return new PlayerServiceImpl(databaseService, playlistService, player);
     }
 
     @GenIgnore
@@ -35,7 +39,7 @@ public interface PlayerService {
 
     Future<Integer> prevSong();
 
-    Future<Integer> toggleLoop(int loopId);
+    Future<Integer> cycleRepeatMode();
 
     Future<Integer> playSongInQueueAtPosition(int position);
 
@@ -48,4 +52,6 @@ public interface PlayerService {
     Future<List<JsonObject>> songsInQueue();
 
     Future<JsonObject> playbackStatus();
+
+    Future<Void> stop();
 }

@@ -1,4 +1,4 @@
-package player;
+package player.mpv;
 
 /**
  * <a href="https://github.com/mpv-player/mpv/blob/master/libmpv/client.h#L630">MPV format</a>

@@ -219,11 +219,7 @@ final class GraphQLInitializer {
         final DataFetcher<Future<Integer>> nextSong = environment -> playerService.nextSong();
         final DataFetcher<Future<Integer>> prevSong = environment -> playerService.prevSong();
 
-        final DataFetcher<Future<Integer>> toggleLoop = environment -> {
-            final int id = extractField(environment, "id");
-            return playerService.toggleLoop(id);
-        };
-
+        final DataFetcher<Future<Integer>> toggleLoop = environment -> playerService.cycleRepeatMode();
 
         final DataFetcher<Future<Integer>> playSongInQueueAtPosition = environment -> {
             final int position = extractField(environment, "position");

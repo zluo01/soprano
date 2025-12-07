@@ -1,4 +1,4 @@
-package player;
+package player.mpv;
 
 import com.google.common.collect.ImmutableMap;
 

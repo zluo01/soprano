@@ -1,6 +1,32 @@
-import { request } from '@/lib/queries/utils.ts';
 import { IPlaybackStatus, IQueueSong } from '@/type';
 import { useQuery } from '@tanstack/react-query';
+
+import { request } from './utils.ts';
+
+const PlaybackSongQueryDocument = /* GraphQL */ `
+  query {
+    PlaybackStatus {
+      song {
+        name
+        path
+        artists
+        albumId
+        album
+        duration
+      }
+    }
+  }
+`;
+
+export function useGetPlaybackSongQuery() {
+  return useQuery({
+    queryKey: [PlaybackSongQueryDocument],
+    queryFn: async () =>
+      request<{
+        PlaybackStatus: IPlaybackStatus;
+      }>(PlaybackSongQueryDocument),
+  });
+}
 
 const PlaybackStatusQueryDocument = /* GraphQL */ `
   query {
@@ -20,13 +46,14 @@ const PlaybackStatusQueryDocument = /* GraphQL */ `
   }
 `;
 
-export function useGetPlaybackStatusQuery() {
+export function useGetPlaybackStatusQuery(enabled: boolean) {
   return useQuery({
     queryKey: [PlaybackStatusQueryDocument],
     queryFn: async () =>
       request<{
         PlaybackStatus: IPlaybackStatus;
       }>(PlaybackStatusQueryDocument),
+    enabled,
     refetchInterval: 1000,
     refetchIntervalInBackground: false,
   });
@@ -45,13 +72,14 @@ const SongsInQueueQueryDocument = /* GraphQL */ `
   }
 `;
 
-export function useGetSongInQueueQuery() {
+export function useGetSongInQueueQuery(enabled: boolean) {
   return useQuery({
     queryKey: [SongsInQueueQueryDocument],
     queryFn: async () =>
       request<{
         SongsInQueue: IQueueSong[];
       }>(SongsInQueueQueryDocument),
+    enabled,
     refetchInterval: 1000,
     refetchIntervalInBackground: false,
   });
@@ -178,3 +206,9 @@ const ClearQueueMutationDocument = /* GraphQL */ `
 export async function clearQueue() {
   await request(ClearQueueMutationDocument);
 }
+
+export const OnPlaybackSongUpdateDocument = /* GraphQL */ `
+  subscription OnPlaybackSongUpdate {
+    OnPlaybackSongUpdate
+  }
+`;

@@ -89,7 +89,7 @@ public final class MPVAudioPlayer implements AudioPlayer {
     }
 
     @Override
-    public void startMonitor(final Supplier<Optional<String>> supplier) {
+    public void startMonitor(final Supplier<Optional<String>> nextSong, final Runnable changeSong) {
         monitorThread = new Thread(() -> {
             while (running && !Thread.currentThread().isInterrupted()) {
                 try {
@@ -99,10 +99,16 @@ public final class MPVAudioPlayer implements AudioPlayer {
                         continue;
                     }
 
+                    // on song change
+                    if (event.event_id == MPVEventId.MPV_EVENT_FILE_LOADED) {
+                        changeSong.run();
+                    }
+
+                    // on song stop
                     if (event.event_id == MPVEventId.MPV_EVENT_END_FILE) {
                         final MPV.mpv_event_end_file endFile = new MPV.mpv_event_end_file(event.data);
                         if (endFile.reason == MPVEndFileReason.MPV_END_FILE_REASON_EOF) {
-                            supplier.get().ifPresent(this::playSongFromPath);
+                            nextSong.get().ifPresent(this::playSongFromPath);
                         }
                     }
                 } catch (Exception e) {

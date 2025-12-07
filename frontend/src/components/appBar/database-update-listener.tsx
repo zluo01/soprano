@@ -24,8 +24,8 @@ function DatabaseUpdateListener() {
             toast('Fail to update database.');
           }
         },
-        error: () => {
-          toast('Fail to update database.');
+        error: error => {
+          console.error('DatabaseUpdate subscription error:', error);
         },
         complete: () => {
           /* empty */

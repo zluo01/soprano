@@ -22,7 +22,7 @@ export default function PlaybackQueue() {
     usePlaybackQueueStore();
   const { openFavorModal } = useFavorStore();
 
-  const { data, isLoading } = useGetSongInQueueQuery();
+  const { data, isLoading } = useGetSongInQueueQuery(playbackQueueModalState);
 
   const isPlaying = data?.SongsInQueue[0]
     ? data?.SongsInQueue[0].playing

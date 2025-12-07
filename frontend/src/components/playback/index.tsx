@@ -12,15 +12,10 @@ import {
   usePlaybackQueueStore,
   usePlaybackStore,
 } from '@/lib/context';
-import { toggleLoop } from '@/lib/queries';
-import { IPlaybackStatus } from '@/type';
+import { toggleLoop, useGetPlaybackStatusQuery } from '@/lib/queries';
 import { HeartFilledIcon, ListBulletIcon } from '@radix-ui/react-icons';
 import { useNavigate } from '@tanstack/react-router';
 import { Repeat, Repeat1 } from 'lucide-react';
-
-interface IPlaybackDrawerProps {
-  status?: IPlaybackStatus;
-}
 
 function LoopIcon({ id }: { id: number }) {
   switch (id) {
@@ -33,20 +28,22 @@ function LoopIcon({ id }: { id: number }) {
   }
 }
 
-export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
+export default function PlaybackDrawer() {
   const navigate = useNavigate();
 
   const { playbackModalState, updatePlaybackModalState } = usePlaybackStore();
   const { updatePlaybackQueueModalState } = usePlaybackQueueStore();
   const { openFavorModal } = useFavorStore();
 
+  const { data } = useGetPlaybackStatusQuery(playbackModalState);
+
   async function toAlbumPage() {
-    if (!status?.song) {
+    if (!data?.PlaybackStatus.song) {
       return;
     }
     await navigate({
       to: '/albums/$id',
-      params: { id: status.song.albumId.toString() },
+      params: { id: data.PlaybackStatus.song.albumId.toString() },
     });
     updatePlaybackModalState(false);
   }
@@ -60,30 +57,30 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
         <div className="flex h-full flex-col items-center justify-between px-6 py-12">
           <div className="flex w-full items-center justify-center">
             <Cover
-              albumId={status?.song?.albumId}
+              albumId={data?.PlaybackStatus.song?.albumId}
               height={400}
               width={400}
-              alt={status?.song?.name || ''}
+              alt={data?.PlaybackStatus.song?.name || ''}
             />
           </div>
 
           <div className="flex min-h-16 w-full flex-col flex-wrap items-center gap-3 text-center select-none">
             <span className="w-full truncate text-xl font-extrabold">
-              {status?.song?.name}
+              {data?.PlaybackStatus.song?.name}
             </span>
             <span
               className="w-full cursor-pointer truncate text-primary/35"
               onClick={toAlbumPage}
             >
-              {status?.song?.album}
+              {data?.PlaybackStatus.song?.album}
             </span>
           </div>
 
           <ProgressPreview
-            elapsed={status?.elapsed || 0}
-            duration={status?.song?.duration || 0}
+            elapsed={data?.PlaybackStatus.elapsed || 0}
+            duration={data?.PlaybackStatus.song?.duration || 0}
           />
-          <Control playing={status?.playing || false} />
+          <Control playing={data?.PlaybackStatus.playing || false} />
         </div>
         <DrawerFooter className="bottom-0 flex flex-row flex-nowrap items-center justify-between px-6">
           <Button
@@ -91,7 +88,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
             className="size-10 rounded-full p-1"
             onClick={toggleLoop}
           >
-            <LoopIcon id={status?.loopId || 0} />
+            <LoopIcon id={data?.PlaybackStatus.loopId || 0} />
           </Button>
           <Button
             variant="ghost"
@@ -103,7 +100,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
           <Button
             variant="ghost"
             className="size-10 rounded-full p-1"
-            onClick={() => openFavorModal(status?.song?.path)}
+            onClick={() => openFavorModal(data?.PlaybackStatus.song?.path)}
           >
             <HeartFilledIcon className="size-6" />
             <span className="sr-only">Favor album</span>

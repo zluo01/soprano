@@ -10,3 +10,4 @@ src-tauri
 dist
 .github
 **/routeTree.gen.ts
+pnpm-lock.yaml

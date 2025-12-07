@@ -1,14 +1,16 @@
 import AppBar from '@/components/appBar';
-import Favor from '@/components/favor';
 import Preview from '@/components/preview';
-import PlaybackQueue from '@/components/queue';
 import Tabs from '@/components/tabs';
 import { Toaster } from '@/components/ui/sonner.tsx';
 import type { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { Suspense } from 'react';
+import { lazy, Suspense } from 'react';
+
+const Favor = lazy(() => import('src/components/favor'));
+const PlaybackQueue = lazy(() => import('src/components/queue'));
+const PlaybackDrawer = lazy(() => import('src/components/playback'));
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -28,6 +30,7 @@ export const Route = createRootRouteWithContext<{
       <Suspense>
         <Favor />
         <PlaybackQueue />
+        <PlaybackDrawer />
       </Suspense>
       <Toaster position="top-center" expand={false} />
       <ReactQueryDevtools buttonPosition="top-right" />

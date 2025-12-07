@@ -32,6 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import static enums.WorkerAction.DATABASE_UPDATE;
+import static enums.WorkerAction.PLAYER_SONG_UPDATE;
 import static enums.WorkerAction.SCAN_DIRECTORY;
 import static enums.WorkerAction.UPDATE_DIRECTORY;
 
@@ -107,10 +108,7 @@ final class GraphQLInitializer {
 
         final DataFetcher<Publisher<Boolean>> onDatabaseUpdate = environment -> {
             final PublishProcessor<Boolean> processor = PublishProcessor.create();
-            final var consumer = eventBus.<Boolean>consumer(DATABASE_UPDATE.name(), message -> {
-                processor.onNext(message.body());
-            });
-
+            final var consumer = eventBus.<Boolean>consumer(DATABASE_UPDATE.name(), message -> processor.onNext(message.body()));
             return processor.doOnCancel(consumer::unregister);
         };
 
@@ -125,7 +123,7 @@ final class GraphQLInitializer {
 
         initializeSongOperations(wiringBuilder, databaseService);
         initializePlaylistOperations(wiringBuilder, playlistService);
-        initializePlayerOperations(wiringBuilder, playerService);
+        initializePlayerOperations(wiringBuilder, playerService, eventBus);
         return wiringBuilder
                 .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Albums", albums))
                 .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Album", album))
@@ -208,10 +206,17 @@ final class GraphQLInitializer {
     }
 
     private static void initializePlayerOperations(final RuntimeWiring.Builder wiringBuilder,
-                                                   final PlayerService playerService) {
+                                                   final PlayerService playerService,
+                                                   final EventBus eventBus) {
         final DataFetcher<Future<List<JsonObject>>> songsInQueue = environment -> playerService.songsInQueue();
 
         final DataFetcher<Future<JsonObject>> playbackStatus = environment -> playerService.playbackStatus();
+
+        final DataFetcher<Publisher<Boolean>> onPlaybackSongUpdate = environment -> {
+            final PublishProcessor<Boolean> processor = PublishProcessor.create();
+            final var consumer = eventBus.<Boolean>consumer(PLAYER_SONG_UPDATE.name(), message -> processor.onNext(message.body()));
+            return processor.doOnCancel(consumer::unregister);
+        };
 
         final DataFetcher<Future<Integer>> playSong = environment -> {
             final String songPath = extractField(environment, "songPath");
@@ -264,7 +269,8 @@ final class GraphQLInitializer {
                 .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("PlaySongInQueueAtPosition", playSongInQueueAtPosition))
                 .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("AddSongsToQueue", addSongsToQueue))
                 .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("RemoveSongFromQueue", removeSongFromQueue))
-                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("ClearQueue", clearQueue));
+                .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("ClearQueue", clearQueue))
+                .type(GraphqlOperationType.Subscription.name(), builder -> builder.dataFetcher("OnPlaybackSongUpdate", onPlaybackSongUpdate));
     }
 
     private static <T> T extractField(final DataFetchingEnvironment env, final String key) {

@@ -36,7 +36,7 @@ public class PlayerVerticle extends VerticleBase {
     @Override
     public Future<?> start() {
         final AudioPlayer player = audioPlayer.orElseGet(() -> AudioPlayerFactory.create(config()));
-        playerService = PlayerService.create(databaseService, playlistService, player);
+        playerService = PlayerService.create(databaseService, playlistService, player, vertx.eventBus());
         final ServiceBinder binder = new ServiceBinder(vertx);
         binder.setAddress(PlayerVerticle.class.getName())
               .register(PlayerService.class, playerService);

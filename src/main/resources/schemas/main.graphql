@@ -156,4 +156,6 @@ type Mutation {
 
 type Subscription {
     OnDatabaseUpdate: Boolean!
+
+    OnPlaybackSongUpdate: Boolean!
 }

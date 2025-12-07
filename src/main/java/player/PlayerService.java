@@ -6,6 +6,7 @@ import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import player.base.AudioPlayer;
 import playlists.PlaylistService;
@@ -18,8 +19,9 @@ public interface PlayerService {
     @GenIgnore
     static PlayerService create(final DatabaseService databaseService,
                                 final PlaylistService playlistService,
-                                final AudioPlayer player) {
-        return new PlayerServiceImpl(databaseService, playlistService, player);
+                                final AudioPlayer player,
+                                final EventBus eventBus) {
+        return new PlayerServiceImpl(databaseService, playlistService, player, eventBus);
     }
 
     @GenIgnore

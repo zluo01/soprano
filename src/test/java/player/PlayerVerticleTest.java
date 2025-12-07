@@ -53,7 +53,7 @@ public class PlayerVerticleTest {
 
         Mockito.when(audioPlayer.play(Mockito.anyString())).thenReturn(Future.succeededFuture(0));
         Mockito.when(audioPlayer.stop()).thenReturn(Future.succeededFuture(0));
-        Mockito.doNothing().when(audioPlayer).startMonitor(Mockito.any());
+        Mockito.doNothing().when(audioPlayer).startMonitor(Mockito.any(), Mockito.any());
 
         final var testDBPath = Objects.requireNonNull(this.getClass().getClassLoader().getResource("test.sqlite")).getPath();
         tempDbPath = Files.createTempFile(UUID.randomUUID() + "_db", ".db");

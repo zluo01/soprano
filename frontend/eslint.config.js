@@ -41,7 +41,12 @@ export default [
           argsIgnorePattern: '^_',
         },
       ],
-      'no-console': 'error',
+      'no-console': [
+        2,
+        {
+          allow: ['error'],
+        },
+      ],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

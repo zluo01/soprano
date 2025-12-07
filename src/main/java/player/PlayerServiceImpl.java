@@ -2,6 +2,7 @@ package player;
 
 import database.DatabaseService;
 import io.vertx.core.Future;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import models.Song;
 import org.apache.logging.log4j.LogManager;
@@ -18,27 +19,34 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static enums.WorkerAction.PLAYER_SONG_UPDATE;
+
 public class PlayerServiceImpl implements PlayerService {
     private static final Logger LOGGER = LogManager.getLogger(PlayerServiceImpl.class.getName());
 
     private final DatabaseService databaseService;
     private final PlaylistService playlistService;
     private final AudioPlayer player;
+    private final EventBus eventBus;
     private final AtomicReference<PlayState> playState;
 
     public PlayerServiceImpl(final DatabaseService databaseService,
                              final PlaylistService playlistService,
-                             final AudioPlayer player) {
+                             final AudioPlayer player,
+                             final EventBus eventBus) {
         this.databaseService = databaseService;
         this.playlistService = playlistService;
         this.player = player;
+        this.eventBus = eventBus;
+
         this.playState = new AtomicReference<>(PlayState.DEFAULT);
 
-
-        this.player.startMonitor(() -> {
-            final var stat = playState.updateAndGet(PlayState::next);
-            return stat.currentSongPath();
-        });
+        this.player.startMonitor(
+                () -> {
+                    final var stat = playState.updateAndGet(PlayState::next);
+                    return stat.currentSongPath();
+                },
+                this::updateCurrentSong);
     }
 
     @Override
@@ -137,6 +145,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public Future<Integer> clearQueue() {
         playState.updateAndGet(PlayState::reset);
+        updateCurrentSong();
         return player.stop();
     }
 
@@ -196,6 +205,10 @@ public class PlayerServiceImpl implements PlayerService {
     public Future<Void> stop() {
         player.close();
         return Future.succeededFuture();
+    }
+
+    private void updateCurrentSong() {
+        eventBus.publish(PLAYER_SONG_UPDATE.name(), true);
     }
 
     private record PlayState(List<JsonObject> playlist,

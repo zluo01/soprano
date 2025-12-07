@@ -14,7 +14,7 @@ public interface AudioPlayer {
 
     Future<PlaybackStatus> playbackStatus();
 
-    void startMonitor(Supplier<Optional<String>> action);
+    void startMonitor(Supplier<Optional<String>> nextSong, Runnable changeSong);
 
     void close();
 }

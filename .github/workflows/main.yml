@@ -34,7 +34,7 @@ jobs:
         run: ./build.sh
 
       - name: Build with Maven and Run unit Test
-        run: mvn --batch-mode --update-snapshots verify
+        run: mvn -q --batch-mode --update-snapshots verify
 
   package:
     runs-on: ubuntu-latest
@@ -65,7 +65,7 @@ jobs:
         run: ./build.sh
 
       - name: build extension
-        run: mvn package -f pom.xml
+        run: mvn package -f pom.xml -q
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v5

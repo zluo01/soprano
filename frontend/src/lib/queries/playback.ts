@@ -124,17 +124,13 @@ export async function prevSong() {
 }
 
 const ToggleLoopMutationDocument = /* GraphQL */ `
-  mutation ToggleLoop($id: Int!) {
-    ToggleLoop(id: $id)
+  mutation ToggleLoop {
+    ToggleLoop
   }
 `;
 
-export async function toggleLoop(currentId?: number) {
-  if (currentId === undefined) {
-    return;
-  }
-  const id = (currentId + 1) % 3;
-  await request(ToggleLoopMutationDocument, { id });
+export async function toggleLoop() {
+  await request(ToggleLoopMutationDocument);
 }
 
 const PlaySongInAtPositionMutationDocument = /* GraphQL */ `

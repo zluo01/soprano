@@ -177,7 +177,7 @@ export const generalTagAlbumsQueryOptions = (tag: GeneralTag, id: string) => {
         GenreAlbums?: IAlbum[];
         ArtistAlbums?: IAlbum[];
         AlbumArtistAlbums?: IAlbum[];
-      }>(query, { id }).then(response => {
+      }>(query, { id: parseInt(id) }).then(response => {
         switch (tag) {
           case GeneralTag.GENRE:
             return response.GenreAlbums;

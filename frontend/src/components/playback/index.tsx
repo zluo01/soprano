@@ -89,7 +89,7 @@ export default function PlaybackDrawer({ status }: IPlaybackDrawerProps) {
           <Button
             variant="ghost"
             className="size-10 rounded-full p-1"
-            onClick={() => toggleLoop(status?.loopId)}
+            onClick={toggleLoop}
           >
             <LoopIcon id={status?.loopId || 0} />
           </Button>

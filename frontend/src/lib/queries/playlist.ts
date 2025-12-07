@@ -1,8 +1,7 @@
-import { queryClient } from '@/lib/queries/index.ts';
 import { IPlaylist, ISong } from '@/type';
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
-import { IMMUTABLE_REQUEST, request } from './utils.ts';
+import { IMMUTABLE_REQUEST, request, queryClient } from './utils.ts';
 
 const PlaylistsQueryDocument = /*GraphQL*/ `
     query {

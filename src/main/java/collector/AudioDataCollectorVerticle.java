@@ -6,6 +6,7 @@ import database.DatabaseService;
 import io.vertx.core.Future;
 import io.vertx.core.VerticleBase;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.file.FileSystem;
 import models.AlbumData;
 import models.SongData;
@@ -25,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static collector.AlbumScannerHelper.parseTag;
 import static collector.AlbumScannerHelper.retrieveSongPaths;
@@ -33,6 +33,7 @@ import static collector.ImageOptimizer.optimize;
 import static config.ServerConfig.coverSourceDimension;
 import static config.ServerConfig.coverVariants;
 import static config.ServerConfig.musicDirectory;
+import static enums.WorkerAction.DATABASE_UPDATE;
 import static enums.WorkerAction.SCAN_DIRECTORY;
 import static enums.WorkerAction.UPDATE_DIRECTORY;
 
@@ -46,11 +47,12 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
                                                  .setDaemon(true)
                                                  .build());
 
-    private static final AtomicBoolean IS_RUNNING = new AtomicBoolean(false);
+    private volatile boolean running = false;
 
     private final DatabaseService databaseService;
 
     private FileSystem fileSystem;
+    private EventBus eventBus;
 
     public AudioDataCollectorVerticle(final DatabaseService databaseService) {
         this.databaseService = databaseService;
@@ -59,8 +61,7 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
     @Override
     public Future<?> start() {
         fileSystem = vertx.fileSystem();
-
-        final var eventBus = vertx.eventBus();
+        eventBus = vertx.eventBus();
 
         eventBus.consumer(UPDATE_DIRECTORY.name(), __ -> scanDirectory(musicDirectory(config()), true));
 
@@ -84,12 +85,12 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
 
     private void scanDirectory(final String root, final boolean update) {
         try {
-            if (IS_RUNNING.get()) {
+            if (running) {
                 LOGGER.info("Already scanning the directory.");
                 return;
             }
             LOGGER.info("Start scanning directory: {}", root);
-            IS_RUNNING.set(true);
+            running = true;
             final List<String> songPaths = retrieveSongPaths(root);
 
             if (update) {
@@ -114,7 +115,9 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
                                        LOGGER.info("{} songs to add.", songPathsNotInDB.size());
                                        parseSongData(songPathsNotInDB);
                                    } else {
-                                       IS_RUNNING.set(false);
+                                       LOGGER.info("Nothing to update.");
+                                       eventBus.publish(DATABASE_UPDATE.name(), true);
+                                       running = false;
                                    }
                                })
                                .onFailure(LOGGER::error);
@@ -177,10 +180,16 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
                            optimizeImages(visitedAlbum);
                            return Future.succeededFuture();
                        })
-                       .onSuccess(__ -> LOGGER.info("Finish scanning the directory."))
-                       .onFailure(throwable -> LOGGER.error("Fail to build directory", throwable))
+                       .onSuccess(__ -> {
+                           LOGGER.info("Finish scanning the directory.");
+                           eventBus.publish(DATABASE_UPDATE.name(), true);
+                       })
+                       .onFailure(throwable -> {
+                           LOGGER.error("Fail to build directory", throwable);
+                           eventBus.publish(DATABASE_UPDATE.name(), false);
+                       })
                        .eventually(() -> {
-                           IS_RUNNING.set(false);
+                           running = false;
                            return Future.succeededFuture();
                        });
     }

@@ -1,7 +1,12 @@
 import { QueryClient } from '@tanstack/react-query';
+import { createClient } from 'graphql-ws';
 
 const BASE_URL =
   import.meta.env.MODE === 'development' ? 'http://localhost:6868' : '';
+
+export const graphQLWSClient = createClient({
+  url: `ws://${window.location.host}/graphql`,
+});
 
 export const queryClient = new QueryClient();
 

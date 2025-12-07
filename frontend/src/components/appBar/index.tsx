@@ -15,6 +15,7 @@ import { lazy, Suspense } from 'react';
 
 const Search = lazy(() => import('@/components/search'));
 const Settings = lazy(() => import('@/components/settings'));
+const DatabaseUpdateListener = lazy(() => import('./database-update-listener'));
 
 interface ISecondaryHeader {
   header?: string;
@@ -88,6 +89,7 @@ export default function AppBar() {
       <Suspense>
         <Search />
         <Settings />
+        <DatabaseUpdateListener />
       </Suspense>
     </>
   );

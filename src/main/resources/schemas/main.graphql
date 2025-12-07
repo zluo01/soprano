@@ -153,3 +153,7 @@ type Mutation {
     RemoveSongFromQueue(position: Int!): Int!
     ClearQueue: Int!
 }
+
+type Subscription {
+    OnDatabaseUpdate: Boolean!
+}

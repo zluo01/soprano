@@ -1,4 +1,4 @@
-import { request } from '@/lib/queries/utils.ts';
+import { request } from './utils.ts';
 
 const UpdateDatabaseMutationDocument = /* GraphQL */ `
   mutation {
@@ -19,3 +19,9 @@ const BuildDatabaseMutationDocument = /* GraphQL */ `
 export async function buildDatabase() {
   await request(BuildDatabaseMutationDocument);
 }
+
+export const OnDatabaseUpdateSubscriptionDocument = /* GraphQL */ `
+  subscription OnDatabaseUpdate {
+    OnDatabaseUpdate
+  }
+`;

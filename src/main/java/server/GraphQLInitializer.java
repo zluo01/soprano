@@ -16,12 +16,14 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import io.reactivex.rxjava3.processors.PublishProcessor;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.handler.graphql.instrumentation.JsonObjectAdapter;
 import io.vertx.ext.web.handler.graphql.instrumentation.VertxFutureAdapter;
 import models.Album;
+import org.reactivestreams.Publisher;
 import player.PlayerService;
 import playlists.PlaylistService;
 
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+import static enums.WorkerAction.DATABASE_UPDATE;
 import static enums.WorkerAction.SCAN_DIRECTORY;
 import static enums.WorkerAction.UPDATE_DIRECTORY;
 
@@ -102,6 +105,15 @@ final class GraphQLInitializer {
             return Future.succeededFuture(true);
         };
 
+        final DataFetcher<Publisher<Boolean>> onDatabaseUpdate = environment -> {
+            final PublishProcessor<Boolean> processor = PublishProcessor.create();
+            final var consumer = eventBus.<Boolean>consumer(DATABASE_UPDATE.name(), message -> {
+                processor.onNext(message.body());
+            });
+
+            return processor.doOnCancel(consumer::unregister);
+        };
+
         final DataFetcher<Future<JsonObject>> stats = environment -> databaseService.stats();
 
         final DataFetcher<Future<JsonObject>> search = environment -> {
@@ -127,6 +139,7 @@ final class GraphQLInitializer {
                 .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Search", search))
                 .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("Build", build))
                 .type(GraphqlOperationType.Mutation.name(), builder -> builder.dataFetcher("Update", update))
+                .type(GraphqlOperationType.Subscription.name(), builder -> builder.dataFetcher("OnDatabaseUpdate", onDatabaseUpdate))
                 .scalar(ExtendedScalars.GraphQLLong)
                 .build();
     }

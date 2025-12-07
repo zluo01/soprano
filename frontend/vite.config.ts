@@ -75,7 +75,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/graphql': 'http://localhost:6868',
+      '/graphql': {
+        target: 'http://localhost:6868',
+        changeOrigin: true,
+        ws: true,
+      },
       '/covers': 'http://localhost:6868',
     },
   },

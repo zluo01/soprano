@@ -15,12 +15,12 @@ echo "Building web UI package..."
 # Navigate to the frontend directory
 if [ -d "$FRONTEND_DIR" ]; then
   cd "$FRONTEND_DIR"
-  # Install npm dependencies
-  echo "Installing npm dependencies..."
-  npm install --silent
+  # Install pnpm dependencies
+  echo "Installing pnpm dependencies..."
+  pnpm install --silent
   # Build the web UI package
   echo "Building the web UI package..."
-  npm run build --silent
+  pnpm run --silent build
   # Return to the Maven project directory
   cd "$MAVEN_PROJECT_DIR"
 else

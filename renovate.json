@@ -50,5 +50,5 @@
       "matchPackagePrefixes": ["@tanstack", "lodash", "next-themes", "zustand", "react-router", "motion"]
     }
   ],
-  "postUpdateOptions": ["npmDedupe"]
+  "postUpdateOptions": ["pnpmDedupe"]
 }

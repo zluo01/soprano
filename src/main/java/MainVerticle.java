@@ -19,6 +19,8 @@ import player.PlayerVerticle;
 import playlists.PlaylistService;
 import server.WebServerVerticle;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -26,6 +28,8 @@ import static config.ServerConfig.verifyAndSetupConfig;
 
 public final class MainVerticle extends VerticleBase {
     private static final Logger LOGGER = LogManager.getLogger(MainVerticle.class);
+
+    private DatabaseService databaseService;
 
     static {
         // disable the annoying jaudiotagger logs
@@ -49,12 +53,12 @@ public final class MainVerticle extends VerticleBase {
                 .compose(__ -> configRetriever.getConfig())
                 .compose(ServerConfig::verifyAndSetupConfig)
                 .compose(config -> {
-                    final DatabaseService databaseService = DatabaseService.create(vertx, config);
+                    databaseService = DatabaseService.create(vertx, config);
                     final PlaylistService playlistService = PlaylistService.create(vertx, databaseService);
                     return databaseService.initialization()
                                           .compose(__ -> playlistService.validatePlaylists())
                                           .compose(__ -> Future.all(deployEventLoopVertical(new WebServerVerticle(databaseService, playlistService), config),
-                                                                    deployVerticle(new PlayerVerticle(databaseService),
+                                                                    deployVerticle(new PlayerVerticle(databaseService, playlistService),
                                                                                    new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
                                                                                                           .setWorkerPoolName("Player")
                                                                                                           .setConfig(config)),
@@ -72,6 +76,15 @@ public final class MainVerticle extends VerticleBase {
                 .onFailure(LOGGER::error));
 
         return startFuture;
+    }
+
+    @Override
+    public Future<Void> stop() {
+        final List<Future<?>> futures = new ArrayList<>();
+        if (databaseService != null) {
+            futures.add(databaseService.close());
+        }
+        return Future.all(futures).mapEmpty();
     }
 
     private Future<Void> deployEventLoopVertical(final Deployable deployable, final JsonObject config) {

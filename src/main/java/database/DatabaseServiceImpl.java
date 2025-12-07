@@ -349,6 +349,11 @@ class DatabaseServiceImpl implements DatabaseService {
                                                     .eventually((Supplier<Future<Void>>) connection::close));
     }
 
+    @Override
+    public Future<Void> close() {
+        return pool.close();
+    }
+
     private Future<JsonObject> searchAlbums(final String keyword) {
         return pool.preparedQuery(DatabaseAction.SEARCH_ALBUMS.query())
                    .execute(Tuple.of(keyword))

@@ -59,4 +59,6 @@ public interface DatabaseService {
     Future<Void> removeSongs(List<String> paths);
 
     Future<Void> clearDatabase();
+
+    Future<Void> close();
 }

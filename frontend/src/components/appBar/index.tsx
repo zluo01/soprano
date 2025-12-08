@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button.tsx';
+import { useDatabaseUpdateSubscription } from '@/hooks/useDatabaseUpdateSubscription.ts';
 import { useSearchStore, useSettingStore } from '@/lib/context';
 import {
   CaretLeftIcon,
@@ -15,7 +16,6 @@ import { lazy, Suspense } from 'react';
 
 const Search = lazy(() => import('@/components/search'));
 const Settings = lazy(() => import('@/components/settings'));
-const DatabaseUpdateListener = lazy(() => import('./database-update-listener'));
 
 interface ISecondaryHeader {
   header?: string;
@@ -58,6 +58,7 @@ function Header({ name, pathname }: { name?: string; pathname: string }) {
 }
 
 export default function AppBar() {
+  useDatabaseUpdateSubscription();
   const location = useLocation();
   const { name } = useParams({ strict: false });
 
@@ -89,7 +90,6 @@ export default function AppBar() {
       <Suspense>
         <Search />
         <Settings />
-        <DatabaseUpdateListener />
       </Suspense>
     </>
   );

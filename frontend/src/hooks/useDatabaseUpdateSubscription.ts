@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
-function DatabaseUpdateListener() {
+export function useDatabaseUpdateSubscription() {
   const queryClient = useQueryClient();
   const graphQLClient = useWebSocketClient();
 
@@ -36,8 +36,4 @@ function DatabaseUpdateListener() {
 
     return () => unsubscribe();
   }, [graphQLClient, queryClient]);
-
-  return null;
 }
-
-export default DatabaseUpdateListener;

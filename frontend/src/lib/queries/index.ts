@@ -250,4 +250,3 @@ export * from './playback.ts';
 export * from './playlist.ts';
 export * from './database-mutation.ts';
 export { constructImg, queryClient } from './utils.ts';
-export { graphQLWSClient } from './graphqlClient.ts';

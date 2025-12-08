@@ -1,7 +1,7 @@
 import Cover from '@/components/cover';
 import { usePlaybackStore } from '@/lib/context';
+import { useWebSocketClient } from '@/lib/context/WebSocketContext.tsx';
 import {
-  graphQLWSClient,
   OnPlaybackSongUpdateDocument,
   useGetPlaybackSongQuery,
 } from '@/lib/queries';
@@ -10,9 +10,10 @@ import { useEffect } from 'react';
 export default function Preview() {
   const { data, refetch } = useGetPlaybackSongQuery();
   const { updatePlaybackModalState } = usePlaybackStore();
+  const graphQLClient = useWebSocketClient();
 
   useEffect(() => {
-    const unsubscribe = graphQLWSClient.subscribe<{
+    const unsubscribe = graphQLClient.subscribe<{
       OnPlaybackSongUpdate: boolean;
     }>(
       {
@@ -33,10 +34,8 @@ export default function Preview() {
       },
     );
 
-    return () => {
-      unsubscribe();
-    };
-  }, [refetch]);
+    return () => unsubscribe();
+  }, [graphQLClient, refetch]);
 
   return (
     <div className="w-full shadow-md sm:hidden">

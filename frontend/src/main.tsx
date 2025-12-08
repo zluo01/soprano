@@ -1,3 +1,4 @@
+import { WebSocketProvider } from '@/lib/context/WebSocketContext.tsx';
 import { queryClient } from '@/lib/queries';
 import ThemeProvider from '@/lib/theme';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -41,7 +42,9 @@ if (!rootElement.innerHTML) {
           enableSystem
           disableTransitionOnChange
         >
-          <RouterProvider router={router} />
+          <WebSocketProvider>
+            <RouterProvider router={router} />
+          </WebSocketProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>,

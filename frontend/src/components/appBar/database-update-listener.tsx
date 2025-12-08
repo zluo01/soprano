@@ -1,16 +1,15 @@
-import {
-  graphQLWSClient,
-  OnDatabaseUpdateSubscriptionDocument,
-} from '@/lib/queries';
+import { useWebSocketClient } from '@/lib/context/WebSocketContext.tsx';
+import { OnDatabaseUpdateSubscriptionDocument } from '@/lib/queries';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 function DatabaseUpdateListener() {
   const queryClient = useQueryClient();
+  const graphQLClient = useWebSocketClient();
 
   useEffect(() => {
-    const unsubscribe = graphQLWSClient.subscribe<{
+    const unsubscribe = graphQLClient.subscribe<{
       OnDatabaseUpdate: boolean;
     }>(
       {
@@ -35,10 +34,8 @@ function DatabaseUpdateListener() {
       },
     );
 
-    return () => {
-      unsubscribe();
-    };
-  }, [queryClient]);
+    return () => unsubscribe();
+  }, [graphQLClient, queryClient]);
 
   return null;
 }

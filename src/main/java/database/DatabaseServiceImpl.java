@@ -13,6 +13,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.apache.logging.log4j.util.Supplier;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -268,7 +269,7 @@ class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Future<List<JsonObject>> songsFromPath(final List<String> paths) {
+    public Future<List<JsonObject>> songsFromPath(final Collection<String> paths) {
         final String payload = paths.stream().map(o -> "\"" + o + "\"").collect(Collectors.joining(","));
         final String query = DatabaseAction.GET_SONGS_DATA_FROM_PATHS.query().replace("?", payload);
         return pool.query(query)

@@ -10,6 +10,7 @@ import io.vertx.sqlclient.PoolOptions;
 import models.Album;
 import models.AlbumData;
 
+import java.util.Collection;
 import java.util.List;
 
 import static config.ServerConfig.DATABASE_CONFIG;
@@ -46,7 +47,7 @@ public interface DatabaseService {
 
     Future<Void> scan(List<AlbumData> albums);
 
-    Future<List<JsonObject>> songsFromPath(List<String> paths);
+    Future<List<JsonObject>> songsFromPath(Collection<String> paths);
 
     Future<JsonObject> stats();
 

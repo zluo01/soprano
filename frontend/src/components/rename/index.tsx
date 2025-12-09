@@ -47,7 +47,10 @@ export default function RenamePlaylistModal() {
       open={renamePlaylistModalState.open}
       onOpenChange={closeRenamePlaylistModal}
     >
-      <DialogContent className="w-full max-w-[61.8%] rounded-xl border-0 shadow-2xl">
+      <DialogContent
+        showCloseButton={false}
+        className="w-full max-w-[61.8%] rounded-xl border-0 shadow-2xl"
+      >
         <DialogHeader>
           <DialogTitle>Rename Playlist</DialogTitle>
         </DialogHeader>

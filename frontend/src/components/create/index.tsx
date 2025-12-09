@@ -46,7 +46,10 @@ export default function CreatePlaylistModal() {
       open={createPlaylistModalState}
       onOpenChange={updateCreatePlaylistModalState}
     >
-      <DialogContent className="w-full max-w-[61.8%] rounded-xl border-0 shadow-2xl">
+      <DialogContent
+        showCloseButton={false}
+        className="w-full max-w-[61.8%] rounded-xl border-0 shadow-2xl"
+      >
         <DialogHeader>
           <DialogTitle>Create New Playlist</DialogTitle>
         </DialogHeader>

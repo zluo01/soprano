@@ -71,7 +71,21 @@ public final class WebServerVerticle extends VerticleBase {
         router.route().handler(BodyHandler.create());
 
         if (enableWebUI) {
-            router.get().handler(StaticHandler.create());
+            router.get("/").handler(ctx -> ctx.response()
+                    .putHeader("Content-Type", "text/html")
+                    .putHeader("Cache-Control", "public, max-age=0, must-revalidate")
+                    .sendFile("webroot/index.html"));
+
+            router.get("/sw.js").handler(ctx -> ctx.response()
+                    .putHeader("Content-Type", "application/javascript")
+                    .putHeader("Cache-Control", "public, max-age=0, must-revalidate")
+                    .sendFile("webroot/sw.js"));
+
+            router.get("/manifest.webmanifest").handler(ctx -> ctx.response()
+                    .putHeader("Content-Type", "application/manifest+json")
+                    .sendFile("webroot/manifest.webmanifest"));
+
+            router.get().handler(StaticHandler.create().setCachingEnabled(true));
         }
 
         router.route("/covers/*").handler(StaticImageHandler.create(ServerConfig.COVER_PATH));

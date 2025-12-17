@@ -13,6 +13,7 @@ import {
   playSongInAtPosition,
   removeSongFromQueue,
 } from '@/lib/queries';
+import { cn } from '@/lib/utils.ts';
 import { HeartFilledIcon, TrashIcon } from '@radix-ui/react-icons';
 import isEmpty from 'lodash-es/isEmpty';
 import slice from 'lodash-es/slice';
@@ -33,7 +34,12 @@ export default function PlaybackQueue() {
       open={playbackQueueModalState}
       onOpenChange={open => updatePlaybackQueueModalState(open)}
     >
-      <DrawerContent className="size-full data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-screen">
+      <DrawerContent
+        className={cn(
+          'size-full data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-screen',
+          'pt-[env(safe-area-inset-top)]',
+        )}
+      >
         <div className="flex size-full flex-col flex-nowrap overflow-y-scroll p-6">
           <p className="font-bold">Now Playing</p>
           {isPlaying ? (
@@ -70,7 +76,7 @@ export default function PlaybackQueue() {
             ))
           )}
         </div>
-        <DrawerFooter className="items-center">
+        <DrawerFooter className="items-center px-6 py-2">
           <Button
             variant="ghost"
             size="icon"

@@ -13,6 +13,7 @@ import {
   usePlaybackStore,
 } from '@/lib/context';
 import { toggleLoop, useGetPlaybackStatusQuery } from '@/lib/queries';
+import { cn } from '@/lib/utils.ts';
 import { HeartFilledIcon, ListBulletIcon } from '@radix-ui/react-icons';
 import { useNavigate } from '@tanstack/react-router';
 import { Repeat, Repeat1 } from 'lucide-react';
@@ -53,8 +54,13 @@ export default function PlaybackDrawer() {
       open={playbackModalState}
       onOpenChange={open => updatePlaybackModalState(open)}
     >
-      <DrawerContent className="h-full data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-screen">
-        <div className="flex h-full flex-col items-center justify-between px-6 py-12">
+      <DrawerContent
+        className={cn(
+          'h-full data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-screen',
+          'pt-[env(safe-area-inset-top)]',
+        )}
+      >
+        <div className="flex h-full flex-col items-center justify-between p-6">
           <div className="flex w-full items-center justify-center">
             <Cover
               albumId={data?.PlaybackStatus.song?.albumId}
@@ -82,7 +88,7 @@ export default function PlaybackDrawer() {
           />
           <Control playing={data?.PlaybackStatus.playing || false} />
         </div>
-        <DrawerFooter className="bottom-0 flex flex-row flex-nowrap items-center justify-between px-6">
+        <DrawerFooter className="bottom-0 flex flex-row flex-nowrap items-center justify-between px-6 py-2">
           <Button
             variant="ghost"
             className="size-10 rounded-full p-1"

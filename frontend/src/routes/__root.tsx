@@ -18,13 +18,13 @@ export const Route = createRootRouteWithContext<{
   component: () => (
     <>
       <div className="h-full w-screen scroll-smooth select-none">
-        <div className="h-full pb-[72px]">
+        <div className="h-full pb-18">
           <AppBar />
           <Tabs />
           <Outlet />
         </div>
       </div>
-      <div className="fixed bottom-0 z-20 w-full pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-0 z-20 w-full">
         <Preview />
       </div>
       <Suspense>

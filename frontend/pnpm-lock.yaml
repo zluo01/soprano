@@ -81,8 +81,8 @@ importers:
         specifier: 3.0.2
         version: 3.0.2(react@19.2.3)
       react-use-motion-measure:
-        specifier: 3.0.0
-        version: 3.0.0(framer-motion@12.29.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        specifier: 4.0.0
+        version: 4.0.0(motion@12.29.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       sonner:
         specifier: 2.0.7
         version: 2.0.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -3293,12 +3293,12 @@ packages:
       '@types/react':
         optional: true
 
-  react-use-motion-measure@3.0.0:
-    resolution: {integrity: sha512-zOC1DWbBDmER+CmBvTk8pNQFY7qIUPVR6Wsj10RITSHRAskDYZgcNms1Lyp5gcbx2sarb4wtHtSAs43OS/ncKA==}
+  react-use-motion-measure@4.0.0:
+    resolution: {integrity: sha512-j+v+fVqOqALSMLzpYJN0nX+Re8JCmYFshH4TEcCJxkg2eLGmqachbxfTKj3eILbJBSOGiR7HDRJdf0+e4vPFZg==}
     peerDependencies:
-      framer-motion: '>=8.0.0'
-      react: '>=16.13'
-      react-dom: '>=16.13'
+      motion: '>=11.0.0'
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
 
   react@19.2.3:
     resolution: {integrity: sha512-Ku/hhYbVjOQnXDZFv2+RibmLFGwFdeeKHFcOTlrt7xplBnya5OGn/hIRDsqDiSUcfORsDC7MPxwork8jBwsIWA==}
@@ -7081,10 +7081,10 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.9
 
-  react-use-motion-measure@3.0.0(framer-motion@12.29.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  react-use-motion-measure@4.0.0(motion@12.29.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       debounce: 1.2.1
-      framer-motion: 12.29.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      motion: 12.29.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 

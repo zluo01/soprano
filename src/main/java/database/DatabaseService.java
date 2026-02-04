@@ -5,7 +5,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.jdbcclient.JDBCConnectOptions;
 import io.vertx.jdbcclient.JDBCPool;
-import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
 import models.Album;
 import models.AlbumData;

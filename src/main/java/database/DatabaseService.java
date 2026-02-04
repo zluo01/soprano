@@ -23,8 +23,9 @@ public interface DatabaseService {
 
         final JDBCConnectOptions connectOptions = new JDBCConnectOptions()
                 .setJdbcUrl("jdbc:sqlite:" + url);
-        final Pool client = JDBCPool.pool(vertx, connectOptions, new PoolOptions());
-        return new DatabaseServiceImpl(client);
+        final PoolOptions poolOptions = new PoolOptions().setMaxSize(1);
+        final var pool = JDBCPool.pool(vertx, connectOptions, poolOptions);
+        return new DatabaseServiceImpl(pool);
     }
 
     Future<Void> initialization();

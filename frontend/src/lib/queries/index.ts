@@ -1,12 +1,12 @@
-import {
-  GeneralTag,
-  IAlbum,
-  IGeneralTag,
-  ISearchResponse,
-  IStats,
-} from '@/type';
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import isEmpty from 'lodash-es/isEmpty';
+import {
+	GeneralTag,
+	type IAlbum,
+	type IGeneralTag,
+	type ISearchResponse,
+	type IStats,
+} from '@/type';
 
 import { IMMUTABLE_REQUEST, request } from './utils';
 
@@ -23,9 +23,9 @@ const AlbumsQueryDocument = /*GraphQL*/ `
 `;
 
 export const displayAlbumsQueryOptions = queryOptions({
-  queryKey: [AlbumsQueryDocument],
-  queryFn: async () => request<{ Albums: IAlbum[] }>(AlbumsQueryDocument),
-  ...IMMUTABLE_REQUEST,
+	queryKey: [AlbumsQueryDocument],
+	queryFn: async () => request<{ Albums: IAlbum[] }>(AlbumsQueryDocument),
+	...IMMUTABLE_REQUEST,
 });
 
 const AlbumDetailQueryDocument = /*GraphQL*/ `
@@ -46,14 +46,14 @@ const AlbumDetailQueryDocument = /*GraphQL*/ `
 `;
 
 export const albumDetailQueryOptions = (albumId: string) =>
-  queryOptions({
-    queryKey: [AlbumDetailQueryDocument, albumId],
-    queryFn: async () =>
-      request<{ Album: IAlbum }>(AlbumDetailQueryDocument, {
-        id: parseInt(albumId!),
-      }),
-    ...IMMUTABLE_REQUEST,
-  });
+	queryOptions({
+		queryKey: [AlbumDetailQueryDocument, albumId],
+		queryFn: async () =>
+			request<{ Album: IAlbum }>(AlbumDetailQueryDocument, {
+				id: parseInt(albumId!, 10),
+			}),
+		...IMMUTABLE_REQUEST,
+	});
 
 const GenreQueryDocument = /*GraphQL*/ `
     query {
@@ -86,39 +86,39 @@ const AlbumArtistQueryDocument = /*GraphQL*/ `
 `;
 
 function generalTagQuery(tag: GeneralTag): string {
-  switch (tag) {
-    case GeneralTag.GENRE:
-      return GenreQueryDocument;
-    case GeneralTag.ARTIST:
-      return ArtistQueryDocument;
-    case GeneralTag.ALBUM_ARTIST:
-      return AlbumArtistQueryDocument;
-  }
+	switch (tag) {
+		case GeneralTag.GENRE:
+			return GenreQueryDocument;
+		case GeneralTag.ARTIST:
+			return ArtistQueryDocument;
+		case GeneralTag.ALBUM_ARTIST:
+			return AlbumArtistQueryDocument;
+	}
 }
 
 export const generalTagQueryOptions = (tag: GeneralTag) => {
-  const query = generalTagQuery(tag);
-  return queryOptions({
-    queryKey: [query],
-    queryFn: async () =>
-      request<{
-        Genres?: IGeneralTag[];
-        Artists?: IGeneralTag[];
-        AlbumArtists?: IGeneralTag[];
-      }>(query).then(response => {
-        switch (tag) {
-          case GeneralTag.GENRE:
-            return response.Genres;
-          case GeneralTag.ARTIST:
-            return response.Artists;
-          case GeneralTag.ALBUM_ARTIST:
-            return response.AlbumArtists;
-          default:
-            throw Error('Unknown tag: ' + tag);
-        }
-      }),
-    ...IMMUTABLE_REQUEST,
-  });
+	const query = generalTagQuery(tag);
+	return queryOptions({
+		queryKey: [query],
+		queryFn: async () =>
+			request<{
+				Genres?: IGeneralTag[];
+				Artists?: IGeneralTag[];
+				AlbumArtists?: IGeneralTag[];
+			}>(query).then((response) => {
+				switch (tag) {
+					case GeneralTag.GENRE:
+						return response.Genres;
+					case GeneralTag.ARTIST:
+						return response.Artists;
+					case GeneralTag.ALBUM_ARTIST:
+						return response.AlbumArtists;
+					default:
+						throw Error(`Unknown tag: ${tag}`);
+				}
+			}),
+		...IMMUTABLE_REQUEST,
+	});
 };
 
 const AlbumForGenreQueryDocument = /*GraphQL*/ `
@@ -158,39 +158,39 @@ const AlbumForAlbumArtistQueryDocument = /*GraphQL*/ `
 `;
 
 function albumsForTagQuery(tag: GeneralTag): string {
-  switch (tag) {
-    case GeneralTag.GENRE:
-      return AlbumForGenreQueryDocument;
-    case GeneralTag.ARTIST:
-      return AlbumForArtistQueryDocument;
-    case GeneralTag.ALBUM_ARTIST:
-      return AlbumForAlbumArtistQueryDocument;
-  }
+	switch (tag) {
+		case GeneralTag.GENRE:
+			return AlbumForGenreQueryDocument;
+		case GeneralTag.ARTIST:
+			return AlbumForArtistQueryDocument;
+		case GeneralTag.ALBUM_ARTIST:
+			return AlbumForAlbumArtistQueryDocument;
+	}
 }
 
 export const generalTagAlbumsQueryOptions = (tag: GeneralTag, id: string) => {
-  const query = albumsForTagQuery(tag);
-  return queryOptions({
-    queryKey: [query, id],
-    queryFn: async () =>
-      request<{
-        GenreAlbums?: IAlbum[];
-        ArtistAlbums?: IAlbum[];
-        AlbumArtistAlbums?: IAlbum[];
-      }>(query, { id: parseInt(id) }).then(response => {
-        switch (tag) {
-          case GeneralTag.GENRE:
-            return response.GenreAlbums;
-          case GeneralTag.ARTIST:
-            return response.ArtistAlbums;
-          case GeneralTag.ALBUM_ARTIST:
-            return response.AlbumArtistAlbums;
-          default:
-            throw Error('Unknown tag: ' + tag);
-        }
-      }),
-    ...IMMUTABLE_REQUEST,
-  });
+	const query = albumsForTagQuery(tag);
+	return queryOptions({
+		queryKey: [query, id],
+		queryFn: async () =>
+			request<{
+				GenreAlbums?: IAlbum[];
+				ArtistAlbums?: IAlbum[];
+				AlbumArtistAlbums?: IAlbum[];
+			}>(query, { id: parseInt(id, 10) }).then((response) => {
+				switch (tag) {
+					case GeneralTag.GENRE:
+						return response.GenreAlbums;
+					case GeneralTag.ARTIST:
+						return response.ArtistAlbums;
+					case GeneralTag.ALBUM_ARTIST:
+						return response.AlbumArtistAlbums;
+					default:
+						throw Error(`Unknown tag: ${tag}`);
+				}
+			}),
+		...IMMUTABLE_REQUEST,
+	});
 };
 
 const StatsQueryDocument = /* GraphQL */ `
@@ -204,11 +204,11 @@ const StatsQueryDocument = /* GraphQL */ `
 `;
 
 export function useGetStatsQuery() {
-  return useQuery({
-    queryKey: [StatsQueryDocument],
-    queryFn: async () => request<{ Stats: IStats }>(StatsQueryDocument),
-    ...IMMUTABLE_REQUEST,
-  });
+	return useQuery({
+		queryKey: [StatsQueryDocument],
+		queryFn: async () => request<{ Stats: IStats }>(StatsQueryDocument),
+		...IMMUTABLE_REQUEST,
+	});
 }
 
 const SearchQueryDocument = /* GraphQL */ `
@@ -236,17 +236,17 @@ const SearchQueryDocument = /* GraphQL */ `
 `;
 
 export function useGetSearchQuery(searchText: string) {
-  return useQuery({
-    queryKey: [SearchQueryDocument, searchText],
-    queryFn: async () =>
-      request<{
-        Search: ISearchResponse;
-      }>(SearchQueryDocument, { searchText }),
-    enabled: !isEmpty(searchText),
-  });
+	return useQuery({
+		queryKey: [SearchQueryDocument, searchText],
+		queryFn: async () =>
+			request<{
+				Search: ISearchResponse;
+			}>(SearchQueryDocument, { searchText }),
+		enabled: !isEmpty(searchText),
+	});
 }
 
+export * from './database-mutation.ts';
 export * from './playback.ts';
 export * from './playlist.ts';
-export * from './database-mutation.ts';
 export { constructImg, queryClient } from './utils.ts';

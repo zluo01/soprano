@@ -1,7 +1,7 @@
-import { IPlaylist, ISong } from '@/type';
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
+import type { IPlaylist, ISong } from '@/type';
 
-import { IMMUTABLE_REQUEST, request, queryClient } from './utils.ts';
+import { IMMUTABLE_REQUEST, queryClient, request } from './utils.ts';
 
 const PlaylistsQueryDocument = /*GraphQL*/ `
     query {
@@ -15,19 +15,19 @@ const PlaylistsQueryDocument = /*GraphQL*/ `
 `;
 
 export const playlistQueryOptions = queryOptions({
-  queryKey: [PlaylistsQueryDocument],
-  queryFn: async () =>
-    request<{ Playlists: IPlaylist[] }>(PlaylistsQueryDocument),
-  ...IMMUTABLE_REQUEST,
+	queryKey: [PlaylistsQueryDocument],
+	queryFn: async () =>
+		request<{ Playlists: IPlaylist[] }>(PlaylistsQueryDocument),
+	...IMMUTABLE_REQUEST,
 });
 
 export function useGetPlaylistsQuery() {
-  return useQuery({
-    queryKey: [PlaylistsQueryDocument],
-    queryFn: async () =>
-      request<{ Playlists: IPlaylist[] }>(PlaylistsQueryDocument),
-    ...IMMUTABLE_REQUEST,
-  });
+	return useQuery({
+		queryKey: [PlaylistsQueryDocument],
+		queryFn: async () =>
+			request<{ Playlists: IPlaylist[] }>(PlaylistsQueryDocument),
+		...IMMUTABLE_REQUEST,
+	});
 }
 
 const SongsForPlaylistQueryDocument = /*GraphQL*/ `
@@ -43,14 +43,14 @@ const SongsForPlaylistQueryDocument = /*GraphQL*/ `
 `;
 
 export const songsInPlaylistQueryOptions = (name: string) =>
-  queryOptions({
-    queryKey: [SongsForPlaylistQueryDocument, name],
-    queryFn: async () =>
-      request<{ PlaylistSongs: ISong[] }>(SongsForPlaylistQueryDocument, {
-        name,
-      }),
-    ...IMMUTABLE_REQUEST,
-  });
+	queryOptions({
+		queryKey: [SongsForPlaylistQueryDocument, name],
+		queryFn: async () =>
+			request<{ PlaylistSongs: ISong[] }>(SongsForPlaylistQueryDocument, {
+				name,
+			}),
+		...IMMUTABLE_REQUEST,
+	});
 
 const CreatePlaylistMutationDocument = /* GraphQL */ `
   mutation CreatePlaylist($name: String!) {
@@ -59,17 +59,17 @@ const CreatePlaylistMutationDocument = /* GraphQL */ `
 `;
 
 export function useCreatePlaylistMutation() {
-  return useMutation({
-    mutationFn: async ({ name }: { name?: string }) => {
-      if (!name) {
-        return;
-      }
-      await request(CreatePlaylistMutationDocument, { name });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
-    },
-  });
+	return useMutation({
+		mutationFn: async ({ name }: { name?: string }) => {
+			if (!name) {
+				return;
+			}
+			await request(CreatePlaylistMutationDocument, { name });
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+		},
+	});
 }
 
 const DeletePlaylistMutationDocument = /* GraphQL */ `
@@ -79,20 +79,20 @@ const DeletePlaylistMutationDocument = /* GraphQL */ `
 `;
 
 export function useDeletePlaylistMutation() {
-  return useMutation({
-    mutationFn: async ({ name }: { name?: string }) => {
-      if (!name) {
-        return;
-      }
+	return useMutation({
+		mutationFn: async ({ name }: { name?: string }) => {
+			if (!name) {
+				return;
+			}
 
-      await request(DeletePlaylistMutationDocument, {
-        name,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
-    },
-  });
+			await request(DeletePlaylistMutationDocument, {
+				name,
+			});
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+		},
+	});
 }
 
 const RenamePlaylistMutationDocument = /* GraphQL */ `
@@ -102,24 +102,24 @@ const RenamePlaylistMutationDocument = /* GraphQL */ `
 `;
 
 export function useRenamePlaylistMutation() {
-  return useMutation({
-    mutationFn: async ({
-      name,
-      newName,
-    }: {
-      name?: string;
-      newName?: string;
-    }) => {
-      if (!name || !newName) {
-        return;
-      }
+	return useMutation({
+		mutationFn: async ({
+			name,
+			newName,
+		}: {
+			name?: string;
+			newName?: string;
+		}) => {
+			if (!name || !newName) {
+				return;
+			}
 
-      await request(RenamePlaylistMutationDocument, { name, newName });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
-    },
-  });
+			await request(RenamePlaylistMutationDocument, { name, newName });
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+		},
+	});
 }
 
 const AddSongToPlaylistMutationDocument = /* GraphQL */ `
@@ -129,30 +129,30 @@ const AddSongToPlaylistMutationDocument = /* GraphQL */ `
 `;
 
 export function useAddSongToPlaylistMutation() {
-  return useMutation({
-    mutationFn: async ({
-      name,
-      songPath,
-    }: {
-      name?: string;
-      songPath?: string;
-    }) => {
-      if (!name || !songPath) {
-        return;
-      }
+	return useMutation({
+		mutationFn: async ({
+			name,
+			songPath,
+		}: {
+			name?: string;
+			songPath?: string;
+		}) => {
+			if (!name || !songPath) {
+				return;
+			}
 
-      await request(AddSongToPlaylistMutationDocument, {
-        name,
-        songPath,
-      });
-    },
-    onSuccess: (_data, variables, _context) => {
-      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
-      queryClient.invalidateQueries({
-        queryKey: [SongsForPlaylistQueryDocument, variables.name],
-      });
-    },
-  });
+			await request(AddSongToPlaylistMutationDocument, {
+				name,
+				songPath,
+			});
+		},
+		onSuccess: (_data, variables, _context) => {
+			queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+			queryClient.invalidateQueries({
+				queryKey: [SongsForPlaylistQueryDocument, variables.name],
+			});
+		},
+	});
 }
 
 const DeleteSongFromPlaylistMutationDocument = /* GraphQL */ `
@@ -162,28 +162,28 @@ const DeleteSongFromPlaylistMutationDocument = /* GraphQL */ `
 `;
 
 export function useDeleteSongFromPlaylistMutation() {
-  return useMutation({
-    mutationFn: async ({
-      name,
-      songPath,
-    }: {
-      name?: string;
-      songPath?: string;
-    }) => {
-      if (!name || !songPath) {
-        return;
-      }
+	return useMutation({
+		mutationFn: async ({
+			name,
+			songPath,
+		}: {
+			name?: string;
+			songPath?: string;
+		}) => {
+			if (!name || !songPath) {
+				return;
+			}
 
-      await request(DeleteSongFromPlaylistMutationDocument, {
-        name,
-        songPath,
-      });
-    },
-    onSuccess: (_data, variables, _context) => {
-      queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
-      queryClient.invalidateQueries({
-        queryKey: [SongsForPlaylistQueryDocument, variables.name],
-      });
-    },
-  });
+			await request(DeleteSongFromPlaylistMutationDocument, {
+				name,
+				songPath,
+			});
+		},
+		onSuccess: (_data, variables, _context) => {
+			queryClient.invalidateQueries({ queryKey: [PlaylistsQueryDocument] });
+			queryClient.invalidateQueries({
+				queryKey: [SongsForPlaylistQueryDocument, variables.name],
+			});
+		},
+	});
 }

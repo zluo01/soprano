@@ -81,11 +81,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/albums/$id': typeof AlbumsIdRoute
   '/playlists/$name': typeof PlaylistsNameRoute
-  '/albumArtists': typeof AlbumArtistsIndexRoute
-  '/albums': typeof AlbumsIndexRoute
-  '/artists': typeof ArtistsIndexRoute
-  '/genres': typeof GenresIndexRoute
-  '/playlists': typeof PlaylistsIndexRoute
+  '/albumArtists/': typeof AlbumArtistsIndexRoute
+  '/albums/': typeof AlbumsIndexRoute
+  '/artists/': typeof ArtistsIndexRoute
+  '/genres/': typeof GenresIndexRoute
+  '/playlists/': typeof PlaylistsIndexRoute
   '/albumArtists/$id/$name': typeof AlbumArtistsIdNameRoute
   '/artists/$id/$name': typeof ArtistsIdNameRoute
   '/genres/$id/$name': typeof GenresIdNameRoute
@@ -123,11 +123,11 @@ export interface FileRouteTypes {
     | '/'
     | '/albums/$id'
     | '/playlists/$name'
-    | '/albumArtists'
-    | '/albums'
-    | '/artists'
-    | '/genres'
-    | '/playlists'
+    | '/albumArtists/'
+    | '/albums/'
+    | '/artists/'
+    | '/genres/'
+    | '/playlists/'
     | '/albumArtists/$id/$name'
     | '/artists/$id/$name'
     | '/genres/$id/$name'
@@ -185,35 +185,35 @@ declare module '@tanstack/react-router' {
     '/playlists/': {
       id: '/playlists/'
       path: '/playlists'
-      fullPath: '/playlists'
+      fullPath: '/playlists/'
       preLoaderRoute: typeof PlaylistsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/genres/': {
       id: '/genres/'
       path: '/genres'
-      fullPath: '/genres'
+      fullPath: '/genres/'
       preLoaderRoute: typeof GenresIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/artists/': {
       id: '/artists/'
       path: '/artists'
-      fullPath: '/artists'
+      fullPath: '/artists/'
       preLoaderRoute: typeof ArtistsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/albums/': {
       id: '/albums/'
       path: '/albums'
-      fullPath: '/albums'
+      fullPath: '/albums/'
       preLoaderRoute: typeof AlbumsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/albumArtists/': {
       id: '/albumArtists/'
       path: '/albumArtists'
-      fullPath: '/albumArtists'
+      fullPath: '/albumArtists/'
       preLoaderRoute: typeof AlbumArtistsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

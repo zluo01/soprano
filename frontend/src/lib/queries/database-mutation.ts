@@ -7,7 +7,7 @@ const UpdateDatabaseMutationDocument = /* GraphQL */ `
 `;
 
 export async function updateDatabase() {
-  await request(UpdateDatabaseMutationDocument);
+	await request(UpdateDatabaseMutationDocument);
 }
 
 const BuildDatabaseMutationDocument = /* GraphQL */ `
@@ -17,7 +17,7 @@ const BuildDatabaseMutationDocument = /* GraphQL */ `
 `;
 
 export async function buildDatabase() {
-  await request(BuildDatabaseMutationDocument);
+	await request(BuildDatabaseMutationDocument);
 }
 
 export const OnDatabaseUpdateSubscriptionDocument = /* GraphQL */ `

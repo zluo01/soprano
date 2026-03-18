@@ -1,5 +1,5 @@
-import { IPlaybackStatus, IQueueSong } from '@/type';
 import { useQuery } from '@tanstack/react-query';
+import type { IPlaybackStatus, IQueueSong } from '@/type';
 
 import { request } from './utils.ts';
 
@@ -19,13 +19,13 @@ const PlaybackSongQueryDocument = /* GraphQL */ `
 `;
 
 export function useGetPlaybackSongQuery() {
-  return useQuery({
-    queryKey: [PlaybackSongQueryDocument],
-    queryFn: async () =>
-      request<{
-        PlaybackStatus: IPlaybackStatus;
-      }>(PlaybackSongQueryDocument),
-  });
+	return useQuery({
+		queryKey: [PlaybackSongQueryDocument],
+		queryFn: async () =>
+			request<{
+				PlaybackStatus: IPlaybackStatus;
+			}>(PlaybackSongQueryDocument),
+	});
 }
 
 const PlaybackStatusQueryDocument = /* GraphQL */ `
@@ -47,16 +47,16 @@ const PlaybackStatusQueryDocument = /* GraphQL */ `
 `;
 
 export function useGetPlaybackStatusQuery(enabled: boolean) {
-  return useQuery({
-    queryKey: [PlaybackStatusQueryDocument],
-    queryFn: async () =>
-      request<{
-        PlaybackStatus: IPlaybackStatus;
-      }>(PlaybackStatusQueryDocument),
-    enabled,
-    refetchInterval: 1000,
-    refetchIntervalInBackground: false,
-  });
+	return useQuery({
+		queryKey: [PlaybackStatusQueryDocument],
+		queryFn: async () =>
+			request<{
+				PlaybackStatus: IPlaybackStatus;
+			}>(PlaybackStatusQueryDocument),
+		enabled,
+		refetchInterval: 1000,
+		refetchIntervalInBackground: false,
+	});
 }
 
 const SongsInQueueQueryDocument = /* GraphQL */ `
@@ -73,16 +73,16 @@ const SongsInQueueQueryDocument = /* GraphQL */ `
 `;
 
 export function useGetSongInQueueQuery(enabled: boolean) {
-  return useQuery({
-    queryKey: [SongsInQueueQueryDocument],
-    queryFn: async () =>
-      request<{
-        SongsInQueue: IQueueSong[];
-      }>(SongsInQueueQueryDocument),
-    enabled,
-    refetchInterval: 1000,
-    refetchIntervalInBackground: false,
-  });
+	return useQuery({
+		queryKey: [SongsInQueueQueryDocument],
+		queryFn: async () =>
+			request<{
+				SongsInQueue: IQueueSong[];
+			}>(SongsInQueueQueryDocument),
+		enabled,
+		refetchInterval: 1000,
+		refetchIntervalInBackground: false,
+	});
 }
 
 const PlaySongMutationDocument = /* GraphQL */ `
@@ -92,7 +92,7 @@ const PlaySongMutationDocument = /* GraphQL */ `
 `;
 
 export async function playSong(songPath: string) {
-  await request(PlaySongMutationDocument, { songPath });
+	await request(PlaySongMutationDocument, { songPath });
 }
 
 const PlayPlaylistMutationDocument = /* GraphQL */ `
@@ -102,10 +102,10 @@ const PlayPlaylistMutationDocument = /* GraphQL */ `
 `;
 
 export async function playPlaylist(playlistName?: string) {
-  if (!playlistName) {
-    return;
-  }
-  await request(PlayPlaylistMutationDocument, { playlistName });
+	if (!playlistName) {
+		return;
+	}
+	await request(PlayPlaylistMutationDocument, { playlistName });
 }
 
 const PlayAlbumMutationDocument = /* GraphQL */ `
@@ -115,10 +115,10 @@ const PlayAlbumMutationDocument = /* GraphQL */ `
 `;
 
 export async function playAlbum(id?: number) {
-  if (!id) {
-    return;
-  }
-  await request(PlayAlbumMutationDocument, { id });
+	if (!id) {
+		return;
+	}
+	await request(PlayAlbumMutationDocument, { id });
 }
 
 const PauseSongMutationDocument = /* GraphQL */ `
@@ -128,7 +128,7 @@ const PauseSongMutationDocument = /* GraphQL */ `
 `;
 
 export async function pauseSong() {
-  await request(PauseSongMutationDocument);
+	await request(PauseSongMutationDocument);
 }
 
 const NextSongMutationDocument = /* GraphQL */ `
@@ -138,7 +138,7 @@ const NextSongMutationDocument = /* GraphQL */ `
 `;
 
 export async function nextSong() {
-  await request(NextSongMutationDocument);
+	await request(NextSongMutationDocument);
 }
 
 const PrevSongMutationDocument = /* GraphQL */ `
@@ -148,7 +148,7 @@ const PrevSongMutationDocument = /* GraphQL */ `
 `;
 
 export async function prevSong() {
-  await request(PrevSongMutationDocument);
+	await request(PrevSongMutationDocument);
 }
 
 const ToggleLoopMutationDocument = /* GraphQL */ `
@@ -158,7 +158,7 @@ const ToggleLoopMutationDocument = /* GraphQL */ `
 `;
 
 export async function toggleLoop() {
-  await request(ToggleLoopMutationDocument);
+	await request(ToggleLoopMutationDocument);
 }
 
 const PlaySongInAtPositionMutationDocument = /* GraphQL */ `
@@ -168,10 +168,10 @@ const PlaySongInAtPositionMutationDocument = /* GraphQL */ `
 `;
 
 export async function playSongInAtPosition(position?: number) {
-  if (!position) {
-    return;
-  }
-  await request(PlaySongInAtPositionMutationDocument, { position });
+	if (!position) {
+		return;
+	}
+	await request(PlaySongInAtPositionMutationDocument, { position });
 }
 
 const AddSongsToQueueMutationDocument = /* GraphQL */ `
@@ -181,7 +181,7 @@ const AddSongsToQueueMutationDocument = /* GraphQL */ `
 `;
 
 export async function addSongsToQueue(songPaths: string[]) {
-  await request(AddSongsToQueueMutationDocument, { songPaths });
+	await request(AddSongsToQueueMutationDocument, { songPaths });
 }
 
 const RemoveSongFromQueueMutationDocument = /* GraphQL */ `
@@ -191,10 +191,10 @@ const RemoveSongFromQueueMutationDocument = /* GraphQL */ `
 `;
 
 export async function removeSongFromQueue(position?: number) {
-  if (!position) {
-    return;
-  }
-  await request(RemoveSongFromQueueMutationDocument, { position });
+	if (!position) {
+		return;
+	}
+	await request(RemoveSongFromQueueMutationDocument, { position });
 }
 
 const ClearQueueMutationDocument = /* GraphQL */ `
@@ -204,7 +204,7 @@ const ClearQueueMutationDocument = /* GraphQL */ `
 `;
 
 export async function clearQueue() {
-  await request(ClearQueueMutationDocument);
+	await request(ClearQueueMutationDocument);
 }
 
 export const OnPlaybackSongUpdateDocument = /* GraphQL */ `

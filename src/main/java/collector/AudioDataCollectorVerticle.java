@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,7 +48,7 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
                                                  .setDaemon(true)
                                                  .build());
 
-    private volatile boolean running = false;
+    private final AtomicBoolean running = new AtomicBoolean(false);
 
     private final DatabaseService databaseService;
 
@@ -85,12 +86,11 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
 
     private void scanDirectory(final String root, final boolean update) {
         try {
-            if (running) {
+            if (!running.compareAndSet(false, true)) {
                 LOGGER.info("Already scanning the directory.");
                 return;
             }
             LOGGER.info("Start scanning directory: {}", root);
-            running = true;
             final List<String> songPaths = retrieveSongPaths(root);
 
             if (update) {
@@ -117,7 +117,7 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
                                    } else {
                                        LOGGER.info("Nothing to update.");
                                        eventBus.publish(DATABASE_UPDATE.name(), true);
-                                       running = false;
+                                       running.set(false);
                                    }
                                })
                                .onFailure(LOGGER::error);
@@ -198,7 +198,7 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
                            eventBus.publish(DATABASE_UPDATE.name(), false);
                        })
                        .eventually(() -> {
-                           running = false;
+                           running.set(false);
                            return Future.succeededFuture();
                        });
     }

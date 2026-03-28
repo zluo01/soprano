@@ -2,8 +2,7 @@ import { HeartFilledIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { useNavigate } from '@tanstack/react-router';
 import isEmpty from 'lodash-es/isEmpty';
 import { ListPlus } from 'lucide-react';
-import { motion, type PanInfo } from 'motion/react';
-import { useState } from 'react';
+import { type PointerEvent, useEffect, useRef, useState } from 'react';
 import Cover from '@/components/cover';
 import { LoadingList } from '@/components/loading';
 import { GeneralTagItem } from '@/components/shares';
@@ -15,7 +14,7 @@ import {
 	AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input.tsx';
-import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet.tsx';
+import { Sheet, SheetContent } from '@/components/ui/sheet.tsx';
 import { useDebounce } from '@/hooks/useDebounce.ts';
 import { useFavorStore, useSearchStore } from '@/lib/context';
 import { addSongsToQueue, playSong, useGetSearchQuery } from '@/lib/queries';
@@ -146,18 +145,83 @@ function SearchContent({ searchText }: { searchText: string }) {
 	);
 }
 
+const DISMISS_RATIO = 0.61;
+
 export default function Search() {
 	const { searchModalState, updateSearchModalState } = useSearchStore();
 
 	const [searchText, setSearchText] = useState('');
 	const debounceSearch = useDebounce(searchText);
 
-	function dragEndHandler(dragInfo: PanInfo) {
-		const draggedDistance = dragInfo.offset.x;
-		const swipeThreshold = 100;
-		// swipe to the right
-		if (draggedDistance > swipeThreshold) {
-			updateSearchModalState(false);
+	const contentRef = useRef<HTMLDivElement>(null);
+	const scrollRef = useRef<HTMLDivElement>(null);
+	const dragStartY = useRef(0);
+	const isDragging = useRef(false);
+
+	useEffect(() => {
+		const vv = window.visualViewport;
+		if (!vv || !searchModalState) return;
+
+		function update() {
+			if (!contentRef.current || !vv) return;
+			contentRef.current.style.height = `${vv.height}px`;
+			contentRef.current.style.top = `${vv.offsetTop}px`;
+		}
+
+		update();
+		vv.addEventListener('resize', update);
+		vv.addEventListener('scroll', update);
+		return () => {
+			vv.removeEventListener('resize', update);
+			vv.removeEventListener('scroll', update);
+		};
+	}, [searchModalState]);
+
+	function canDismiss() {
+		if (!scrollRef.current) return true;
+		return scrollRef.current.scrollTop <= 0;
+	}
+
+	function onPointerDown(e: PointerEvent) {
+		dragStartY.current = e.clientY;
+	}
+
+	function onPointerMove(e: PointerEvent) {
+		if (!contentRef.current) return;
+		const delta = e.clientY - dragStartY.current;
+
+		if (!isDragging.current) {
+			if (delta > 0 && canDismiss()) {
+				isDragging.current = true;
+				dragStartY.current = e.clientY;
+			}
+			return;
+		}
+
+		const dragDelta = e.clientY - dragStartY.current;
+		if (dragDelta > 0) {
+			contentRef.current.style.transform = `translateY(${dragDelta}px)`;
+			contentRef.current.style.transition = 'none';
+		}
+	}
+
+	function onPointerUp() {
+		if (!isDragging.current || !contentRef.current) {
+			isDragging.current = false;
+			return;
+		}
+		isDragging.current = false;
+		const sheetHeight = contentRef.current.getBoundingClientRect().height;
+		const threshold = sheetHeight * DISMISS_RATIO;
+		const currentY = new DOMMatrixReadOnly(
+			getComputedStyle(contentRef.current).transform,
+		).m42;
+		contentRef.current.style.transition = 'transform 0.3s ease-out';
+		if (currentY > threshold) {
+			contentRef.current.style.transform = 'translateY(100%)';
+			setTimeout(() => updateSearchModalState(false), 300);
+		} else {
+			contentRef.current.style.transform = '';
 		}
 	}
 
@@ -166,8 +230,18 @@ export default function Search() {
 			open={searchModalState}
 			onOpenChange={(open) => updateSearchModalState(open)}
 		>
-			<SheetContent className="max-h-screen w-full overflow-y-scroll px-0 pt-0">
-				<SheetHeader className="sticky top-0 z-20 border-b-2 bg-primary-foreground px-6 pt-[12px] pb-0.5">
+			<SheetContent
+				ref={contentRef}
+				side="bottom"
+				className="flex h-full flex-col rounded-t-3xl gap-0 px-0 pt-0 top-0 bottom-auto"
+				onPointerDown={onPointerDown}
+				onPointerMove={onPointerMove}
+				onPointerUp={onPointerUp}
+			>
+				<div className="flex shrink-0 justify-center py-4">
+					<div className="h-1.5 w-12 rounded-full bg-muted" />
+				</div>
+				<div className="shrink-0 border-b-2 bg-primary-foreground px-6 py-1.5">
 					<div className="relative space-x-1">
 						<MagnifyingGlassIcon className="absolute top-2.5 left-2 size-5 text-muted-foreground" />
 						<Input
@@ -178,38 +252,14 @@ export default function Search() {
 							onChange={(e) => setSearchText(e.target.value)}
 						/>
 					</div>
-				</SheetHeader>
-				<motion.div
-					className="flex min-h-[calc(100%-120px)] w-full flex-col py-2"
-					animate="active"
-					exit="exit"
-					variants={sliderVariants}
-					transition={sliderTransition}
-					//Only on x-axis
-					drag="x"
-					//End of the window either side
-					dragConstraints={{ left: 0, right: 0 }}
-					// The degree of movement allowed outside constraints.
-					dragElastic={0}
-					onDragEnd={(_, dragInfo) => dragEndHandler(dragInfo)}
+				</div>
+				<div
+					ref={scrollRef}
+					className="flex flex-1 flex-col overflow-y-auto py-2"
 				>
 					<SearchContent searchText={debounceSearch} />
-				</motion.div>
+				</div>
 			</SheetContent>
 		</Sheet>
 	);
 }
-
-const sliderVariants = {
-	active: { x: 0, scale: 1, opacity: 1 },
-	exit: {
-		x: '-100%',
-		scale: 1,
-		opacity: 0.2,
-	},
-};
-
-const sliderTransition = {
-	duration: 0.5,
-	ease: [0.56, 0.03, 0.12, 1.04],
-};

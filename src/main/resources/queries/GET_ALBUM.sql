@@ -1,6 +1,6 @@
 SELECT a.id             AS album_id,
        a.name           AS album_name,
-       ar.name          AS album_artist,
+       (SELECT ar.name FROM albumArtists ar WHERE ar.album = a.id LIMIT 1) AS album_artist,
        a.date           as album_date,
        a.add_time       as album_add_time,
        a.modified_time  as album_modified_time,
@@ -14,7 +14,5 @@ SELECT a.id             AS album_id,
 FROM albums a
          LEFT JOIN
      songs s ON a.id = s.album
-         LEFT JOIN
-     albumArtists ar ON ar.album = a.id
 WHERE a.id = ?
 ORDER BY disc, track_num

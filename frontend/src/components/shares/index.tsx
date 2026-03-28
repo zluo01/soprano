@@ -93,12 +93,12 @@ export function GeneralTagItem({
 	);
 }
 
-interface IGeneralTagItemsPros {
+interface IGeneralTagItemsProps {
 	tag: GeneralTag;
 	data?: IGeneralTag[];
 }
 
-export function GeneralTagItems({ tag, data }: IGeneralTagItemsPros) {
+export function GeneralTagItems({ tag, data }: IGeneralTagItemsProps) {
 	return (
 		<div className="w-full px-6">
 			{data?.map((t) => (

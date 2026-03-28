@@ -270,10 +270,12 @@ class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<List<JsonObject>> songsFromPath(final Collection<String> paths) {
-        final String payload = paths.stream().map(o -> "\"" + o + "\"").collect(Collectors.joining(","));
-        final String query = DatabaseAction.GET_SONGS_DATA_FROM_PATHS.query().replace("?", payload);
-        return pool.query(query)
-                   .execute()
+        final String placeholders = paths.stream().map(__ -> "?").collect(Collectors.joining(","));
+        final String query = DatabaseAction.GET_SONGS_DATA_FROM_PATHS.query().replace("?", placeholders);
+        final Tuple params = Tuple.tuple();
+        paths.forEach(params::addString);
+        return pool.preparedQuery(query)
+                   .execute(params)
                    .map(rows -> {
                        final List<JsonObject> songs = new ArrayList<>();
                        for (Row row : rows) {
@@ -328,10 +330,12 @@ class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Future<Void> removeSongs(final List<String> paths) {
-        final String payload = paths.stream().map(o -> "\"" + o + "\"").collect(Collectors.joining(","));
-        final String query = DatabaseAction.DELETE_SONGS_WITH_PATHS.query().replace("?", payload);
-        return pool.query(query)
-                   .execute()
+        final String placeholders = paths.stream().map(__ -> "?").collect(Collectors.joining(","));
+        final String query = DatabaseAction.DELETE_SONGS_WITH_PATHS.query().replace("?", placeholders);
+        final Tuple params = Tuple.tuple();
+        paths.forEach(params::addString);
+        return pool.preparedQuery(query)
+                   .execute(params)
                    .flatMap(__ -> pool.query(DatabaseAction.CLEANUP_ALBUMS.query()).execute())
                    .flatMap(__ -> Future.succeededFuture());
     }

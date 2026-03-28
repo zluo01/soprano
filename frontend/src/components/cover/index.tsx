@@ -8,16 +8,15 @@ function Cover({
 	style,
 	width,
 	height,
-	...props
+	alt,
 }: IImageLoaderProps): ReactElement {
 	return (
 		<img
 			className={cn('aspect-square h-auto max-w-full object-cover', style)}
 			src={constructImg(width, height, albumId)}
-			{...props}
 			width={width}
 			height={height}
-			alt={props.alt}
+			alt={alt}
 			loading="lazy"
 			crossOrigin="anonymous"
 			onError={(e) => {

@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { constructImg } from '@/lib/queries';
 import { cn } from '@/lib/utils.ts';
-import type { IImageLoaderPops } from '@/type';
+import type { IImageLoaderProps } from '@/type';
 
 function Cover({
 	albumId,
@@ -9,7 +9,7 @@ function Cover({
 	width,
 	height,
 	...props
-}: IImageLoaderPops): ReactElement {
+}: IImageLoaderProps): ReactElement {
 	return (
 		<img
 			className={cn('aspect-square h-auto max-w-full object-cover', style)}

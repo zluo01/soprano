@@ -68,7 +68,7 @@ export interface ISearchResponse {
 	songs: ISong[];
 }
 
-export interface IImageLoaderPops {
+export interface IImageLoaderProps {
 	albumId?: number;
 	alt: string;
 	width: number;

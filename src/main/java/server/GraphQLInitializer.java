@@ -109,7 +109,8 @@ final class GraphQLInitializer {
         final DataFetcher<Publisher<Boolean>> onDatabaseUpdate = environment -> {
             final PublishProcessor<Boolean> processor = PublishProcessor.create();
             final var consumer = eventBus.<Boolean>consumer(DATABASE_UPDATE.name(), message -> processor.onNext(message.body()));
-            return processor.doOnCancel(consumer::unregister);
+            return processor.doOnCancel(consumer::unregister)
+                            .doOnTerminate(consumer::unregister);
         };
 
         final DataFetcher<Future<JsonObject>> stats = environment -> databaseService.stats();
@@ -215,7 +216,8 @@ final class GraphQLInitializer {
         final DataFetcher<Publisher<Boolean>> onPlaybackSongUpdate = environment -> {
             final PublishProcessor<Boolean> processor = PublishProcessor.create();
             final var consumer = eventBus.<Boolean>consumer(PLAYER_SONG_UPDATE.name(), message -> processor.onNext(message.body()));
-            return processor.doOnCancel(consumer::unregister);
+            return processor.doOnCancel(consumer::unregister)
+                            .doOnTerminate(consumer::unregister);
         };
 
         final DataFetcher<Future<Integer>> playSong = environment -> {

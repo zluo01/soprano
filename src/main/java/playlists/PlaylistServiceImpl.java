@@ -189,20 +189,19 @@ public class PlaylistServiceImpl implements PlaylistService {
     public Future<Boolean> addSongToPlaylist(final String playlistName, final String songPath) {
         final String filePath = resolvePlaylistFilePath(playlistName);
         return fileSystem.readFile(filePath)
-                         .map(content -> {
+                         .flatMap(content -> {
                              final List<String> songs = Arrays.stream(content.toString(StandardCharsets.UTF_8)
                                                                              .trim()
                                                                              .split("\n"))
                                                               .filter(s -> !Strings.isBlank(s))
                                                               .collect(Collectors.toList());
                              if (songs.contains(songPath)) {
-                                 return Future.succeededFuture();
+                                 return Future.succeededFuture(true);
                              }
                              songs.add(songPath);
                              final Buffer newContent = Buffer.buffer(String.join("\n", songs));
-                             return fileSystem.writeFile(filePath, newContent);
-                         })
-                         .map(__ -> true);
+                             return fileSystem.writeFile(filePath, newContent).map(__ -> true);
+                         });
     }
 
     @Override

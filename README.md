@@ -76,7 +76,5 @@ To build the database from the provided music directory for the first time. You 
 
 
 ## Todo
- - P0: Add testing
  - P1: Auto refresh database on source folder change
- - P2: Graphql socket support
  - P2: Pad, Desktop web ui

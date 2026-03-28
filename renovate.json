@@ -1,53 +1,60 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":disableDependencyDashboard"],
-  "schedule": [
-    "every weekend"
-  ],
+  "schedule": ["every weekend"],
   "packageRules": [
     {
-      "updateTypes": [
-        "minor",
-        "patch",
-        "pin",
-        "digest"
-      ],
+      "updateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
     },
     {
-      "groupName": "definitelyTyped",
-      "matchPackagePrefixes": ["@types/"]
-    },
-    {
-      "groupName": "eslint",
-      "matchPackagePrefixes": [
-        "@eslint",
-        "eslint",
-        "typescript-eslint",
-        "globals"
+      "groupName": "frontend-framework",
+      "matchPackageNames": [
+        "react", "react-dom",
+        "@tanstack/**",
+        "zustand", "graphql-ws", "lodash-es"
       ]
     },
     {
-      "groupName": "styling",
-      "matchPackagePrefixes": [
-        "@radix-ui/",
-        "lucide-react",
-        "tailwind",
-        "tailwindcss",
-        "autoprefixer",
-        "postcss",
-        "clsx",
-        "class-variance-authority",
-        "vaul"
+      "groupName": "frontend-ui",
+      "matchPackageNames": [
+        "@radix-ui/**", "embla-carousel*", "lucide-react", "vaul", "sonner",
+        "tailwind*", "@tailwindcss/**", "clsx", "class-variance-authority"
       ]
     },
     {
-      "groupName": "build-tools",
-      "matchPackagePrefixes": ["vite", "@vitejs/"]
+      "groupName": "frontend-tooling",
+      "matchPackageNames": [
+        "vite*", "@vitejs/**", "@rolldown/**", "@vite-pwa/**",
+        "typescript", "babel-plugin-react-compiler",
+        "@biomejs/**", "@types/**"
+      ]
     },
     {
-      "groupName": "utilities",
-      "matchPackagePrefixes": ["@tanstack", "lodash", "next-themes", "zustand", "react-router", "motion"]
+      "groupName": "backend-framework",
+      "matchPackageNames": [
+        "io.vertx:*",
+        "com.fasterxml.jackson*",
+        "org.apache.logging.log4j:*",
+        "com.google.guava:*",
+        "org.xerial:*",
+        "commons-io:*",
+        "net.jthink:*",
+        "com.github.ben-manes.caffeine:*",
+        "net.java.dev.jna:*"
+      ]
+    },
+    {
+      "groupName": "backend-testing",
+      "matchPackageNames": ["org.junit.jupiter:*", "org.mockito:*"]
+    },
+    {
+      "groupName": "backend-tooling",
+      "matchPackageNames": [
+        "org.apache.maven.plugins:*",
+        "com.github.eirslett:*",
+        "org.codehaus.mojo:*"
+      ]
     }
   ],
   "postUpdateOptions": ["pnpmDedupe"]

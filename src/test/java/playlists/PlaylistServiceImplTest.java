@@ -120,17 +120,16 @@ class PlaylistServiceImplTest {
     @Test
     void addSongToPlaylist(Vertx vertx, VertxTestContext context) {
         final String name = uniqueName();
+        final String filePath = resolvePlaylistFilePath(name);
         playlistService.createPlaylist(name)
                        .compose(__ -> playlistService.addSongToPlaylist(name, "/music/song1.flac"))
-                       .onSuccess(result -> context.verify(() -> {
-                           try {
-                               assertTrue(result);
-                               final String content = Files.readString(Path.of(resolvePlaylistFilePath(name)));
-                               assertTrue(content.contains("/music/song1.flac"));
-                               context.completeNow();
-                           } catch (IOException e) {
-                               context.failNow(e);
-                           }
+                       .compose(result -> {
+                           assertTrue(result);
+                           return vertx.fileSystem().readFile(filePath);
+                       })
+                       .onSuccess(buffer -> context.verify(() -> {
+                           assertTrue(buffer.toString().contains("/music/song1.flac"));
+                           context.completeNow();
                        }))
                        .onFailure(context::failNow);
     }
@@ -139,18 +138,14 @@ class PlaylistServiceImplTest {
     void addDuplicateSongToPlaylist(Vertx vertx, VertxTestContext context) throws IOException {
         final String name = uniqueName();
         final String songPath = "/music/song1.flac";
+        final String filePath = resolvePlaylistFilePath(name);
         writePlaylistFile(name, songPath);
 
         playlistService.addSongToPlaylist(name, songPath)
-                       .onSuccess(result -> context.verify(() -> {
-                           try {
-                               final String content = Files.readString(Path.of(resolvePlaylistFilePath(name)));
-                               // should not duplicate the entry
-                               assertEquals(1, content.lines().filter(l -> l.equals(songPath)).count());
-                               context.completeNow();
-                           } catch (IOException e) {
-                               context.failNow(e);
-                           }
+                       .compose(__ -> vertx.fileSystem().readFile(filePath))
+                       .onSuccess(buffer -> context.verify(() -> {
+                           assertEquals(1, buffer.toString().lines().filter(l -> l.equals(songPath)).count());
+                           context.completeNow();
                        }))
                        .onFailure(context::failNow);
     }
@@ -158,19 +153,17 @@ class PlaylistServiceImplTest {
     @Test
     void addSongToPlaylistIgnoresBlankLines(Vertx vertx, VertxTestContext context) throws IOException {
         final String name = uniqueName();
+        final String filePath = resolvePlaylistFilePath(name);
         writePlaylistFile(name, "/music/song1.flac\n\n\n/music/song2.flac\n");
 
         playlistService.addSongToPlaylist(name, "/music/song3.flac")
-                       .onSuccess(result -> context.verify(() -> {
-                           try {
-                               final String content = Files.readString(Path.of(resolvePlaylistFilePath(name)));
-                               final long nonBlankLines = content.lines().filter(l -> !l.isBlank()).count();
-                               assertEquals(3, nonBlankLines);
-                               assertFalse(content.lines().anyMatch(String::isBlank));
-                               context.completeNow();
-                           } catch (IOException e) {
-                               context.failNow(e);
-                           }
+                       .compose(__ -> vertx.fileSystem().readFile(filePath))
+                       .onSuccess(buffer -> context.verify(() -> {
+                           final String content = buffer.toString();
+                           final long nonBlankLines = content.lines().filter(l -> !l.isBlank()).count();
+                           assertEquals(3, nonBlankLines);
+                           assertFalse(content.lines().anyMatch(String::isBlank));
+                           context.completeNow();
                        }))
                        .onFailure(context::failNow);
     }
@@ -178,20 +171,20 @@ class PlaylistServiceImplTest {
     @Test
     void deleteSongFromPlaylist(Vertx vertx, VertxTestContext context) throws IOException {
         final String name = uniqueName();
+        final String filePath = resolvePlaylistFilePath(name);
         writePlaylistFile(name, "/music/song1.flac\n/music/song2.flac\n/music/song3.flac");
 
         playlistService.deleteSongFromPlaylist(name, "/music/song2.flac")
-                       .onSuccess(result -> context.verify(() -> {
-                           try {
-                               assertTrue(result);
-                               final String content = Files.readString(Path.of(resolvePlaylistFilePath(name)));
-                               assertFalse(content.contains("/music/song2.flac"));
-                               assertTrue(content.contains("/music/song1.flac"));
-                               assertTrue(content.contains("/music/song3.flac"));
-                               context.completeNow();
-                           } catch (IOException e) {
-                               context.failNow(e);
-                           }
+                       .compose(result -> {
+                           assertTrue(result);
+                           return vertx.fileSystem().readFile(filePath);
+                       })
+                       .onSuccess(buffer -> context.verify(() -> {
+                           final String content = buffer.toString();
+                           assertFalse(content.contains("/music/song2.flac"));
+                           assertTrue(content.contains("/music/song1.flac"));
+                           assertTrue(content.contains("/music/song3.flac"));
+                           context.completeNow();
                        }))
                        .onFailure(context::failNow);
     }

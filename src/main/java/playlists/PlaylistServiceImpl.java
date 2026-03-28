@@ -213,7 +213,7 @@ public class PlaylistServiceImpl implements PlaylistService {
                                                               .split("\n"))
                                                .filter(path -> !path.equals(songPath))
                                                .collect(Collectors.joining("\n")))
-                         .map(content -> fileSystem.writeFile(filePath, Buffer.buffer(content)))
+                         .flatMap(content -> fileSystem.writeFile(filePath, Buffer.buffer(content)))
                          .map(__ -> true);
     }
 

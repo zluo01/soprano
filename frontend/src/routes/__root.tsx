@@ -8,9 +8,9 @@ import Preview from '@/components/preview';
 import Tabs from '@/components/tabs';
 import { Toaster } from '@/components/ui/sonner.tsx';
 
-const Favor = lazy(() => import('src/components/favor'));
-const PlaybackQueue = lazy(() => import('src/components/queue'));
-const PlaybackDrawer = lazy(() => import('src/components/playback'));
+const Favor = lazy(() => import('@/components/favor'));
+const PlaybackQueue = lazy(() => import('@/components/queue'));
+const PlaybackDrawer = lazy(() => import('@/components/playback'));
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;

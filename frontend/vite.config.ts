@@ -1,10 +1,9 @@
-import path from 'node:path';
+import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
-import react from '@vitejs/plugin-react';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA, type VitePWAOptions } from 'vite-plugin-pwa';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 const manifestForPlugIn: Partial<VitePWAOptions> = {
 	registerType: 'autoUpdate',
@@ -64,22 +63,16 @@ const manifestForPlugIn: Partial<VitePWAOptions> = {
 export default defineConfig({
 	plugins: [
 		tanstackRouter({ target: 'react', autoCodeSplitting: true }),
-		react({
-			babel: {
-				plugins: ['babel-plugin-react-compiler'],
-			},
-		}),
+		react(),
+		babel({ presets: [reactCompilerPreset()] }),
 		tailwindcss(),
-		tsconfigPaths(),
 		VitePWA(manifestForPlugIn),
 	],
 	build: {
 		target: 'esnext',
 	},
 	resolve: {
-		alias: {
-			'@': path.resolve(__dirname, './src'),
-		},
+		tsconfigPaths: true,
 	},
 	server: {
 		proxy: {

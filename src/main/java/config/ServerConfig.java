@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public final class ServerConfig {
     private static final int DEFAULT_COVER_SOURCE_DIMENSION = 800;
 
-    private static final Level DEAULT_LOG_LEVEL = Level.ERROR;
+    private static final Level DEFAULT_LOG_LEVEL = Level.ERROR;
 
     private static final List<Integer> DEFAULT_COVER_VARIANTS = List.of(50, 180);
 
@@ -77,7 +77,7 @@ public final class ServerConfig {
         }
 
         // configure
-        configGlobalLogLevel(Level.toLevel(config.getString(LOG_LEVEL), DEAULT_LOG_LEVEL));
+        configGlobalLogLevel(Level.toLevel(config.getString(LOG_LEVEL), DEFAULT_LOG_LEVEL));
         return Future.succeededFuture(config);
     }
 

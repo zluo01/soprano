@@ -70,12 +70,12 @@ const setContainerStyles = (
 	api.containerNode().style.transform = `translateZ(${WHEEL_RADIUS}px) rotateX(${wheelRotation}deg)`;
 };
 
-type IPicketItemProps = {
+type IPickerItemProps = {
 	slides: string[];
 	select: Dispatch<SetStateAction<number>>;
 };
 
-export default function PickerItems({ slides, select }: IPicketItemProps) {
+export default function PickerItems({ slides, select }: IPickerItemProps) {
 	const [ref, api] = useEmblaCarousel({
 		loop: false,
 		axis: 'y',

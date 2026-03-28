@@ -135,8 +135,35 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
         }
     }
 
-    private void parseSongData(final List<String> songPaths) {
+    static Map<Integer, AlbumData> aggregateSongData(final List<SongData> songs) {
         final Map<Integer, AlbumData> sourceMap = new HashMap<>();
+        for (final SongData song : songs) {
+            final String albumArtist = song.albumArtist();
+            final int key = Objects.hash(song.album(), song.albumArtist());
+
+            sourceMap.compute(key, (k, albumData) -> {
+                if (albumData == null) {
+                    albumData = AlbumData.builder()
+                                         .name(song.album())
+                                         .artist(albumArtist.isEmpty() ? song.artist() : albumArtist)
+                                         .date(song.date())
+                                         .songs(new ArrayList<>())
+                                         .atime(song.atime())
+                                         .mtime(song.mtime())
+                                         .build();
+                }
+                albumData.addSong(song);
+                albumData.incrementTotalDuration(song.duration());
+                albumData.updateAddTime(song.atime());
+                albumData.updateModifiedTime(song.mtime());
+                return albumData;
+            });
+        }
+        return sourceMap;
+    }
+
+    private void parseSongData(final List<String> songPaths) {
+        final List<SongData> songs = new ArrayList<>();
         final Map<Integer, Artwork> visitedAlbum = new HashMap<>();
 
         for (final String path : songPaths) {
@@ -145,34 +172,16 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
                 final SongPayload songPayload = parseTag(path);
 
                 final SongData song = songPayload.song();
-                final String albumArtist = song.albumArtist();
+                songs.add(song);
+
                 final int key = Objects.hash(song.album(), song.albumArtist());
-
-                sourceMap.compute(key, (k, albumData) -> {
-                    if (albumData == null) {
-                        albumData = AlbumData.builder()
-                                             .name(song.album())
-                                             .artist(albumArtist.isEmpty() ? song.artist() : albumArtist)
-                                             .date(song.date())
-                                             .totalDuration(song.duration())
-                                             .songs(new ArrayList<>())
-                                             .atime(song.atime())
-                                             .mtime(song.mtime())
-                                             .build();
-                    }
-                    albumData.addSong(song);
-                    albumData.incrementTotalDuration(song.duration());
-                    albumData.updateAddTime(song.atime());
-                    albumData.updateModifiedTime(song.mtime());
-                    return albumData;
-                });
-
-                // aggregate album artwork
                 visitedAlbum.computeIfAbsent(key, k -> songPayload.artwork());
             } catch (Exception e) {
                 LOGGER.error("Fail to parse song data", e);
             }
         }
+
+        final Map<Integer, AlbumData> sourceMap = aggregateSongData(songs);
 
         databaseService.scan(List.copyOf(sourceMap.values()))
                        .compose(__ -> {

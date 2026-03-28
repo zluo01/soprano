@@ -10,18 +10,17 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import static helper.PathHelper.resolvePlaylistFilePath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,8 +32,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(VertxExtension.class)
 class PlaylistServiceImplTest {
 
-    private PlaylistService playlistService;
-    private final List<String> createdPlaylists = new ArrayList<>();
+    @TempDir
+    Path tempDir;
+
+    private PlaylistServiceImpl playlistService;
 
     @Mock
     private DatabaseService databaseService;
@@ -43,25 +44,20 @@ class PlaylistServiceImplTest {
     @BeforeEach
     void setup(Vertx vertx) {
         closeable = MockitoAnnotations.openMocks(this);
-        playlistService = new PlaylistServiceImpl(databaseService, vertx.fileSystem());
+        playlistService = new PlaylistServiceImpl(databaseService, vertx.fileSystem(), tempDir.toString());
     }
 
     @AfterEach
     void tearDown() throws Exception {
-        for (String name : createdPlaylists) {
-            Files.deleteIfExists(Path.of(resolvePlaylistFilePath(name)));
-        }
         closeable.close();
     }
 
     private String uniqueName() {
-        final String name = "test_" + UUID.randomUUID();
-        createdPlaylists.add(name);
-        return name;
+        return "test_" + UUID.randomUUID();
     }
 
     private void writePlaylistFile(String name, String content) throws IOException {
-        Files.writeString(Path.of(resolvePlaylistFilePath(name)), content);
+        Files.writeString(Path.of(playlistService.resolvePlaylistFilePath(name)), content);
     }
 
     @Test
@@ -70,7 +66,7 @@ class PlaylistServiceImplTest {
         playlistService.createPlaylist(name)
                        .onSuccess(result -> context.verify(() -> {
                            assertTrue(result);
-                           assertTrue(Files.exists(Path.of(resolvePlaylistFilePath(name))));
+                           assertTrue(Files.exists(Path.of(playlistService.resolvePlaylistFilePath(name))));
                            context.completeNow();
                        }))
                        .onFailure(context::failNow);
@@ -83,7 +79,7 @@ class PlaylistServiceImplTest {
                        .compose(__ -> playlistService.deletePlaylist(name))
                        .onSuccess(result -> context.verify(() -> {
                            assertTrue(result);
-                           assertFalse(Files.exists(Path.of(resolvePlaylistFilePath(name))));
+                           assertFalse(Files.exists(Path.of(playlistService.resolvePlaylistFilePath(name))));
                            context.completeNow();
                        }))
                        .onFailure(context::failNow);
@@ -97,8 +93,8 @@ class PlaylistServiceImplTest {
                        .compose(__ -> playlistService.renamePlaylist(name, newName))
                        .onSuccess(result -> context.verify(() -> {
                            assertTrue(result);
-                           assertFalse(Files.exists(Path.of(resolvePlaylistFilePath(name))));
-                           assertTrue(Files.exists(Path.of(resolvePlaylistFilePath(newName))));
+                           assertFalse(Files.exists(Path.of(playlistService.resolvePlaylistFilePath(name))));
+                           assertTrue(Files.exists(Path.of(playlistService.resolvePlaylistFilePath(newName))));
                            context.completeNow();
                        }))
                        .onFailure(context::failNow);
@@ -111,7 +107,7 @@ class PlaylistServiceImplTest {
                        .compose(__ -> playlistService.renamePlaylist(name, name))
                        .onSuccess(result -> context.verify(() -> {
                            assertTrue(result);
-                           assertTrue(Files.exists(Path.of(resolvePlaylistFilePath(name))));
+                           assertTrue(Files.exists(Path.of(playlistService.resolvePlaylistFilePath(name))));
                            context.completeNow();
                        }))
                        .onFailure(context::failNow);
@@ -120,7 +116,7 @@ class PlaylistServiceImplTest {
     @Test
     void addSongToPlaylist(Vertx vertx, VertxTestContext context) {
         final String name = uniqueName();
-        final String filePath = resolvePlaylistFilePath(name);
+        final String filePath = playlistService.resolvePlaylistFilePath(name);
         playlistService.createPlaylist(name)
                        .compose(__ -> playlistService.addSongToPlaylist(name, "/music/song1.flac"))
                        .compose(result -> {
@@ -138,7 +134,7 @@ class PlaylistServiceImplTest {
     void addDuplicateSongToPlaylist(Vertx vertx, VertxTestContext context) throws IOException {
         final String name = uniqueName();
         final String songPath = "/music/song1.flac";
-        final String filePath = resolvePlaylistFilePath(name);
+        final String filePath = playlistService.resolvePlaylistFilePath(name);
         writePlaylistFile(name, songPath);
 
         playlistService.addSongToPlaylist(name, songPath)
@@ -153,7 +149,7 @@ class PlaylistServiceImplTest {
     @Test
     void addSongToPlaylistIgnoresBlankLines(Vertx vertx, VertxTestContext context) throws IOException {
         final String name = uniqueName();
-        final String filePath = resolvePlaylistFilePath(name);
+        final String filePath = playlistService.resolvePlaylistFilePath(name);
         writePlaylistFile(name, "/music/song1.flac\n\n\n/music/song2.flac\n");
 
         playlistService.addSongToPlaylist(name, "/music/song3.flac")
@@ -171,7 +167,7 @@ class PlaylistServiceImplTest {
     @Test
     void deleteSongFromPlaylist(Vertx vertx, VertxTestContext context) throws IOException {
         final String name = uniqueName();
-        final String filePath = resolvePlaylistFilePath(name);
+        final String filePath = playlistService.resolvePlaylistFilePath(name);
         writePlaylistFile(name, "/music/song1.flac\n/music/song2.flac\n/music/song3.flac");
 
         playlistService.deleteSongFromPlaylist(name, "/music/song2.flac")

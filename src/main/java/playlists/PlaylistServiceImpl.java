@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Strings;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,7 +22,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static config.ServerConfig.PLAYLIST_PATH;
-import static helper.PathHelper.resolvePlaylistFilePath;
 
 public class PlaylistServiceImpl implements PlaylistService {
     private static final Logger LOGGER = LogManager.getLogger(PlaylistServiceImpl.class);
@@ -30,16 +30,28 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     private final DatabaseService databaseService;
     private final FileSystem fileSystem;
+    private final String playlistPath;
 
     public PlaylistServiceImpl(final DatabaseService databaseService,
                                final FileSystem fileSystem) {
+        this(databaseService, fileSystem, PLAYLIST_PATH);
+    }
+
+    PlaylistServiceImpl(final DatabaseService databaseService,
+                        final FileSystem fileSystem,
+                        final String playlistPath) {
         this.databaseService = databaseService;
         this.fileSystem = fileSystem;
+        this.playlistPath = playlistPath;
+    }
+
+    String resolvePlaylistFilePath(final String fileName) {
+        return Path.of(playlistPath).resolve(fileName + ".m3u").toString();
     }
 
     @Override
     public Future<Void> validatePlaylists() {
-        return fileSystem.readDir(PLAYLIST_PATH, M3U_MATCH_REGEX)
+        return fileSystem.readDir(playlistPath, M3U_MATCH_REGEX)
                          .compose(paths -> {
                              final var futures = paths.stream()
                                                       .map(this::verifyPlaylist)
@@ -77,7 +89,7 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     @Override
     public Future<List<JsonObject>> listPlaylists() {
-        return fileSystem.readDir(PLAYLIST_PATH, M3U_MATCH_REGEX)
+        return fileSystem.readDir(playlistPath, M3U_MATCH_REGEX)
                          .compose(paths -> {
                              final var futures =
                                      paths.stream()

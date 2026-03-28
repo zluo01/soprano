@@ -8,7 +8,11 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 const manifestForPlugIn: Partial<VitePWAOptions> = {
 	registerType: 'autoUpdate',
-	includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+	includeAssets: [
+		'favicon.ico',
+		'apple-touch-icon-180x180.png',
+		'maskable-icon-512x512.png',
+	],
 	manifest: {
 		name: 'Soprano',
 		short_name: 'Soprano',
@@ -38,7 +42,7 @@ const manifestForPlugIn: Partial<VitePWAOptions> = {
 				src: 'apple-touch-icon-180x180.png',
 				sizes: '180x180',
 				type: 'image/png',
-				purpose: 'apple touch icon',
+				purpose: 'any',
 			},
 			{
 				src: 'maskable-icon-512x512.png',

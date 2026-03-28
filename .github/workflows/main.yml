@@ -19,7 +19,7 @@ jobs:
           distribution: 'corretto'
 
       - name: Build with Maven and Run unit Test
-        run: mvn --batch-mode --update-snapshots verify -e
+        run: mvn --batch-mode --update-snapshots verify -e -q
 
   package:
     runs-on: ubuntu-latest

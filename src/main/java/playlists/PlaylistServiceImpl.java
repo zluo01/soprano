@@ -135,9 +135,14 @@ public class PlaylistServiceImpl implements PlaylistService {
         return fileSystem.readFile(filePath)
                          .flatMap(content -> {
                              final Map<String, Integer> orderMap = new HashMap<>();
-                             final String[] songPaths = content.toString(StandardCharsets.UTF_8)
-                                                               .trim()
-                                                               .split("\n");
+                             final String[] songPaths = Arrays.stream(content.toString(StandardCharsets.UTF_8)
+                                                                             .trim()
+                                                                             .split("\n"))
+                                                              .filter(s -> !Strings.isBlank(s))
+                                                              .toArray(String[]::new);
+                             if (songPaths.length == 0) {
+                                 return Future.succeededFuture(List.of());
+                             }
                              for (int i = 0; i < songPaths.length; i++) {
                                  final int idx = i;
                                  orderMap.computeIfAbsent(songPaths[i], s -> idx);
@@ -188,6 +193,7 @@ public class PlaylistServiceImpl implements PlaylistService {
                              final List<String> songs = Arrays.stream(content.toString(StandardCharsets.UTF_8)
                                                                              .trim()
                                                                              .split("\n"))
+                                                              .filter(s -> !Strings.isBlank(s))
                                                               .collect(Collectors.toList());
                              if (songs.contains(songPath)) {
                                  return Future.succeededFuture();

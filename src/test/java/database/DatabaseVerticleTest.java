@@ -5,8 +5,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.jdbcclient.JDBCConnectOptions;
+import io.vertx.jdbcclient.JDBCPool;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import io.vertx.sqlclient.PoolOptions;
 import models.AlbumData;
 import models.SongData;
 import org.junit.jupiter.api.AfterEach;
@@ -56,6 +59,33 @@ class DatabaseVerticleTest {
         if (tempDbPath != null && Files.exists(tempDbPath)) {
             Files.delete(tempDbPath);
         }
+    }
+
+    @Test
+    void verifyInitialization(Vertx vertx, VertxTestContext context) {
+        final var pool = JDBCPool.pool(vertx,
+                new JDBCConnectOptions().setJdbcUrl("jdbc:sqlite::memory:"),
+                new PoolOptions().setMaxSize(1));
+        final var freshService = new DatabaseServiceImpl(pool);
+
+        freshService.initialization()
+                    .compose(__ -> pool.query(
+                                    "SELECT name FROM sqlite_master WHERE type IN ('table','index') ORDER BY name")
+                            .execute())
+                    .onSuccess(rows -> context.verify(() -> {
+                        final List<String> names = new ArrayList<>();
+                        for (var row : rows) {
+                            names.add(row.getString("name"));
+                        }
+                        assertTrue(names.contains("albums"));
+                        assertTrue(names.contains("songs"));
+                        assertTrue(names.contains("genres"));
+                        assertTrue(names.contains("artists"));
+                        assertTrue(names.contains("albumArtists"));
+                        assertTrue(names.contains("albums_name_add_time_index"));
+                        context.completeNow();
+                    }))
+                    .onFailure(context::failNow);
     }
 
     @Test

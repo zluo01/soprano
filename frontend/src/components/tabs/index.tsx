@@ -1,5 +1,5 @@
 import { Link, useLocation } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils.ts';
 
 interface ITab {
@@ -15,15 +15,15 @@ const TABS = new Map<string, ITab>([
 	['/genres', { name: 'Genres' }],
 ]);
 
+const TAB_ENTRIES = Array.from(TABS.entries());
 const ALLOW_PATHS = new Set(TABS.keys());
 
 export default function Tabs() {
 	const location = useLocation();
+	const tabRefs = useRef<Map<string, HTMLSpanElement>>(new Map());
 
 	useEffect(() => {
-		const paths = TABS.keys();
-		const selected = Array.from(paths).indexOf(location.pathname);
-		const anchor = document.getElementById(`tab-${selected}`);
+		const anchor = tabRefs.current.get(location.pathname);
 		if (anchor) {
 			anchor.scrollIntoView({
 				behavior: 'smooth',
@@ -40,10 +40,12 @@ export default function Tabs() {
 				!ALLOW_PATHS.has(location.pathname) && 'hidden',
 			)}
 		>
-			{Array.from(TABS.entries()).map(([path, v], index) => (
-				<Link key={index} to={path}>
+			{TAB_ENTRIES.map(([path, v]) => (
+				<Link key={path} to={path}>
 					<span
-						id={`tab-${index}`}
+						ref={(el) => {
+							if (el) tabRefs.current.set(path, el);
+						}}
 						className={cn(
 							'text cursor-pointer p-1.5 font-bold whitespace-nowrap opacity-30 select-none',
 							location.pathname === path &&

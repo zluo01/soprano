@@ -30,7 +30,7 @@ function Playlist() {
 	const mutation = useDeleteSongFromPlaylistMutation();
 
 	return (
-		<div className="w-full pt-2">
+		<div className="w-full">
 			<div className="sticky top-[calc(env(safe-area-inset-top)+2.75rem)] z-20 flex w-full flex-row flex-nowrap items-center gap-2 bg-background px-6 py-3">
 				<Separator className="flex-1" />
 				<Button

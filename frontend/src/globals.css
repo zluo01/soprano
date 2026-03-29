@@ -136,6 +136,7 @@
 	}
 
 	html {
+		scroll-behavior: smooth;
 		min-height: -webkit-fill-available;
 	}
 }

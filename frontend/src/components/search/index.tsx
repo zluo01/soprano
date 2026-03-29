@@ -264,7 +264,7 @@ export default function Search() {
 				</div>
 				<div
 					ref={scrollRef}
-					className="flex flex-1 flex-col overflow-y-auto py-2"
+					className="flex flex-1 flex-col overflow-y-auto py-2 pb-[env(safe-area-inset-bottom)]"
 				>
 					<SearchContent searchText={debounceSearch} />
 				</div>

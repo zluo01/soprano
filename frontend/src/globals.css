@@ -14,10 +14,14 @@
 	--text-color-blue: #5f86c7;
 	--text-color-char: #f04a4a;
 
+	/* Base value registers the token so Tailwind generates pb-preview / bottom-preview utilities.
+	   Overridden at runtime in :root below to include the device safe area. */
 	--spacing-preview: 4.5rem;
 }
 
 :root {
+	/* Runtime override — env() is device-dependent and can't be resolved at build time in @theme. */
+	--spacing-preview: calc(4.5rem + env(safe-area-inset-bottom));
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.141 0.005 285.823);
 	--card: oklch(1 0 0);

@@ -76,7 +76,7 @@ export default function PlaybackQueue() {
 						))
 					)}
 				</div>
-				<DrawerFooter className="items-center px-6 py-2">
+				<DrawerFooter className="items-center px-6 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
 					<Button
 						variant="ghost"
 						size="icon"

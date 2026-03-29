@@ -30,7 +30,7 @@ function RootComponent() {
 					<Outlet />
 				</div>
 			</div>
-			<div className="fixed bottom-0 z-20 w-full bg-background">
+			<div className="fixed bottom-0 z-20 w-full bg-background pb-[env(safe-area-inset-bottom)]">
 				<Preview />
 			</div>
 			<Suspense>

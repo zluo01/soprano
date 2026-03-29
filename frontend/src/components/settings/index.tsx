@@ -57,7 +57,7 @@ export default function Settings() {
 						</div>
 					</div>
 				</div>
-				<DrawerFooter className="flex flex-row justify-around pb-4">
+				<DrawerFooter className="flex flex-row justify-around pb-[max(1rem,env(safe-area-inset-bottom))]">
 					<Button
 						variant="outline"
 						className="size-12 rounded-full p-2"

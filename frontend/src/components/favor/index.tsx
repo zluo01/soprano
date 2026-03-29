@@ -27,7 +27,10 @@ export default function Favor() {
 
 	return (
 		<Sheet open={favorModalState.open} onOpenChange={closeFavorModal}>
-			<SheetContent className="h-[31.8%] rounded-2xl p-6" side="bottom">
+			<SheetContent
+				className="h-[31.8%] rounded-2xl p-6 pb-[env(safe-area-inset-bottom)]"
+				side="bottom"
+			>
 				<PlaylistPicker playlists={playlists} submit={submit} />
 			</SheetContent>
 		</Sheet>

@@ -163,16 +163,21 @@ export default function Search() {
 		const vv = window.visualViewport;
 		if (!vv || !searchModalState) return;
 
+		let raf = 0;
 		function update() {
-			if (!contentRef.current || !vv) return;
-			contentRef.current.style.height = `${vv.height}px`;
-			contentRef.current.style.top = `${vv.offsetTop}px`;
+			cancelAnimationFrame(raf);
+			raf = requestAnimationFrame(() => {
+				if (!contentRef.current || !vv) return;
+				contentRef.current.style.height = `${vv.height}px`;
+				contentRef.current.style.top = `${vv.offsetTop}px`;
+			});
 		}
 
 		update();
 		vv.addEventListener('resize', update);
 		vv.addEventListener('scroll', update);
 		return () => {
+			cancelAnimationFrame(raf);
 			vv.removeEventListener('resize', update);
 			vv.removeEventListener('scroll', update);
 		};

@@ -19,7 +19,7 @@ export default function Favor() {
 
 	const playlists = orderBy(data?.Playlists, ['modifiedTime'], 'desc');
 
-	async function submit(playlistName: string) {
+	function submit(playlistName: string) {
 		mutation.mutate({ name: playlistName, songPath: favorModalState.songPath });
 		toast(`Successfully add song to ${playlistName}.`);
 		closeFavorModal();
@@ -36,7 +36,7 @@ export default function Favor() {
 
 interface IPlaylistPicker {
 	playlists: IPlaylist[];
-	submit: (playlistName: string) => Promise<void>;
+	submit: (playlistName: string) => void;
 }
 
 function PlaylistPicker({ playlists, submit }: IPlaylistPicker) {

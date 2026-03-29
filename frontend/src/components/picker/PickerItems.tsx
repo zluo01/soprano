@@ -154,7 +154,7 @@ export default function PickerItems({ slides, select }: IPickerItemProps) {
 					className="h-8 w-full touch-none select-none perspective-distant"
 					ref={ref}
 				>
-					<div className="will-change-transformc size-full transform-3d">
+					<div className="will-change-transform size-full transform-3d">
 						{slides.map((name, index) => (
 							<div
 								className="flex size-full items-center justify-center text-center text-lg opacity-0 backface-hidden"

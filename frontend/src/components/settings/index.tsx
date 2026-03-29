@@ -14,7 +14,7 @@ import { updateDatabase, useGetStatsQuery } from '@/lib/queries';
 
 export default function Settings() {
 	const { settingModalState, updateSettingModalState } = useSettingStore();
-	const { data } = useGetStatsQuery();
+	const { data } = useGetStatsQuery(settingModalState);
 
 	return (
 		<Drawer

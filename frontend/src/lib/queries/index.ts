@@ -203,10 +203,11 @@ const StatsQueryDocument = /* GraphQL */ `
   }
 `;
 
-export function useGetStatsQuery() {
+export function useGetStatsQuery(enabled: boolean) {
 	return useQuery({
 		queryKey: [StatsQueryDocument],
 		queryFn: async () => request<{ Stats: IStats }>(StatsQueryDocument),
+		enabled,
 		...IMMUTABLE_REQUEST,
 	});
 }

@@ -82,7 +82,7 @@ function PlaylistsView() {
 					/>
 				))}
 			</div>
-			<div className="sticky bottom-18 bg-background px-6 py-1.5">
+			<div className="sticky bottom-preview bg-background px-6 py-1.5">
 				<Button
 					variant="outline"
 					className="w-full bg-accent opacity-75"

@@ -26,7 +26,7 @@ function RootComponent() {
 					<AppBar />
 					<Tabs />
 				</div>
-				<div className="flex flex-1 flex-col pb-18">
+				<div className="flex flex-1 flex-col pb-preview">
 					<Outlet />
 				</div>
 			</div>

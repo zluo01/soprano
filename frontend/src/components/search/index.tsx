@@ -235,7 +235,7 @@ export default function Search() {
 				ref={contentRef}
 				side="bottom"
 				className={cn(
-					'flex h-full flex-col rounded-t-3xl gap-0 px-0 pt-0 top-0 bottom-auto',
+					'flex h-full flex-col rounded-t-3xl gap-0 px-0 top-0 bottom-auto',
 					'pt-[env(safe-area-inset-top)]',
 				)}
 				onPointerDown={onPointerDown}

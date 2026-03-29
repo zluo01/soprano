@@ -15,16 +15,22 @@ const PlaybackDrawer = lazy(() => import('@/components/playback'));
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
 }>()({
-	component: () => (
+	component: RootComponent,
+});
+
+function RootComponent() {
+	return (
 		<>
-			<div className="h-full w-screen scroll-smooth select-none">
-				<div className="h-full pb-18">
+			<div className="flex min-h-dvh flex-col select-none">
+				<div className="sticky top-0 z-30 bg-background pt-[env(safe-area-inset-top)]">
 					<AppBar />
 					<Tabs />
+				</div>
+				<div className="flex flex-1 flex-col pb-18">
 					<Outlet />
 				</div>
 			</div>
-			<div className="fixed bottom-0 z-20 w-full">
+			<div className="fixed bottom-0 z-20 w-full bg-background">
 				<Preview />
 			</div>
 			<Suspense>
@@ -36,5 +42,5 @@ export const Route = createRootRouteWithContext<{
 			<ReactQueryDevtools buttonPosition="top-right" />
 			<TanStackRouterDevtools position="bottom-right" />
 		</>
-	),
-});
+	);
+}

@@ -5,7 +5,6 @@ import { Music2 } from 'lucide-react';
 import { lazy, Suspense } from 'react';
 import Cover from '@/components/cover';
 import { LoadingSongs } from '@/components/loading';
-import ScrollContainer from '@/components/scroll';
 import { SwipeAction } from '@/components/swipe';
 import { Button } from '@/components/ui/button.tsx';
 import { useCreatePlaylistStore, useRenamePlaylistStore } from '@/lib/context';
@@ -41,8 +40,8 @@ function PlaylistsView() {
 	const { updateCreatePlaylistModalState } = useCreatePlaylistStore();
 
 	return (
-		<div className="flex h-[calc(100%-100px)] w-full flex-col pt-2">
-			<ScrollContainer className="size-full px-6">
+		<div className="flex flex-1 w-full flex-col pt-2">
+			<div className="flex-1 px-6">
 				{data?.Playlists.map((o) => (
 					<SwipeAction
 						key={o.name}
@@ -82,8 +81,8 @@ function PlaylistsView() {
 						]}
 					/>
 				))}
-			</ScrollContainer>
-			<div className="static bottom-0 z-10 px-6 py-1.5">
+			</div>
+			<div className="sticky bottom-18 bg-background px-6 py-1.5">
 				<Button
 					variant="outline"
 					className="w-full bg-accent opacity-75"

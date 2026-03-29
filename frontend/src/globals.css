@@ -132,16 +132,11 @@
 
 	body {
 		@apply bg-background text-foreground;
-
-		height: calc(100dvh - env(safe-area-inset-top));
-		min-height: calc(100dvh - env(safe-area-inset-top));
-		max-height: calc(100dvh - env(safe-area-inset-top));
-
-		margin-top: env(safe-area-inset-top);
+		min-height: 100dvh;
 	}
 
 	html {
-		height: -webkit-fill-available;
+		min-height: -webkit-fill-available;
 	}
 }
 

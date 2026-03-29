@@ -28,7 +28,7 @@ export default function Tabs() {
 			anchor.scrollIntoView({
 				behavior: 'smooth',
 				inline: 'center',
-				block: 'center',
+				block: 'nearest',
 			});
 		}
 	}, [location.pathname]);

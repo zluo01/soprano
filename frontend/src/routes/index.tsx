@@ -2,7 +2,6 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import orderBy from 'lodash-es/orderBy';
 import { LoadingAlbums } from '@/components/loading';
-import ScrollContainer from '@/components/scroll';
 import { AlbumGridView } from '@/components/shares';
 import { displayAlbumsQueryOptions } from '@/lib/queries';
 
@@ -22,8 +21,8 @@ function RecentlyAdded() {
 	);
 
 	return (
-		<ScrollContainer className="h-[calc(100%-100px)] w-full pt-2">
+		<div className="w-full pt-2">
 			<AlbumGridView albums={recentAddedAlbums} />
-		</ScrollContainer>
+		</div>
 	);
 }

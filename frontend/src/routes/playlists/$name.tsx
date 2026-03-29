@@ -3,7 +3,6 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { ListPlus } from 'lucide-react';
 import { LoadingSongs } from '@/components/loading';
-import ScrollContainer from '@/components/scroll';
 import { Song } from '@/components/song';
 import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
@@ -31,8 +30,8 @@ function Playlist() {
 	const mutation = useDeleteSongFromPlaylistMutation();
 
 	return (
-		<ScrollContainer className="h-[calc(100%-45px)] w-full pt-2">
-			<div className="sticky top-0 z-20 flex w-full flex-row flex-nowrap items-center gap-2 bg-background px-6 py-3">
+		<div className="w-full pt-2">
+			<div className="sticky top-[calc(env(safe-area-inset-top)+2.75rem)] z-20 flex w-full flex-row flex-nowrap items-center gap-2 bg-background px-6 py-3">
 				<Separator className="flex-1" />
 				<Button
 					variant="ghost"
@@ -90,6 +89,6 @@ function Playlist() {
 					))}
 				</div>
 			)}
-		</ScrollContainer>
+		</div>
 	);
 }

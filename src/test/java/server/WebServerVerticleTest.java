@@ -22,11 +22,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import player.PlayerService;
 import playlists.PlaylistService;
+import playlists.PlaylistServiceImpl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,8 +47,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(VertxExtension.class)
 class WebServerVerticleTest {
 
-    @Mock
-    private PlaylistService playlistService;
+    @TempDir
+    Path tempDir;
+
     @Mock
     private PlayerService playerService;
 
@@ -56,6 +62,7 @@ class WebServerVerticleTest {
 
         final var testDBPath = Objects.requireNonNull(getClass().getClassLoader().getResource("test.sqlite")).getPath();
         final DatabaseService databaseService = DatabaseService.create(vertx, new JsonObject().put(DATABASE_CONFIG, testDBPath));
+        final PlaylistService playlistService = new PlaylistServiceImpl(databaseService, vertx.fileSystem(), tempDir.toString());
 
         final String schema = vertx.fileSystem().readFileBlocking("schemas/main.graphql").toString();
         final TypeDefinitionRegistry registry = new SchemaParser().parse(schema);
@@ -98,8 +105,8 @@ class WebServerVerticleTest {
 
         // verify one album's parsed data
         final var album = albums.stream()
-                .filter(a -> a.get("id").equals(2037516188))
-                .findFirst().orElseThrow();
+                                .filter(a -> a.get("id").equals(2037516188))
+                                .findFirst().orElseThrow();
         assertEquals("KID A MNESIA", album.get("name"));
         assertEquals("Radiohead", album.get("artist"));
         assertEquals("2021-11-05", album.get("date"));
@@ -139,8 +146,8 @@ class WebServerVerticleTest {
         assertEquals(7, genres.size());
 
         final var pop = genres.stream()
-                .filter(g -> g.get("name").equals("Pop"))
-                .findFirst().orElseThrow();
+                              .filter(g -> g.get("name").equals("Pop"))
+                              .findFirst().orElseThrow();
         assertNotNull(pop.get("id"));
         assertTrue((int) pop.get("albumCount") > 0);
         context.completeNow();
@@ -245,67 +252,84 @@ class WebServerVerticleTest {
     }
 
     @Test
-    void queryPlaylists(Vertx vertx, VertxTestContext context) {
-        when(playlistService.listPlaylists()).thenReturn(Future.succeededFuture(
-                List.of(JsonObject.of("name", "MyPlaylist", "modifiedTime", 1000L, "songCount", 3))));
+    void queryPlaylists(Vertx vertx, VertxTestContext context) throws IOException {
+        Files.writeString(tempDir.resolve("MyPlaylist.m3u"),
+                          "/home/a/Music/Music/Muse/[Hi-Res][Muse]The Resistance/01-01-Muse-Uprising.flac");
 
-        Map<String, Object> data = executeQuery("{ Playlists { name songCount } }");
+        Map<String, Object> data = executeQuery("{ Playlists { name songCount coverId } }");
         List<Map<String, Object>> playlists = (List<Map<String, Object>>) data.get("Playlists");
         assertEquals(1, playlists.size());
         assertEquals("MyPlaylist", playlists.getFirst().get("name"));
-        assertEquals(3, playlists.getFirst().get("songCount"));
+        assertEquals(1, playlists.getFirst().get("songCount"));
+        assertEquals(627123027, playlists.getFirst().get("coverId"));
+        context.completeNow();
+    }
+
+    @Test
+    void queryPlaylistSongs(Vertx vertx, VertxTestContext context) throws IOException {
+        final String songPath = "/home/a/Music/Music/Muse/[Hi-Res][Muse]The Resistance/01-01-Muse-Uprising.flac";
+        Files.writeString(tempDir.resolve("TestList.m3u"), songPath);
+
+        Map<String, Object> data = executeQuery(
+                "query { PlaylistSongs(name: \"TestList\") { name path } }");
+        List<Map<String, Object>> songs = (List<Map<String, Object>>) data.get("PlaylistSongs");
+        assertEquals(1, songs.size());
+        assertEquals("Uprising", songs.getFirst().get("name"));
+        assertEquals(songPath, songs.getFirst().get("path"));
         context.completeNow();
     }
 
     @Test
     void mutationCreatePlaylist(Vertx vertx, VertxTestContext context) {
-        when(playlistService.createPlaylist("NewList")).thenReturn(Future.succeededFuture(true));
-
         Map<String, Object> data = executeQuery("mutation { CreatePlaylist(name: \"NewList\") }");
         assertEquals(true, data.get("CreatePlaylist"));
-        verify(playlistService).createPlaylist("NewList");
+        assertTrue(Files.exists(tempDir.resolve("NewList.m3u")));
         context.completeNow();
     }
 
     @Test
-    void mutationDeletePlaylist(Vertx vertx, VertxTestContext context) {
-        when(playlistService.deletePlaylist("OldList")).thenReturn(Future.succeededFuture(true));
+    void mutationDeletePlaylist(Vertx vertx, VertxTestContext context) throws IOException {
+        Files.createFile(tempDir.resolve("OldList.m3u"));
 
         Map<String, Object> data = executeQuery("mutation { DeletePlaylist(name: \"OldList\") }");
         assertEquals(true, data.get("DeletePlaylist"));
-        verify(playlistService).deletePlaylist("OldList");
+        assertFalse(Files.exists(tempDir.resolve("OldList.m3u")));
         context.completeNow();
     }
 
     @Test
-    void mutationRenamePlaylist(Vertx vertx, VertxTestContext context) {
-        when(playlistService.renamePlaylist("Old", "New")).thenReturn(Future.succeededFuture(true));
+    void mutationRenamePlaylist(Vertx vertx, VertxTestContext context) throws IOException {
+        Files.createFile(tempDir.resolve("Old.m3u"));
 
         Map<String, Object> data = executeQuery("mutation { RenamePlaylist(name: \"Old\", newName: \"New\") }");
         assertEquals(true, data.get("RenamePlaylist"));
-        verify(playlistService).renamePlaylist("Old", "New");
+        assertFalse(Files.exists(tempDir.resolve("Old.m3u")));
+        assertTrue(Files.exists(tempDir.resolve("New.m3u")));
         context.completeNow();
     }
 
     @Test
-    void mutationAddSongToPlaylist(Vertx vertx, VertxTestContext context) {
-        when(playlistService.addSongToPlaylist("List", "/song.flac")).thenReturn(Future.succeededFuture(true));
+    void mutationAddSongToPlaylist(Vertx vertx, VertxTestContext context) throws IOException {
+        Files.createFile(tempDir.resolve("List.m3u"));
 
         Map<String, Object> data = executeQuery(
                 "mutation { AddSongToPlaylist(name: \"List\", songPath: \"/song.flac\") }");
         assertEquals(true, data.get("AddSongToPlaylist"));
-        verify(playlistService).addSongToPlaylist("List", "/song.flac");
+        assertTrue(Files.readString(tempDir.resolve("List.m3u")).contains("/song.flac"));
         context.completeNow();
     }
 
     @Test
-    void mutationDeleteSongFromPlaylist(Vertx vertx, VertxTestContext context) {
-        when(playlistService.deleteSongFromPlaylist("List", "/song.flac")).thenReturn(Future.succeededFuture(true));
+    void mutationDeleteSongFromPlaylist(Vertx vertx, VertxTestContext context) throws IOException {
+        Files.writeString(tempDir.resolve("List.m3u"), "/song1.flac\n/song.flac\n/song2.flac");
 
         Map<String, Object> data = executeQuery(
                 "mutation { DeleteSongFromPlaylist(name: \"List\", songPath: \"/song.flac\") }");
         assertEquals(true, data.get("DeleteSongFromPlaylist"));
-        verify(playlistService).deleteSongFromPlaylist("List", "/song.flac");
+        String content = Files.readString(tempDir.resolve("List.m3u"));
+        assertFalse(content.contains("/song.flac"));
+        assertTrue(content.contains("/song1.flac"));
+        assertTrue(content.contains("/song2.flac"));
         context.completeNow();
     }
 

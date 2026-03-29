@@ -37,9 +37,9 @@ public class PlaylistServiceImpl implements PlaylistService {
         this(databaseService, fileSystem, PLAYLIST_PATH);
     }
 
-    PlaylistServiceImpl(final DatabaseService databaseService,
-                        final FileSystem fileSystem,
-                        final String playlistPath) {
+    public PlaylistServiceImpl(final DatabaseService databaseService,
+                               final FileSystem fileSystem,
+                               final String playlistPath) {
         this.databaseService = databaseService;
         this.fileSystem = fileSystem;
         this.playlistPath = playlistPath;

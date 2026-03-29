@@ -18,6 +18,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet.tsx';
 import { useDebounce } from '@/hooks/useDebounce.ts';
 import { useFavorStore, useSearchStore } from '@/lib/context';
 import { addSongsToQueue, playSong, useGetSearchQuery } from '@/lib/queries';
+import { cn } from '@/lib/utils.ts';
 import { GeneralTag, type IAlbum } from '@/type';
 
 function SearchAlbumItem({ id, name, artist }: IAlbum) {
@@ -233,7 +234,10 @@ export default function Search() {
 			<SheetContent
 				ref={contentRef}
 				side="bottom"
-				className="flex h-full flex-col rounded-t-3xl gap-0 px-0 pt-0 top-0 bottom-auto"
+				className={cn(
+					'flex h-full flex-col rounded-t-3xl gap-0 px-0 pt-0 top-0 bottom-auto',
+					'pt-[env(safe-area-inset-top)]',
+				)}
 				onPointerDown={onPointerDown}
 				onPointerMove={onPointerMove}
 				onPointerUp={onPointerUp}

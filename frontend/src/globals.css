@@ -138,11 +138,23 @@
 		max-height: calc(100dvh - env(safe-area-inset-top));
 
 		margin-top: env(safe-area-inset-top);
-		/*padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);*/
 	}
 
 	html {
 		height: -webkit-fill-available;
+	}
+}
+
+@layer components {
+	/* Sonner toasts: offset by safe area since they use position:fixed */
+	[data-sonner-toaster][data-y-position="top"] {
+		/* biome-ignore lint/complexity/noImportantStyles: override sonner's inline styles */
+		top: env(safe-area-inset-top) !important;
+	}
+
+	[data-sonner-toaster][data-y-position="bottom"] {
+		/* biome-ignore lint/complexity/noImportantStyles: override sonner's inline styles */
+		bottom: env(safe-area-inset-bottom) !important;
 	}
 }
 

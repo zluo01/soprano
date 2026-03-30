@@ -123,25 +123,33 @@ export default function PickerItems({ slides, select }: IPickerItemProps) {
 	useEffect(() => {
 		if (!api) return;
 
-		api.on('pointerUp', (emblaApi) => {
+		const onPointerUp = (emblaApi: EmblaCarouselType) => {
 			const { scrollTo, target, location } = emblaApi.internalEngine();
 			const diffToTarget = target.get() - location.get();
 			const factor = Math.abs(diffToTarget) < WHEEL_ITEM_SIZE / 2.5 ? 10 : 0.1;
 			const distance = diffToTarget * factor;
 			scrollTo.distance(distance, true);
-		});
+		};
 
-		api.on('select', selectPlaylist);
-
-		api.on('scroll', rotateWheel);
-
-		api.on('reInit', (emblaApi) => {
+		const onReInit = (emblaApi: EmblaCarouselType) => {
 			inactivateEmblaTransform(emblaApi);
 			rotateWheel(emblaApi);
-		});
+		};
+
+		api.on('pointerUp', onPointerUp);
+		api.on('select', selectPlaylist);
+		api.on('scroll', rotateWheel);
+		api.on('reInit', onReInit);
 
 		inactivateEmblaTransform(api);
 		rotateWheel(api);
+
+		return () => {
+			api.off('pointerUp', onPointerUp);
+			api.off('select', selectPlaylist);
+			api.off('scroll', rotateWheel);
+			api.off('reInit', onReInit);
+		};
 	}, [api, inactivateEmblaTransform, rotateWheel, selectPlaylist]);
 
 	return (

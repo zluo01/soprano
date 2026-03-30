@@ -1,7 +1,5 @@
 package models;
 
-import io.vertx.core.json.JsonObject;
-
 import java.util.Objects;
 
 public record Song(String name,
@@ -18,17 +16,6 @@ public record Song(String name,
         Objects.requireNonNull(artists, "artists is required");
         Objects.requireNonNull(album, "album is required");
         Objects.requireNonNull(path, "path is required");
-    }
-
-    public Song(final JsonObject song) {
-        this(song.getString("name"),
-             song.getString("artists"),
-             song.getInteger("albumId"),
-             song.getString("album"),
-             song.getString("path"),
-             song.getInteger("disc"),
-             song.getInteger("trackNum"),
-             song.getInteger("duration"));
     }
 
     public static Builder builder() {

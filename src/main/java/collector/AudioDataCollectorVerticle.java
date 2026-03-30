@@ -123,18 +123,25 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
                                        running.set(false);
                                    }
                                })
-                               .onFailure(LOGGER::error);
+                               .onFailure(err -> {
+                                   LOGGER.error(err);
+                                   running.set(false);
+                               });
             } else {
                 databaseService.clearDatabase()
                                .onSuccess(__ -> {
                                    LOGGER.info("Start parsing {} song files.", songPaths.size());
                                    parseSongData(songPaths);
                                })
-                               .onFailure(LOGGER::error);
+                               .onFailure(err -> {
+                                   LOGGER.error(err);
+                                   running.set(false);
+                               });
 
             }
         } catch (IOException e) {
             LOGGER.error("Failed to retrieve song paths from directory: {}", root, e);
+            running.set(false);
         }
     }
 

@@ -12,6 +12,21 @@ const manifestForPlugIn: Partial<VitePWAOptions> = {
 		'apple-touch-icon-180x180.png',
 		'maskable-icon-512x512.png',
 	],
+	workbox: {
+		runtimeCaching: [
+			{
+				urlPattern: /\/covers\/.*\.webp$/,
+				handler: 'CacheFirst',
+				options: {
+					cacheName: 'cover-images',
+					expiration: {
+						maxEntries: 500,
+						maxAgeSeconds: 60 * 60 * 24 * 30,
+					},
+				},
+			},
+		],
+	},
 	manifest: {
 		name: 'Soprano',
 		short_name: 'Soprano',

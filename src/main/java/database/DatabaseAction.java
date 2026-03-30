@@ -62,9 +62,6 @@ enum DatabaseAction {
     }
 
     String query() {
-        if (QUERY_MAP.containsKey(this)) {
-            return QUERY_MAP.get(this);
-        }
-        throw new IllegalArgumentException("Cannot find key: " + this.name());
+        return QUERY_MAP.get(this);
     }
 }

@@ -1,7 +1,6 @@
 package collector;
 
 import models.SongData;
-import org.apache.commons.io.FilenameUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.SupportedFileFormat;
@@ -36,7 +35,7 @@ public final class AlbumScannerHelper {
         try (Stream<Path> walk = Files.walk(Path.of(directoryPath))) {
             return walk.map(Path::toFile)
                        .filter(File::isFile)
-                       .filter(file -> !file.isHidden() && ALLOWED_EXT.contains(FilenameUtils.getExtension(file.getName())))
+                       .filter(file -> !file.isHidden() && ALLOWED_EXT.contains(getExtension(file.getName())))
                        .map(File::getAbsolutePath)
                        .toList();
         }
@@ -74,6 +73,11 @@ public final class AlbumScannerHelper {
                                      .build();
 
         return new SongPayload(songData, artwork);
+    }
+
+    private static String getExtension(final String fileName) {
+        final int dot = fileName.lastIndexOf('.');
+        return dot >= 0 ? fileName.substring(dot + 1) : "";
     }
 
     private static int parseFractionValue(final String value) {

@@ -5,7 +5,6 @@ import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Strings;
@@ -106,7 +105,10 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     private Future<JsonObject> playlistDetail(final String path) {
-        final var payload = JsonObject.of("name", FilenameUtils.getBaseName(path));
+        final String fileName = Path.of(path).getFileName().toString();
+        final int dot = fileName.lastIndexOf('.');
+        final String baseName = dot >= 0 ? fileName.substring(0, dot) : fileName;
+        final var payload = JsonObject.of("name", baseName);
         final var futures = List.of(
                 fileSystem.props(path).map(props -> JsonObject.of("modifiedTime", props.lastModifiedTime())),
                 fileSystem.readFile(path)

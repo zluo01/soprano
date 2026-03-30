@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -96,12 +97,15 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
             if (update) {
                 databaseService.songPaths()
                                .flatMap(songPathsFromDatabase -> {
+                                   final var dbPathSet = new HashSet<>(songPathsFromDatabase);
+                                   final var fsPathSet = new HashSet<>(songPaths);
+
                                    final List<String> songPathsNotInDB = songPaths.stream()
-                                                                                  .filter(o -> !songPathsFromDatabase.contains(o))
+                                                                                  .filter(o -> !dbPathSet.contains(o))
                                                                                   .toList();
 
                                    final List<String> deletedSongPaths = songPathsFromDatabase.stream()
-                                                                                              .filter(o -> !songPaths.contains(o))
+                                                                                              .filter(o -> !fsPathSet.contains(o))
                                                                                               .toList();
                                    if (!deletedSongPaths.isEmpty()) {
                                        LOGGER.info("{} song need to delete.", deletedSongPaths.size());

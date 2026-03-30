@@ -78,7 +78,11 @@ public record MPVInstance(MPV instance, long handle) {
             if (option == null) {
                 throw new IllegalStateException("Failed to get" + entry.getKey() + "with error: " + error);
             }
-            LOGGER.info("MPV setting: {} => {}", entry.getKey(), option.getString(0));
+            try {
+                LOGGER.info("MPV setting: {} => {}", entry.getKey(), option.getString(0));
+            } finally {
+                instance.mpv_free(option);
+            }
         }
 
         return handle;

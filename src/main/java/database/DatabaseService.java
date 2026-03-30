@@ -21,7 +21,7 @@ public interface DatabaseService {
         final String url = config.getString(DATABASE_CONFIG, DATABASE_FILE_PATH);
 
         final JDBCConnectOptions connectOptions = new JDBCConnectOptions()
-                .setJdbcUrl("jdbc:sqlite:" + url);
+                .setJdbcUrl("jdbc:sqlite:" + url + "?foreign_keys=on");
         final PoolOptions poolOptions = new PoolOptions().setMaxSize(1);
         final var pool = JDBCPool.pool(vertx, connectOptions, poolOptions);
         return new DatabaseServiceImpl(pool);

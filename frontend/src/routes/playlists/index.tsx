@@ -60,7 +60,7 @@ function PlaylistsView() {
 										<div className="flex flex-row flex-nowrap items-center gap-1.5 text-sm opacity-35">
 											<Music2 className="size-3" />
 											<span>
-												{o.songCount} album{o.songCount > 1 && 's'}
+												{o.songCount} song{o.songCount > 1 && 's'}
 											</span>
 										</div>
 									</div>

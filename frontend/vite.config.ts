@@ -28,6 +28,7 @@ const manifestForPlugIn: Partial<VitePWAOptions> = {
 		],
 	},
 	manifest: {
+		id: '/',
 		name: 'Soprano',
 		short_name: 'Soprano',
 		icons: [

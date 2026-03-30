@@ -94,7 +94,7 @@ const PlayAlbumMutationDocument = /* GraphQL */ `
 `;
 
 export async function playAlbum(id?: number) {
-	if (!id) {
+	if (id == null) {
 		return;
 	}
 	await request(PlayAlbumMutationDocument, { id });
@@ -147,7 +147,7 @@ const PlaySongInAtPositionMutationDocument = /* GraphQL */ `
 `;
 
 export async function playSongInAtPosition(position?: number) {
-	if (!position) {
+	if (position == null) {
 		return;
 	}
 	await request(PlaySongInAtPositionMutationDocument, { position });
@@ -170,7 +170,7 @@ const RemoveSongFromQueueMutationDocument = /* GraphQL */ `
 `;
 
 export async function removeSongFromQueue(position?: number) {
-	if (!position) {
+	if (position == null) {
 		return;
 	}
 	await request(RemoveSongFromQueueMutationDocument, { position });

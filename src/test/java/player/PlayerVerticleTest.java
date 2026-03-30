@@ -243,6 +243,23 @@ public class PlayerVerticleTest {
     }
 
     @Test
+    void verifyPlaySongAtPositionZero(Vertx vertx, VertxTestContext context) {
+        Mockito.when(audioPlayer.playbackStatus()).thenReturn(Future.succeededFuture(new PlaybackStatus(true, 1)));
+        final String firstSongPath = "/home/a/Music/Music/Muse/[Hi-Res][Muse]The Resistance/01-01-Muse-Uprising.flac";
+        playerService.playAlbum(627123027)
+                     .compose(__ -> playerService.nextSong())
+                     .compose(__ -> playerService.playSongInQueueAtPosition(0))
+                     .flatMap(__ -> playerService.playbackStatus())
+                     .onSuccess(status -> context.verify(() -> {
+                         Mockito.verify(audioPlayer, Mockito.times(3)).play(Mockito.anyString());
+                         assertTrue(status.getBoolean("playing"));
+                         assertEquals(firstSongPath, status.getJsonObject("song").getString("path"));
+                         context.completeNow();
+                     }))
+                     .onFailure(context::failNow);
+    }
+
+    @Test
     void verifyAddSongToQueue(Vertx vertx, VertxTestContext context) {
         final var expectedSongs = List.of(
                 "/home/a/Music/Music/Radiohead/[Hi-Res][Radiohead]OK Computer OKNOTOK 1997 2017/106 - Karma Police (Remastered).wav",

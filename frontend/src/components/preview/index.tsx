@@ -4,11 +4,11 @@ import { usePlaybackStore } from '@/lib/context';
 import { useWebSocketClient } from '@/lib/context/WebSocketContext.tsx';
 import {
 	OnPlaybackSongUpdateDocument,
-	useGetPlaybackSongQuery,
+	useGetPlaybackStatusQuery,
 } from '@/lib/queries';
 
 export default function Preview() {
-	const { data, refetch } = useGetPlaybackSongQuery();
+	const { data, refetch } = useGetPlaybackStatusQuery();
 	const { updatePlaybackModalState } = usePlaybackStore();
 	const graphQLClient = useWebSocketClient();
 

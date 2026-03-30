@@ -3,31 +3,6 @@ import type { IPlaybackStatus, IQueueSong } from '@/type';
 
 import { request } from './utils.ts';
 
-const PlaybackSongQueryDocument = /* GraphQL */ `
-  query {
-    PlaybackStatus {
-      song {
-        name
-        path
-        artists
-        albumId
-        album
-        duration
-      }
-    }
-  }
-`;
-
-export function useGetPlaybackSongQuery() {
-	return useQuery({
-		queryKey: [PlaybackSongQueryDocument],
-		queryFn: async () =>
-			request<{
-				PlaybackStatus: IPlaybackStatus;
-			}>(PlaybackSongQueryDocument),
-	});
-}
-
 const PlaybackStatusQueryDocument = /* GraphQL */ `
   query {
     PlaybackStatus {
@@ -46,15 +21,19 @@ const PlaybackStatusQueryDocument = /* GraphQL */ `
   }
 `;
 
-export function useGetPlaybackStatusQuery(enabled: boolean) {
+const playbackStatusQueryKey = [PlaybackStatusQueryDocument];
+
+export function useGetPlaybackStatusQuery(options?: {
+	enabled?: boolean;
+	refetchInterval?: number;
+}) {
 	return useQuery({
-		queryKey: [PlaybackStatusQueryDocument],
+		queryKey: playbackStatusQueryKey,
 		queryFn: async () =>
 			request<{
 				PlaybackStatus: IPlaybackStatus;
 			}>(PlaybackStatusQueryDocument),
-		enabled,
-		refetchInterval: 1000,
+		...options,
 		refetchIntervalInBackground: false,
 	});
 }

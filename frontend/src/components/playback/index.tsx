@@ -36,7 +36,10 @@ export default function PlaybackDrawer() {
 	const { updatePlaybackQueueModalState } = usePlaybackQueueStore();
 	const { openFavorModal } = useFavorStore();
 
-	const { data } = useGetPlaybackStatusQuery(playbackModalState);
+	const { data } = useGetPlaybackStatusQuery({
+		enabled: playbackModalState,
+		refetchInterval: 1000,
+	});
 
 	async function toAlbumPage() {
 		if (!data?.PlaybackStatus.song) {

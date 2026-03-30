@@ -45,7 +45,10 @@ export default function CreatePlaylistModal() {
 	return (
 		<Dialog
 			open={createPlaylistModalState}
-			onOpenChange={updateCreatePlaylistModalState}
+			onOpenChange={(open) => {
+				if (!open) setName('');
+				updateCreatePlaylistModalState(open);
+			}}
 		>
 			<DialogContent
 				showCloseButton={false}

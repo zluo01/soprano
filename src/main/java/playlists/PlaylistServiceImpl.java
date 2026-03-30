@@ -1,6 +1,5 @@
 package playlists;
 
-import com.google.common.collect.Sets;
 import database.DatabaseService;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
@@ -16,6 +15,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,8 +76,9 @@ public class PlaylistServiceImpl implements PlaylistService {
                                                                                                   .map(o -> o.getString("path"))
                                                                                                   .collect(Collectors.toSet());
 
-                                                               LOGGER.warn("Missing song in database {}",
-                                                                           Sets.difference(songPaths, databaseSongPaths).immutableCopy());
+                                                               final var missing = new HashSet<>(songPaths);
+                                                               missing.removeAll(databaseSongPaths);
+                                                               LOGGER.warn("Missing song in database {}", missing);
                                                                return fileSystem.move(path, path + ".bak");
                                                            }
                                                            return Future.succeededFuture();

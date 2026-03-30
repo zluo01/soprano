@@ -1,6 +1,5 @@
 package collector;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import config.ServerConfig;
 import database.DatabaseService;
 import io.vertx.core.Future;
@@ -44,10 +43,10 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
 
     private static final ExecutorService IMAGE_OPTIMIZATION_EXECUTOR =
             Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
-                                         new ThreadFactoryBuilder()
-                                                 .setNameFormat("image-optimization-%d")
-                                                 .setDaemon(true)
-                                                 .build());
+                                         Thread.ofPlatform()
+                                               .name("image-optimization-", 0)
+                                               .daemon(true)
+                                               .factory());
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 

@@ -1,7 +1,6 @@
 package player.mpv;
 
-import com.google.common.collect.ImmutableMap;
-
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -113,11 +112,11 @@ public enum MPVError {
     private static final Map<Integer, MPVError> ERROR_MAP;
 
     static {
-        final ImmutableMap.Builder<Integer, MPVError> builder = ImmutableMap.builder();
+        final Map<Integer, MPVError> builder = new HashMap<>();
         for (MPVError error : MPVError.values()) {
             builder.put(error.ordinal() * -1, error);
         }
-        ERROR_MAP = builder.build();
+        ERROR_MAP = Map.copyOf(builder);
     }
 
     public static String getError(final int errorId) {

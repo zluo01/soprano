@@ -1,10 +1,9 @@
 package database;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
@@ -45,11 +44,11 @@ enum DatabaseAction {
     private static final Map<DatabaseAction, String> QUERY_MAP;
 
     static {
-        final ImmutableMap.Builder<DatabaseAction, String> builder = ImmutableMap.builder();
+        final Map<DatabaseAction, String> builder = new HashMap<>();
         for (DatabaseAction action : DatabaseAction.values()) {
             builder.put(action, getSQLContent(action));
         }
-        QUERY_MAP = builder.build();
+        QUERY_MAP = Map.copyOf(builder);
     }
 
     private static String getSQLContent(final DatabaseAction action) {

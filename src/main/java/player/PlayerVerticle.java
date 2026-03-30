@@ -1,6 +1,5 @@
 package player;
 
-import com.google.common.annotations.VisibleForTesting;
 import database.DatabaseService;
 import io.vertx.core.Future;
 import io.vertx.core.VerticleBase;
@@ -24,7 +23,6 @@ public class PlayerVerticle extends VerticleBase {
         this(databaseService, playlistService, null);
     }
 
-    @VisibleForTesting
     PlayerVerticle(final DatabaseService databaseService,
                    final PlaylistService playlistService,
                    final AudioPlayer player) {

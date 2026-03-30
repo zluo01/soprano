@@ -27,7 +27,6 @@
         <main.class>MainVerticle</main.class>
         <launcher.class>io.vertx.launcher.application.VertxApplication</launcher.class>
 
-        <guava.version>33.5.0-jre</guava.version>
         <vertx.version>5.0.10</vertx.version>
         <log4j.version>2.25.4</log4j.version>
         <jackson.version>2.21.2</jackson.version>
@@ -276,11 +275,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

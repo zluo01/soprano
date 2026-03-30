@@ -1,4 +1,4 @@
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
+import { queryOptions, useMutation } from '@tanstack/react-query';
 import type { IPlaylist, ISong } from '@/type';
 
 import { IMMUTABLE_REQUEST, queryClient, request } from './utils.ts';
@@ -20,15 +20,6 @@ export const playlistQueryOptions = queryOptions({
 		request<{ Playlists: IPlaylist[] }>(PlaylistsQueryDocument),
 	...IMMUTABLE_REQUEST,
 });
-
-export function useGetPlaylistsQuery() {
-	return useQuery({
-		queryKey: [PlaylistsQueryDocument],
-		queryFn: async () =>
-			request<{ Playlists: IPlaylist[] }>(PlaylistsQueryDocument),
-		...IMMUTABLE_REQUEST,
-	});
-}
 
 const SongsForPlaylistQueryDocument = /*GraphQL*/ `
     query PlaylistSongs($name: String!) {

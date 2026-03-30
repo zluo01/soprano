@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import orderBy from 'lodash-es/orderBy';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -6,8 +7,8 @@ import { Button } from '@/components/ui/button.tsx';
 import { Sheet, SheetContent } from '@/components/ui/sheet.tsx';
 import { useFavorStore } from '@/lib/context';
 import {
+	playlistQueryOptions,
 	useAddSongToPlaylistMutation,
-	useGetPlaylistsQuery,
 } from '@/lib/queries';
 import type { IPlaylist } from '@/type';
 
@@ -15,7 +16,7 @@ export default function Favor() {
 	const mutation = useAddSongToPlaylistMutation();
 	const { favorModalState, closeFavorModal } = useFavorStore();
 
-	const { data } = useGetPlaylistsQuery();
+	const { data } = useQuery(playlistQueryOptions);
 
 	const playlists = orderBy(data?.Playlists, ['modifiedTime'], 'desc');
 

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button.tsx';
 import {
 	Dialog,
@@ -8,14 +9,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input.tsx';
 import { useRenamePlaylistStore } from '@/lib/context';
-import { useGetPlaylistsQuery, useRenamePlaylistMutation } from '@/lib/queries';
+import { playlistQueryOptions, useRenamePlaylistMutation } from '@/lib/queries';
 import { cn } from '@/lib/utils.ts';
 
 export default function RenamePlaylistModal() {
 	const { renamePlaylistModalState, closeRenamePlaylistModal, updateName } =
 		useRenamePlaylistStore();
 
-	const { data } = useGetPlaylistsQuery();
+	const { data } = useQuery(playlistQueryOptions);
 
 	const playlists = data?.Playlists.map((o) => o.name).filter(
 		(o) => o !== renamePlaylistModalState.prevName,

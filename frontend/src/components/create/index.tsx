@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button.tsx';
 import {
@@ -9,11 +10,11 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input.tsx';
 import { useCreatePlaylistStore } from '@/lib/context';
-import { useCreatePlaylistMutation, useGetPlaylistsQuery } from '@/lib/queries';
+import { playlistQueryOptions, useCreatePlaylistMutation } from '@/lib/queries';
 import { cn } from '@/lib/utils.ts';
 
 export default function CreatePlaylistModal() {
-	const { data } = useGetPlaylistsQuery();
+	const { data } = useQuery(playlistQueryOptions);
 
 	const playlists = data?.Playlists.map((o) => o.name);
 

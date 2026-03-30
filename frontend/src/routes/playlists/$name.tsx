@@ -2,7 +2,6 @@ import { PlusIcon, TrashIcon } from '@radix-ui/react-icons';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { ListPlus } from 'lucide-react';
-import { LoadingSongs } from '@/components/loading';
 import { Song } from '@/components/song';
 import { Button } from '@/components/ui/button.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
@@ -23,9 +22,7 @@ export const Route = createFileRoute('/playlists/$name')({
 
 function Playlist() {
 	const name = Route.useParams().name;
-	const { data, isLoading } = useSuspenseQuery(
-		songsInPlaylistQueryOptions(name),
-	);
+	const { data } = useSuspenseQuery(songsInPlaylistQueryOptions(name));
 
 	const mutation = useDeleteSongFromPlaylistMutation();
 
@@ -37,10 +34,7 @@ function Playlist() {
 					variant="ghost"
 					size={'icon'}
 					className="rounded-full"
-					onClick={() =>
-						addSongsToQueue(data?.PlaylistSongs?.map((o) => o.path) || [])
-					}
-					disabled={!data}
+					onClick={() => addSongsToQueue(data.PlaylistSongs.map((o) => o.path))}
 				>
 					<PlusIcon className="size-6" />
 				</Button>
@@ -48,7 +42,6 @@ function Playlist() {
 					size={'icon'}
 					className="rounded-full"
 					onClick={() => playPlaylist(name)}
-					disabled={!data}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -64,31 +57,27 @@ function Playlist() {
 					</svg>
 				</Button>
 			</div>
-			{isLoading ? (
-				<LoadingSongs />
-			) : (
-				<div className="flex size-full flex-col px-6 duration-200 animate-in slide-in-from-right-1/2 sm:animate-none">
-					{data?.PlaylistSongs.map((o) => (
-						<Song
-							key={o.path}
-							play={() => playSong(o.path)}
-							song={o}
-							actions={[
-								{
-									className: 'bg-delete',
-									action: () => mutation.mutate({ name, songPath: o.path }),
-									children: <TrashIcon className="size-6" />,
-								},
-								{
-									className: 'bg-add',
-									action: () => addSongsToQueue([o.path]),
-									children: <ListPlus className="ml-1.5 size-6" />,
-								},
-							]}
-						/>
-					))}
-				</div>
-			)}
+			<div className="flex size-full flex-col px-6 duration-200 animate-in slide-in-from-right-1/2 sm:animate-none">
+				{data.PlaylistSongs.map((o) => (
+					<Song
+						key={o.path}
+						play={() => playSong(o.path)}
+						song={o}
+						actions={[
+							{
+								className: 'bg-delete',
+								action: () => mutation.mutate({ name, songPath: o.path }),
+								children: <TrashIcon className="size-6" />,
+							},
+							{
+								className: 'bg-add',
+								action: () => addSongsToQueue([o.path]),
+								children: <ListPlus className="ml-1.5 size-6" />,
+							},
+						]}
+					/>
+				))}
+			</div>
 		</div>
 	);
 }

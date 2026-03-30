@@ -295,6 +295,23 @@ public class PlayerVerticleTest {
     }
 
     @Test
+    void verifyRemoveLastSongLeavesEmptyQueue(Vertx vertx, VertxTestContext context) {
+        // Album 1375336646 has exactly 1 song
+        playerService.playAlbum(1375336646)
+                     .compose(__ -> playerService.removeSongFromQueue(0))
+                     .flatMap(__ -> playerService.songsInQueue())
+                     .flatMap(songs -> {
+                         context.verify(() -> assertEquals(0, songs.size()));
+                         return playerService.playbackStatus();
+                     })
+                     .onSuccess(status -> context.verify(() -> {
+                         assertFalse(status.containsKey("song"));
+                         context.completeNow();
+                     }))
+                     .onFailure(context::failNow);
+    }
+
+    @Test
     void verifyWhenClearQueueForPlaybackStatus(Vertx vertx, VertxTestContext context) {
         playerService.playAlbum(627123027)
                      .flatMap(__ -> playerService.clearQueue())

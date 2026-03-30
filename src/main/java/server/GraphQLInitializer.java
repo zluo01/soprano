@@ -4,6 +4,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import database.DatabaseService;
 import graphql.GraphQL;
+import graphql.analysis.MaxQueryComplexityInstrumentation;
+import graphql.analysis.MaxQueryDepthInstrumentation;
 import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.execution.instrumentation.Instrumentation;
 import graphql.execution.preparsed.PreparsedDocumentEntry;
@@ -56,7 +58,12 @@ final class GraphQLInitializer {
         final RuntimeWiring wiring = createWiring(databaseService, playlistService, playerService, eventBus);
         final GraphQLSchema graphQLSchema = new SchemaGenerator().makeExecutableSchema(registry, wiring);
 
-        final List<Instrumentation> intrumentationList = List.of(new JsonObjectAdapter(), VertxFutureAdapter.create());
+        final List<Instrumentation> intrumentationList = List.of(
+                new JsonObjectAdapter(),
+                VertxFutureAdapter.create(),
+                new MaxQueryDepthInstrumentation(10),
+                new MaxQueryComplexityInstrumentation(200)
+        );
         final ChainedInstrumentation chainedInstrumentation = new ChainedInstrumentation(intrumentationList);
         return GraphQL.newGraphQL(graphQLSchema)
                       .preparsedDocumentProvider(preparsedCache)

@@ -18,7 +18,7 @@
     {
       "groupName": "frontend-ui",
       "matchPackageNames": [
-        "@radix-ui/**", "embla-carousel*", "lucide-react", "vaul", "sonner",
+        "radix-ui", "@radix-ui/react-icons", "embla-carousel*", "lucide-react", "vaul", "sonner",
         "tailwind*", "@tailwindcss/**", "clsx", "class-variance-authority"
       ]
     },

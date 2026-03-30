@@ -13,7 +13,9 @@ import playlists.PlaylistService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -167,6 +169,10 @@ public class PlayerServiceImpl implements PlayerService {
 
     private Future<JsonObject[]> songsFromPath(final List<String> paths) {
         final JsonObject[] songObjects = new JsonObject[paths.size()];
+        final Map<String, Integer> pathIndex = new HashMap<>(paths.size());
+        for (int i = 0; i < paths.size(); i++) {
+            pathIndex.put(paths.get(i), i);
+        }
         return databaseService.songsFromPath(paths)
                               .flatMap(songs -> {
                                   if (songs.size() != paths.size()) {
@@ -174,9 +180,7 @@ public class PlayerServiceImpl implements PlayerService {
                                   }
                                   for (JsonObject song : songs) {
                                       final String path = song.getString("path");
-
-                                      final int idx = paths.indexOf(path);
-                                      songObjects[idx] = song;
+                                      songObjects[pathIndex.get(path)] = song;
                                   }
                                   return Future.succeededFuture(songObjects);
                               });
@@ -304,8 +308,9 @@ public class PlayerServiceImpl implements PlayerService {
         //        }
 
         PlayState addSongs(final JsonObject... songs) {
+            final var existing = new java.util.HashSet<>(playlist);
             final var newSongs = Arrays.stream(songs)
-                                       .filter(song -> !playlist.contains(song))
+                                       .filter(song -> !existing.contains(song))
                                        .toList();
 
             if (newSongs.isEmpty()) {

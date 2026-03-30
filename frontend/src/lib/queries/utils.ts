@@ -1,8 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
 
-const BASE_URL =
-	import.meta.env.MODE === 'development' ? 'http://localhost:6868' : '';
-
 export const queryClient = new QueryClient();
 
 export const IMMUTABLE_REQUEST = {
@@ -15,7 +12,7 @@ export async function request<T>(
 	query: string,
 	variables: object = {},
 ): Promise<T> {
-	const response = await fetch(`${BASE_URL}/graphql`, {
+	const response = await fetch(`/graphql`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -40,5 +37,5 @@ export function constructImg(
 	height: number,
 	albumId?: number,
 ): string {
-	return `${BASE_URL}/covers/${albumId}_${width}x${height}.webp`;
+	return `/covers/${albumId}_${width}x${height}.webp`;
 }

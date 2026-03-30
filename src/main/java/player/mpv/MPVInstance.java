@@ -116,7 +116,7 @@ public record MPVInstance(MPV instance, long handle) {
         if (osName.contains("mac")) {
             return List.of(
                     "/usr/local/lib/libmpv.dylib", // intel machine
-                    "opt/homebrew/lib/libmpv.dylib" // m-chip
+                    "/opt/homebrew/lib/libmpv.dylib" // m-chip
             );
         }
 

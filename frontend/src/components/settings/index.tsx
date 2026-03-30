@@ -40,19 +40,19 @@ export default function Settings() {
 						<div className="table-row">
 							<div className="table-cell py-1">Artists</div>
 							<div className="table-cell py-1 text-right opacity-50">
-								{data?.Stats.artists || 'Unknown'}
+								{data?.Stats.artists ?? 'Unknown'}
 							</div>
 						</div>
 						<div className="table-row">
 							<div className="table-cell py-1">Albums</div>
 							<div className="table-cell py-1 text-right opacity-50">
-								{data?.Stats.albums || 'Unknown'}
+								{data?.Stats.albums ?? 'Unknown'}
 							</div>
 						</div>
 						<div className="table-row">
 							<div className="table-cell py-1">Songs</div>
 							<div className="table-cell py-1 text-right opacity-50">
-								{data?.Stats.songs || 'Unknown'}
+								{data?.Stats.songs ?? 'Unknown'}
 							</div>
 						</div>
 					</div>

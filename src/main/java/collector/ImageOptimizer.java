@@ -70,14 +70,13 @@ public final class ImageOptimizer {
 
         final Process process = processBuilder.start();
 
-        // Read the output
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            LOGGER.error(line);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                LOGGER.error(line);
+            }
         }
 
-        // Wait for the process to complete
         return process.waitFor();
     }
 }

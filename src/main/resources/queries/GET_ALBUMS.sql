@@ -12,6 +12,7 @@ SELECT a.id             AS album_id,
        s.track_num      AS song_track_num,
        s.duration       AS song_duration
 FROM albums a
-         LEFT JOIN albumArtists ar ON ar.album = a.id AND ar.id = (SELECT MIN(ar2.id) FROM albumArtists ar2 WHERE ar2.album = a.id)
+         LEFT JOIN (SELECT album, MIN(id) AS min_id FROM albumArtists GROUP BY album) fa ON fa.album = a.id
+         LEFT JOIN albumArtists ar ON ar.id = fa.min_id AND ar.album = a.id
          LEFT JOIN songs s ON a.id = s.album
 ORDER BY a.id, s.disc, s.track_num;

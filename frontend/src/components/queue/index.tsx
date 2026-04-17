@@ -40,7 +40,7 @@ export default function PlaybackQueue() {
 					'pt-[env(safe-area-inset-top)]',
 				)}
 			>
-				<div className="flex size-full flex-col flex-nowrap overflow-y-scroll p-6">
+				<div className="min-h-0 w-full flex-1 overflow-y-auto p-6">
 					<p className="font-bold">Now Playing</p>
 					{isPlaying ? (
 						<Song

@@ -171,7 +171,7 @@
                 <version>${frontend-maven-plugin.version}</version>
                 <configuration>
                     <nodeVersion>v22.16.0</nodeVersion>
-                    <pnpmVersion>v10.11.0</pnpmVersion>
+                    <pnpmVersion>v10.33.0</pnpmVersion>
                     <workingDirectory>${project.basedir}/frontend</workingDirectory>
                     <installDirectory>target</installDirectory>
                 </configuration>

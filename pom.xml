@@ -27,10 +27,10 @@
         <main.class>MainVerticle</main.class>
         <launcher.class>io.vertx.launcher.application.VertxApplication</launcher.class>
 
-        <vertx.version>5.0.10</vertx.version>
+        <vertx.version>5.0.11</vertx.version>
         <log4j.version>2.25.4</log4j.version>
         <jackson.version>2.21.2</jackson.version>
-        <sqlite.version>3.51.3.0</sqlite.version>
+        <sqlite.version>3.53.0.0</sqlite.version>
         <jaudiotagger.version>3.0.1</jaudiotagger.version>
         <caffeine.version>3.2.3</caffeine.version>
         <jna-platform.version>5.18.1</jna-platform.version>

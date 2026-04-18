@@ -33,8 +33,8 @@
 		"zustand": "5.0.12"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.4.11",
-		"@rolldown/plugin-babel": "0.2.2",
+		"@biomejs/biome": "2.4.12",
+		"@rolldown/plugin-babel": "0.2.3",
 		"@tanstack/react-query-devtools": "5.99.0",
 		"@tanstack/react-router-devtools": "1.166.13",
 		"@tanstack/router-plugin": "1.167.22",
@@ -46,7 +46,7 @@
 		"@vitejs/plugin-react": "6.0.1",
 		"babel-plugin-react-compiler": "1.0.0",
 		"tailwindcss": "4.2.2",
-		"typescript": "6.0.2",
+		"typescript": "6.0.3",
 		"vite": "8.0.8",
 		"vite-plugin-pwa": "1.2.0",
 		"vitest": "4.1.4"

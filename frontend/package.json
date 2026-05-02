@@ -22,7 +22,7 @@
 		"embla-carousel-react": "8.6.0",
 		"graphql-ws": "6.0.8",
 		"lodash-es": "4.18.1",
-		"lucide-react": "1.11.0",
+		"lucide-react": "1.14.0",
 		"radix-ui": "1.4.3",
 		"react": "19.2.5",
 		"react-dom": "19.2.5",

@@ -27,9 +27,9 @@
         <main.class>MainVerticle</main.class>
         <launcher.class>io.vertx.launcher.application.VertxApplication</launcher.class>
 
-        <vertx.version>5.0.12</vertx.version>
+        <vertx.version>5.1.0</vertx.version>
         <log4j.version>2.26.0</log4j.version>
-        <jackson.version>2.21.3</jackson.version>
+        <jackson.version>2.21.4</jackson.version>
         <sqlite.version>3.53.1.0</sqlite.version>
         <jaudiotagger.version>3.0.1</jaudiotagger.version>
         <caffeine.version>3.2.4</caffeine.version>

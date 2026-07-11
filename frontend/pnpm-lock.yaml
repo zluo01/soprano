@@ -33,8 +33,8 @@ importers:
         specifier: 8.6.0
         version: 8.6.0(react@19.2.7)
       graphql-ws:
-        specifier: 6.0.8
-        version: 6.0.8(graphql@16.12.0)
+        specifier: 6.1.0
+        version: 6.1.0(graphql@16.12.0)
       lodash-es:
         specifier: 4.18.1
         version: 4.18.1
@@ -2399,13 +2399,13 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  graphql-ws@6.0.8:
-    resolution: {integrity: sha512-m3EOaNsUBXwAnkBWbzPfe0Nq8pXUfxsWnolC54sru3FzHvhTZL0Ouf/BoQsaGAXqM+YPerXOJ47BUnmgmoupCw==}
+  graphql-ws@6.1.0:
+    resolution: {integrity: sha512-7ft6KWkuaLnLABwzEIimjUMeF0iByo2ThD6q0MICgsvp6nDuT5ppubKzEHniu8Kmlp5GNsLgr5dil8JMrIwUEQ==}
     engines: {node: '>=20'}
     peerDependencies:
       '@fastify/websocket': ^10 || ^11
       crossws: ~0.3
-      graphql: ^15.10.1 || ^16
+      graphql: ^15.10.1 || ^16 || ^17
       ws: ^8
     peerDependenciesMeta:
       '@fastify/websocket':
@@ -5879,7 +5879,7 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  graphql-ws@6.0.8(graphql@16.12.0):
+  graphql-ws@6.1.0(graphql@16.12.0):
     dependencies:
       graphql: 16.12.0
 

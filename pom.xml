@@ -27,7 +27,7 @@
         <main.class>MainVerticle</main.class>
         <launcher.class>io.vertx.launcher.application.VertxApplication</launcher.class>
 
-        <vertx.version>5.1.4</vertx.version>
+        <vertx.version>5.1.5</vertx.version>
         <log4j.version>2.26.1</log4j.version>
         <jackson.version>2.22.1</jackson.version>
         <sqlite.version>3.53.2.0</sqlite.version>

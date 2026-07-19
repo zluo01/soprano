@@ -37,7 +37,7 @@
 		"@rolldown/plugin-babel": "0.2.3",
 		"@tanstack/react-query-devtools": "5.101.2",
 		"@tanstack/react-router-devtools": "1.167.0",
-		"@tanstack/router-plugin": "1.168.22",
+		"@tanstack/router-plugin": "1.168.23",
 		"@types/lodash-es": "4.17.12",
 		"@types/node": "25.9.5",
 		"@types/react": "19.2.17",

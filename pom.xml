@@ -29,7 +29,7 @@
 
         <vertx.version>5.1.6</vertx.version>
         <log4j.version>2.26.1</log4j.version>
-        <jackson.version>2.22.1</jackson.version>
+        <jackson.version>2.22.2</jackson.version>
         <sqlite.version>3.53.2.1</sqlite.version>
         <jaudiotagger.version>3.0.1</jaudiotagger.version>
         <caffeine.version>3.2.4</caffeine.version>

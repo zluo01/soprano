@@ -1,15 +1,13 @@
 package player.mpv;
 
+import helper.BundledLibrary;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.foreign.MemorySegment;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,26 +85,11 @@ public record MPVInstance(MPV instance, MemorySegment handle) {
 
     private static MPV loadLibMpv() {
         try {
-            final Path lib = extractBundledLibrary();
+            final Path lib = BundledLibrary.extract("/libmpv");
             LOGGER.info("Loading bundled libmpv from {}", lib);
             return new MPV(lib);
         } catch (final IOException e) {
             throw new IllegalStateException("Fail to load bundle libmpv.", e);
-        }
-    }
-
-    /**
-     * Extract the build-in libmpv binary to a file under tmp folder for loading
-     */
-    private static Path extractBundledLibrary() throws IOException {
-        try (InputStream in = MPVInstance.class.getResourceAsStream("/libmpv")) {
-            if (in == null) {
-                throw new IOException("Missing bundled library resource /libmpv");
-            }
-            final Path lib = Files.createTempFile("soprano-libmpv-", ".bin");
-            lib.toFile().deleteOnExit();
-            Files.copy(in, lib, StandardCopyOption.REPLACE_EXISTING);
-            return lib;
         }
     }
 }

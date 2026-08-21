@@ -34,6 +34,7 @@ MPV_OS_ARGS="-Dwasapi=enabled -Diconv=disabled"
 MPV_LDFLAGS="-static"
 FFMPEG_TARGET_ARGS="--enable-cross-compile --target-os=mingw32 --arch=x86_64 --cross-prefix=$CROSS_PREFIX"
 LIBASS_EXTRA_CONF="--host=x86_64-w64-mingw32 --disable-directwrite"
+LIBWEBP_EXTRA_CONF="--host=x86_64-w64-mingw32"
 
 require_tools "sudo dnf install mingw64-gcc mingw64-gcc-c++ make ninja-build pkgconf git curl python3" \
     "${CROSS_PREFIX}gcc" "${CROSS_PREFIX}g++" gcc make ninja pkg-config git curl python3
@@ -70,6 +71,7 @@ build_libass
 build_libplacebo
 build_ffmpeg
 build_mpv
+build_libwebp
 
 # -------------------------------------------------------------------- output
 
@@ -91,4 +93,20 @@ if [ -n "$UNEXPECTED" ]; then
     exit 1
 fi
 log "Dependency check passed: only Windows system DLLs imported."
-log "NOTE: run the jar on a Windows machine to fully verify this DLL."
+
+# ---------------------------------------------------- libwebp bundle output
+
+WEBP_DEST="$OUT/libwebp"
+"${CROSS_PREFIX}gcc" -shared -static -o "$WEBP_DEST" \
+    -Wl,--whole-archive "$PREFIX/lib/libwebp.a" "$PREFIX/lib/libsharpyuv.a" -Wl,--no-whole-archive
+"${CROSS_PREFIX}strip" --strip-unneeded "$WEBP_DEST"
+
+log "Bundled library: $WEBP_DEST ($(du -h "$WEBP_DEST" | cut -f1))"
+WEBP_UNEXPECTED="$("${CROSS_PREFIX}objdump" -p "$WEBP_DEST" | grep "DLL Name" \
+    | grep -Ei "libwinpthread|libgcc|libstdc|libssp" || true)"
+if [ -n "$WEBP_UNEXPECTED" ]; then
+    echo "ERROR: non-system DLL dependencies in libwebp bundle:"
+    echo "$WEBP_UNEXPECTED"
+    exit 1
+fi
+log "NOTE: run the jar on a Windows machine to fully verify these libraries."

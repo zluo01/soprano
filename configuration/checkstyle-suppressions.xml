@@ -2,4 +2,5 @@
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
     <suppress files="MPV.java" checks=""/>
+    <suppress files="WebP.java" checks=""/>
 </suppressions>

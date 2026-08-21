@@ -49,5 +49,9 @@ FFMPEG_SHA256=464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c
 MPV_VERSION=0.41.0
 MPV_SHA256=ee21092a5ee427353392360929dc64645c54479aefdb5babc5cfbb5fad626209
 
+# renovate: datasource=github-tags depName=webmproject/libwebp extractVersion=^v(?<version>.+)$
+LIBWEBP_VERSION=1.6.0
+LIBWEBP_SHA256=e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564
+
 # renovate: datasource=pypi depName=meson
 MESON_VERSION=1.12.0

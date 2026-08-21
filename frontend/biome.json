@@ -23,7 +23,7 @@
 			"react": "recommended"
 		},
 		"rules": {
-			"recommended": true,
+			"preset": "recommended",
 			"suspicious": {
 				"noArrayIndexKey": "off"
 			},

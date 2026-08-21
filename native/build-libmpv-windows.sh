@@ -18,15 +18,14 @@
 # expect to iterate on the first run. The produced DLL must be verified on a
 # Windows machine (run the jar); run_load_check cannot execute it on Linux.
 #
-# Output: native/out/resources/win32-x86-64/mpv.dll
-#         (the name JNA resolves for Native.extractFromResourcePath("mpv"))
+# Output: native/out/resources/libmpv — the jar is built for ONE platform:
+# this overwrites any previously built library, so package the Windows jar
+# right after running this script.
 
 set -euo pipefail
 
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
-JNA_PLATFORM=win32-x86-64
-LIB_BASENAME=mpv.dll
 CXX_RUNTIME_LIB=-lstdc++
 CROSS_PREFIX=x86_64-w64-mingw32-
 # WASAPI only; mingw has no iconv. -static folds the mingw runtime into the
@@ -74,7 +73,7 @@ build_mpv
 
 # -------------------------------------------------------------------- output
 
-DEST="$OUT/$JNA_PLATFORM/$LIB_BASENAME"
+DEST="$OUT/libmpv"
 cp "$PREFIX"/bin/libmpv-*.dll "$DEST"
 "${CROSS_PREFIX}strip" --strip-unneeded "$DEST"
 

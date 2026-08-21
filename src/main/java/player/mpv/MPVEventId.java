@@ -1,7 +1,7 @@
 package player.mpv;
 
 /**
- * <a href="https://github.com/mpv-player/mpv/blob/master/libmpv/client.h#L1242">libmpv</a>
+ * <a href="https://github.com/mpv-player/mpv/blob/master/include/mpv/client.h#L1242">libmpv</a>
  */
 public final class MPVEventId {
     private MPVEventId() {

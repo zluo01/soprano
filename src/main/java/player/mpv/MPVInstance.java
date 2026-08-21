@@ -1,20 +1,22 @@
 package player.mpv;
 
-import com.sun.jna.Native;
-import com.sun.jna.Platform;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.foreign.MemorySegment;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
 import static config.ServerConfig.AUDIO_HARDWARE;
 import static config.ServerConfig.AUDIO_OPTIONS_OVERRIDE;
 
-public record MPVInstance(MPV instance, long handle) {
+public record MPVInstance(MPV instance, MemorySegment handle) {
     private static final Logger LOGGER = LogManager.getLogger(MPVInstance.class);
 
     private static final Map<String, String> DEFAULT_MPV_OPTIONS = Map.of(
@@ -29,17 +31,17 @@ public record MPVInstance(MPV instance, long handle) {
     public static MPVInstance create(final JsonObject config) {
         final MPV instance = loadLibMpv();
 
-        final long handle = initializeMPV(instance, config);
+        final MemorySegment handle = initializeMPV(instance, config);
 
         return new MPVInstance(instance, handle);
     }
 
-    private static long initializeMPV(final MPV instance, final JsonObject config) {
+    private static MemorySegment initializeMPV(final MPV instance, final JsonObject config) {
         int error;
 
-        final long handle = instance.mpv_create();
+        final MemorySegment handle = instance.mpv_create();
 
-        if (handle == 0) {
+        if (handle.address() == 0) {
             throw new IllegalStateException("Failed to create MPV instance");
         }
 
@@ -75,13 +77,9 @@ public record MPVInstance(MPV instance, long handle) {
         for (Map.Entry<String, String> entry : mpvOptions.entrySet()) {
             final var option = instance.mpv_get_property_string(handle, entry.getKey());
             if (option == null) {
-                throw new IllegalStateException("Failed to get" + entry.getKey() + "with error: " + error);
+                throw new IllegalStateException("Failed to get " + entry.getKey());
             }
-            try {
-                LOGGER.info("MPV setting: {} => {}", entry.getKey(), option.getString(0));
-            } finally {
-                instance.mpv_free(option);
-            }
+            LOGGER.info("MPV setting: {} => {}", entry.getKey(), option);
         }
 
         return handle;
@@ -89,11 +87,26 @@ public record MPVInstance(MPV instance, long handle) {
 
     private static MPV loadLibMpv() {
         try {
-            final File lib = Native.extractFromResourcePath("mpv", MPVInstance.class.getClassLoader());
-            LOGGER.info("Loading bundled libmpv from {}", lib.getAbsolutePath());
-            return Native.load(lib.getAbsolutePath(), MPV.class);
+            final Path lib = extractBundledLibrary();
+            LOGGER.info("Loading bundled libmpv from {}", lib);
+            return new MPV(lib);
         } catch (final IOException e) {
-            throw new IllegalStateException("No bundled libmpv for platform " + Platform.RESOURCE_PREFIX, e);
+            throw new IllegalStateException("Fail to load bundle libmpv.", e);
+        }
+    }
+
+    /**
+     * Extract the build-in libmpv binary to a file under tmp folder for loading
+     */
+    private static Path extractBundledLibrary() throws IOException {
+        try (InputStream in = MPVInstance.class.getResourceAsStream("/libmpv")) {
+            if (in == null) {
+                throw new IOException("Missing bundled library resource /libmpv");
+            }
+            final Path lib = Files.createTempFile("soprano-libmpv-", ".bin");
+            lib.toFile().deleteOnExit();
+            Files.copy(in, lib, StandardCopyOption.REPLACE_EXISTING);
+            return lib;
         }
     }
 }

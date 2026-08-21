@@ -35,21 +35,17 @@ public final class MPVAudioPlayer implements AudioPlayer {
 
     @Override
     public Future<Integer> pause() {
-        final var pauseProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "pause");
+        final String pauseProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "pause");
         if (pauseProperty == null) {
             return Future.failedFuture("Failed to get pause status.");
         }
 
-        try {
-            final var pauseStatus = pauseProperty.getString(0).equals("yes") ? "no" : "yes";
-            final int error = mpv.instance().mpv_set_property_string(mpv.handle(), "pause", pauseStatus);
-            if (error != 0) {
-                return Future.failedFuture("Failed to pause: " + MPVError.getError(error));
-            }
-            return Future.succeededFuture(error);
-        } finally {
-            mpv.instance().mpv_free(pauseProperty);
+        final var pauseStatus = pauseProperty.equals("yes") ? "no" : "yes";
+        final int error = mpv.instance().mpv_set_property_string(mpv.handle(), "pause", pauseStatus);
+        if (error != 0) {
+            return Future.failedFuture("Failed to pause: " + MPVError.getError(error));
         }
+        return Future.succeededFuture(error);
     }
 
     @Override
@@ -63,29 +59,19 @@ public final class MPVAudioPlayer implements AudioPlayer {
 
     @Override
     public Future<PlaybackStatus> playbackStatus() {
-        final var pauseProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "pause");
+        final String pauseProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "pause");
         if (pauseProperty == null) {
             return Future.failedFuture("Failed to get pause status.");
         }
+        final boolean isPlaying = pauseProperty.equals("no");
 
-        final boolean isPlaying;
-        try {
-            isPlaying = pauseProperty.getString(0).equals("no");
-        } finally {
-            mpv.instance().mpv_free(pauseProperty);
-        }
-
-        final var playbackTimeProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "playback-time");
+        final String playbackTimeProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "playback-time");
         if (playbackTimeProperty == null) {
             return Future.failedFuture("Fail to get playback time");
         }
 
-        try {
-            final double playbackTime = Double.parseDouble(playbackTimeProperty.getString(0));
-            return Future.succeededFuture(new PlaybackStatus(isPlaying, (int) playbackTime));
-        } finally {
-            mpv.instance().mpv_free(playbackTimeProperty);
-        }
+        final double playbackTime = Double.parseDouble(playbackTimeProperty);
+        return Future.succeededFuture(new PlaybackStatus(isPlaying, (int) playbackTime));
     }
 
     @Override
@@ -93,23 +79,20 @@ public final class MPVAudioPlayer implements AudioPlayer {
         monitorThread = new Thread(() -> {
             while (running && !Thread.currentThread().isInterrupted()) {
                 try {
-                    final MPV.mpv_event event = mpv.instance().mpv_wait_event(mpv.handle(), 1.0);
+                    final MPV.Event event = mpv.instance().mpv_wait_event(mpv.handle(), 1.0);
 
-                    if (event.event_id == MPVEventId.MPV_EVENT_NONE) {
+                    if (event.isNone()) {
                         continue;
                     }
 
                     // on song change
-                    if (event.event_id == MPVEventId.MPV_EVENT_FILE_LOADED) {
+                    if (event.isFileLoaded()) {
                         changeSong.run();
                     }
 
                     // on song stop
-                    if (event.event_id == MPVEventId.MPV_EVENT_END_FILE) {
-                        final MPV.mpv_event_end_file endFile = new MPV.mpv_event_end_file(event.data);
-                        if (endFile.reason == MPVEndFileReason.MPV_END_FILE_REASON_EOF) {
-                            nextSong.get().ifPresent(this::playSongFromPath);
-                        }
+                    if (event.isEndOfFile()) {
+                        nextSong.get().ifPresent(this::playSongFromPath);
                     }
                 } catch (Exception e) {
                     LOGGER.error("MPV monitor thread error", e);
@@ -127,13 +110,18 @@ public final class MPVAudioPlayer implements AudioPlayer {
             if (monitorThread != null) {
                 monitorThread.join(5000);
                 if (monitorThread.isAlive()) {
-                    LOGGER.warn("Monitor thread did not stop within timeout");
+                    LOGGER.warn("Monitor thread did not stop within timeout, skip destroying the mpv instance");
+                    return;
                 }
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            LOGGER.warn("Interrupted while waiting for monitor thread to stop");
+            LOGGER.warn("Interrupted while waiting for monitor thread to stop, skip destroying the mpv instance");
+            return;
         }
+
+        // only cleanup when the tread is properly shut down
+        mpv.instance().mpv_terminate_destroy(mpv.handle());
     }
 
     private int playSongFromPath(final String songPath) {

@@ -14,19 +14,13 @@
 # The result inherits the build host's glibc baseline — build on a machine no
 # newer (glibc-wise) than the deployment target.
 #
-# Output: native/out/resources/<jna-platform>/libmpv.so
-#         (picked up by Maven and packaged into soprano-main.jar)
+# Output: native/out/resources/libmpv — the jar is built for ONE platform:
+# run this script on (or for) the deployment target right before mvn package.
 
 set -euo pipefail
 
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
-case "$(uname -m)" in
-    x86_64)  JNA_PLATFORM=linux-x86-64 ;;
-    aarch64) JNA_PLATFORM=linux-aarch64 ;;
-    *) echo "Unsupported architecture: $(uname -m)"; exit 1 ;;
-esac
-LIB_BASENAME=libmpv.so
 CXX_RUNTIME_LIB=-lstdc++
 MPV_OS_ARGS="-Dalsa=enabled -Diconv=enabled"
 # --exclude-libs keeps the statically linked FFmpeg/libass symbols private to
@@ -63,7 +57,7 @@ build_mpv
 
 # -------------------------------------------------------------------- output
 
-DEST="$OUT/$JNA_PLATFORM/$LIB_BASENAME"
+DEST="$OUT/libmpv"
 cp "$PREFIX/lib/libmpv.so" "$DEST"
 strip --strip-unneeded "$DEST"
 

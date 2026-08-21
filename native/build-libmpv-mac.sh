@@ -15,18 +15,13 @@
 # STATUS: written to mirror the verified Linux build but not yet exercised on
 # a Mac — expect to iterate on the first run.
 #
-# Output: native/out/resources/<jna-platform>/libmpv.dylib
+# Output: native/out/resources/libmpv — the jar is built for ONE platform:
+# run this script on the deployment target's architecture before mvn package.
 
 set -euo pipefail
 
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
-case "$(uname -m)" in
-    arm64)  JNA_PLATFORM=darwin-aarch64 ;;
-    x86_64) JNA_PLATFORM=darwin-x86-64 ;;
-    *) echo "Unsupported architecture: $(uname -m)"; exit 1 ;;
-esac
-LIB_BASENAME=libmpv.dylib
 CXX_RUNTIME_LIB=-lc++
 MPV_OS_ARGS="-Dcoreaudio=enabled -Diconv=enabled"
 LIBASS_EXTRA_CONF="--disable-coretext"
@@ -57,7 +52,7 @@ build_mpv
 
 # -------------------------------------------------------------------- output
 
-DEST="$OUT/$JNA_PLATFORM/$LIB_BASENAME"
+DEST="$OUT/libmpv"
 cp "$PREFIX/lib/libmpv.dylib" "$DEST"
 strip -x "$DEST"
 

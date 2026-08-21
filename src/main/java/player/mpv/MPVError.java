@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <a href="https://github.com/mpv-player/mpv/blob/master/libmpv/client.h#L278">MPV error</a>
+ * <a href="https://github.com/mpv-player/mpv/blob/master/include/mpv/client.h#L278">MPV error</a>
  */
 public enum MPVError {
     /**

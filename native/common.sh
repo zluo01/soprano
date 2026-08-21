@@ -3,8 +3,6 @@
 # functions below in order.
 #
 # Platform knobs read by the stages (set before calling them):
-#   JNA_PLATFORM       jar resource dir (linux-x86-64, darwin-aarch64, ...)
-#   LIB_BASENAME       output name (libmpv.so, libmpv.dylib, mpv.dll)
 #   CXX_RUNTIME_LIB    C++ runtime harfbuzz needs (-lstdc++, or -lc++ on mac)
 #   MPV_OS_ARGS        audio output etc. meson args for the mpv stage
 #   MPV_LDFLAGS        extra link flags for the mpv stage (optional)
@@ -48,7 +46,7 @@ init_dirs() {
         rm -rf "$WORK"/stamps-* "$WORK"/stamps
     fi
     mkdir -p "$WORK" "$TOOLS" "$PREFIX/lib/pkgconfig" "$PREFIX/include" \
-             "$SRC" "$STAMPS" "$OUT/$JNA_PLATFORM"
+             "$SRC" "$STAMPS" "$OUT"
 }
 
 # Fail fast with one clear message instead of a mid-build mystery.

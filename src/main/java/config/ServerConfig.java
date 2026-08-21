@@ -49,8 +49,6 @@ public final class ServerConfig {
 
     public static final String COVER_VARIANT_DIMENSION = "cover.variant";
 
-    public static final String LIB_MPV_SOURCE_OVERRIDE = "lib.mpv.source.override";
-
     public static final String AUDIO_HARDWARE = "audio.hardware";
 
     public static final String AUDIO_OPTIONS_OVERRIDE = "audio.options.override";
@@ -70,10 +68,6 @@ public final class ServerConfig {
         if (config.containsKey(COVER_VARIANT_DIMENSION) && !isValidVariantList(config.getString(COVER_VARIANT_DIMENSION))) {
             return Future.failedFuture("Cover variant should be a comma separated list of integer, but get "
                                        + config.getString(COVER_VARIANT_DIMENSION));
-        }
-
-        if (isWindows() && !config.containsKey(LIB_MPV_SOURCE_OVERRIDE)) {
-            return Future.failedFuture("Require libmpv source override to be set in Windows.");
         }
 
         // configure

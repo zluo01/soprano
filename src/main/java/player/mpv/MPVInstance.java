@@ -1,19 +1,18 @@
 package player.mpv;
 
 import com.sun.jna.Native;
+import com.sun.jna.Platform;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static config.ServerConfig.AUDIO_HARDWARE;
 import static config.ServerConfig.AUDIO_OPTIONS_OVERRIDE;
-import static config.ServerConfig.LIB_MPV_SOURCE_OVERRIDE;
 
 public record MPVInstance(MPV instance, long handle) {
     private static final Logger LOGGER = LogManager.getLogger(MPVInstance.class);
@@ -28,7 +27,7 @@ public record MPVInstance(MPV instance, long handle) {
     );
 
     public static MPVInstance create(final JsonObject config) {
-        final MPV instance = createInstance(config);
+        final MPV instance = loadLibMpv();
 
         final long handle = initializeMPV(instance, config);
 
@@ -88,38 +87,13 @@ public record MPVInstance(MPV instance, long handle) {
         return handle;
     }
 
-    private static MPV createInstance(final JsonObject config) {
-        if (config.containsKey(LIB_MPV_SOURCE_OVERRIDE)) {
-            return Native.load(config.getString(LIB_MPV_SOURCE_OVERRIDE), MPV.class);
+    private static MPV loadLibMpv() {
+        try {
+            final File lib = Native.extractFromResourcePath("mpv", MPVInstance.class.getClassLoader());
+            LOGGER.info("Loading bundled libmpv from {}", lib.getAbsolutePath());
+            return Native.load(lib.getAbsolutePath(), MPV.class);
+        } catch (final IOException e) {
+            throw new IllegalStateException("No bundled libmpv for platform " + Platform.RESOURCE_PREFIX, e);
         }
-
-        final var paths = determinePossibleMpvPath();
-        for (var path : paths) {
-            if (!Files.exists(Path.of(path))) {
-                continue;
-            }
-            return Native.load(path, MPV.class);
-        }
-
-        throw new IllegalStateException("Could not find libmpv.");
-    }
-
-    private static List<String> determinePossibleMpvPath() {
-        final String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.contains("linux")) {
-            return List.of("/usr/lib64/libmpv.so", // fedora
-                           "/usr/local/lib/libmpv.so", // build/install from source
-                           "/usr/lib/aarch64-linux-gnu/libmpv.so" // raspbian
-            );
-        }
-
-        if (osName.contains("mac")) {
-            return List.of(
-                    "/usr/local/lib/libmpv.dylib", // intel machine
-                    "/opt/homebrew/lib/libmpv.dylib" // m-chip
-            );
-        }
-
-        throw new UnsupportedOperationException("Unsupported OS: " + osName);
     }
 }

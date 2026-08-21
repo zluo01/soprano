@@ -28,6 +28,9 @@ JOBS="$(nproc 2>/dev/null || sysctl -n hw.ncpu)"
 
 . "$NATIVE_DIR/versions.sh"
 
+# freetype tags releases as VER-2-14-3; derive the dotted form used in URLs.
+FREETYPE_VERSION="$(echo "${FREETYPE_TAG#VER-}" | tr '-' '.')"
+
 # Stamps are tied to the content of versions.sh: bumping any pin invalidates
 # them all, so a rerun rebuilds everything against the new set instead of
 # silently reusing stages built from old versions.
@@ -66,13 +69,25 @@ require_tools() {
     fi
 }
 
-fetch() {
-    local url="$1" tarball
+sha256_of() {
+    (sha256sum "$1" 2>/dev/null || shasum -a 256 "$1") | awk '{print $1}'
+}
+
+fetch() { # fetch <url> <expected sha256>
+    local url="$1" expected="$2" tarball actual
     tarball="$SRC/$(basename "$url")"
     if [ ! -f "$tarball" ]; then
         log "Downloading $url"
         curl -fL --retry 3 -o "$tarball.tmp" "$url"
         mv "$tarball.tmp" "$tarball"
+    fi
+    actual="$(sha256_of "$tarball")"
+    if [ "$actual" != "$expected" ]; then
+        echo "ERROR: checksum mismatch for $(basename "$tarball")"
+        echo "  expected: $expected"
+        echo "  actual:   $actual"
+        echo "After a version bump, verify the new tarball and update the *_SHA256 pin in versions.sh."
+        exit 1
     fi
     tar -xf "$tarball" -C "$SRC"
 }
@@ -105,7 +120,7 @@ bootstrap_meson() { # args: extra pip packages (e.g. ninja on macOS)
 # x86 SIMD sources. ARM assembly goes through the C compiler's assembler.
 build_nasm() {
     if ! done_stamp nasm; then
-        fetch "https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/nasm-$NASM_VERSION.tar.xz"
+        fetch "https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/nasm-$NASM_VERSION.tar.xz" "$NASM_SHA256"
         log "Building nasm"
         ( cd "$SRC/nasm-$NASM_VERSION" \
           && ./configure --prefix="$TOOLS" >/dev/null \
@@ -117,7 +132,7 @@ build_nasm() {
 # macOS ships no pkg-config; bootstrap pkgconf into the tools prefix.
 build_pkgconf() {
     if ! done_stamp pkgconf; then
-        fetch "https://distfiles.ariadne.space/pkgconf/pkgconf-$PKGCONF_VERSION.tar.xz"
+        fetch "https://distfiles.ariadne.space/pkgconf/pkgconf-$PKGCONF_VERSION.tar.xz" "$PKGCONF_SHA256"
         log "Building pkgconf"
         ( cd "$SRC/pkgconf-$PKGCONF_VERSION" \
           && ./configure --prefix="$TOOLS" >/dev/null \
@@ -141,7 +156,7 @@ meson_build() { # meson_build <srcdir> [extra meson args...]
 
 build_zlib() {
     if ! done_stamp zlib; then
-        fetch "https://github.com/madler/zlib/releases/download/v$ZLIB_VERSION/zlib-$ZLIB_VERSION.tar.xz"
+        fetch "https://github.com/madler/zlib/releases/download/v$ZLIB_VERSION/zlib-$ZLIB_VERSION.tar.xz" "$ZLIB_SHA256"
         log "Building zlib"
         if [ -n "${CROSS_PREFIX:-}" ]; then
             ( cd "$SRC/zlib-$ZLIB_VERSION" \
@@ -169,7 +184,7 @@ EOF
 
 build_freetype() {
     if ! done_stamp freetype; then
-        fetch "https://download.savannah.gnu.org/releases/freetype/freetype-$FREETYPE_VERSION.tar.xz"
+        fetch "https://download.savannah.gnu.org/releases/freetype/freetype-$FREETYPE_VERSION.tar.xz" "$FREETYPE_SHA256"
         log "Building freetype"
         meson_build "$SRC/freetype-$FREETYPE_VERSION" -Dzlib=internal
         mark_done freetype
@@ -178,7 +193,7 @@ build_freetype() {
 
 build_fribidi() {
     if ! done_stamp fribidi; then
-        fetch "https://github.com/fribidi/fribidi/releases/download/v$FRIBIDI_VERSION/fribidi-$FRIBIDI_VERSION.tar.xz"
+        fetch "https://github.com/fribidi/fribidi/releases/download/v$FRIBIDI_VERSION/fribidi-$FRIBIDI_VERSION.tar.xz" "$FRIBIDI_SHA256"
         log "Building fribidi"
         meson_build "$SRC/fribidi-$FRIBIDI_VERSION" -Ddocs=false -Dtests=false
         mark_done fribidi
@@ -187,7 +202,7 @@ build_fribidi() {
 
 build_harfbuzz() {
     if ! done_stamp harfbuzz; then
-        fetch "https://github.com/harfbuzz/harfbuzz/releases/download/$HARFBUZZ_VERSION/harfbuzz-$HARFBUZZ_VERSION.tar.xz"
+        fetch "https://github.com/harfbuzz/harfbuzz/releases/download/$HARFBUZZ_VERSION/harfbuzz-$HARFBUZZ_VERSION.tar.xz" "$HARFBUZZ_SHA256"
         log "Building harfbuzz"
         meson_build "$SRC/harfbuzz-$HARFBUZZ_VERSION" -Dfreetype=enabled -Dtests=disabled -Ddocs=disabled
         # harfbuzz is C++ but its .pc does not declare the C++ runtime; mpv
@@ -203,7 +218,7 @@ build_harfbuzz() {
 # All system font providers are disabled: no font discovery is needed.
 build_libass() {
     if ! done_stamp libass; then
-        fetch "https://github.com/libass/libass/releases/download/$LIBASS_VERSION/libass-$LIBASS_VERSION.tar.xz"
+        fetch "https://github.com/libass/libass/releases/download/$LIBASS_VERSION/libass-$LIBASS_VERSION.tar.xz" "$LIBASS_SHA256"
         log "Building libass"
         ( cd "$SRC/libass-$LIBASS_VERSION" \
           && ./configure --prefix="$PREFIX" --enable-static --disable-shared --with-pic \
@@ -234,7 +249,7 @@ build_libplacebo() {
 # libswscale and libavfilter are kept because mpv requires them at link time.
 build_ffmpeg() {
     if ! done_stamp ffmpeg; then
-        fetch "https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.xz"
+        fetch "https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.xz" "$FFMPEG_SHA256"
         log "Building ffmpeg (audio-only)"
         ( cd "$SRC/ffmpeg-$FFMPEG_VERSION" \
           && ./configure --prefix="$PREFIX" \
@@ -261,7 +276,7 @@ build_ffmpeg() {
 # libmpv only (no cplayer); the audio output comes from MPV_OS_ARGS.
 build_mpv() {
     if ! done_stamp mpv; then
-        fetch "https://github.com/mpv-player/mpv/archive/refs/tags/v$MPV_VERSION.tar.gz"
+        fetch "https://github.com/mpv-player/mpv/archive/refs/tags/v$MPV_VERSION.tar.gz" "$MPV_SHA256"
         log "Building mpv (libmpv, audio-only)"
         ( cd "$SRC/mpv-$MPV_VERSION" \
           && rm -rf build \

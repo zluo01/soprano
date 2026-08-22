@@ -34,7 +34,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import static enums.WorkerAction.DATABASE_UPDATE;
-import static enums.WorkerAction.PLAYER_SONG_UPDATE;
 import static enums.WorkerAction.SCAN_DIRECTORY;
 import static enums.WorkerAction.UPDATE_DIRECTORY;
 
@@ -131,7 +130,7 @@ final class GraphQLInitializer {
 
         initializeSongOperations(wiringBuilder, databaseService);
         initializePlaylistOperations(wiringBuilder, playlistService);
-        initializePlayerOperations(wiringBuilder, playerService, eventBus);
+        initializePlayerOperations(wiringBuilder, playerService);
         return wiringBuilder
                 .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Albums", albums))
                 .type(GraphqlOperationType.Query.name(), builder -> builder.dataFetcher("Album", album))
@@ -214,18 +213,12 @@ final class GraphQLInitializer {
     }
 
     private static void initializePlayerOperations(final RuntimeWiring.Builder wiringBuilder,
-                                                   final PlayerService playerService,
-                                                   final EventBus eventBus) {
+                                                   final PlayerService playerService) {
         final DataFetcher<Future<List<JsonObject>>> songsInQueue = environment -> playerService.songsInQueue();
 
         final DataFetcher<Future<JsonObject>> playbackStatus = environment -> playerService.playbackStatus();
 
-        final DataFetcher<Publisher<Boolean>> onPlaybackSongUpdate = environment -> {
-            final PublishProcessor<Boolean> processor = PublishProcessor.create();
-            final var consumer = eventBus.<Boolean>consumer(PLAYER_SONG_UPDATE.name(), message -> processor.onNext(message.body()));
-            return processor.doOnCancel(consumer::unregister)
-                            .doOnTerminate(consumer::unregister);
-        };
+        final DataFetcher<Publisher<Boolean>> onPlaybackSongUpdate = environment -> playerService.songUpdates();
 
         final DataFetcher<Future<Integer>> playSong = environment -> {
             final String songPath = extractField(environment, "songPath");

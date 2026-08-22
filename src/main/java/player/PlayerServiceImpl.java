@@ -1,12 +1,14 @@
 package player;
 
 import database.DatabaseService;
+import io.reactivex.rxjava3.processors.FlowableProcessor;
+import io.reactivex.rxjava3.processors.PublishProcessor;
 import io.vertx.core.Future;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import models.Song;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.reactivestreams.Publisher;
 import player.base.AudioPlayer;
 import playlists.PlaylistService;
 
@@ -21,25 +23,24 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static enums.WorkerAction.PLAYER_SONG_UPDATE;
-
 public class PlayerServiceImpl implements PlayerService {
     private static final Logger LOGGER = LogManager.getLogger(PlayerServiceImpl.class.getName());
 
     private final DatabaseService databaseService;
     private final PlaylistService playlistService;
     private final AudioPlayer player;
-    private final EventBus eventBus;
     private final AtomicReference<PlayState> playState;
+    private final FlowableProcessor<Boolean> songUpdates;
 
     public PlayerServiceImpl(final DatabaseService databaseService,
                              final PlaylistService playlistService,
-                             final AudioPlayer player,
-                             final EventBus eventBus) {
+                             final AudioPlayer player) {
         this.databaseService = databaseService;
         this.playlistService = playlistService;
         this.player = player;
-        this.eventBus = eventBus;
+
+        // make it thread-safe as it is shared between the monitor thread and vertx thread.
+        this.songUpdates = PublishProcessor.<Boolean>create().toSerialized();
 
         this.playState = new AtomicReference<>(PlayState.DEFAULT);
 
@@ -206,13 +207,17 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public Publisher<Boolean> songUpdates() {
+        return songUpdates;
+    }
+
+    @Override
     public Future<Void> stop() {
-        player.close();
-        return Future.succeededFuture();
+        return player.close();
     }
 
     private void updateCurrentSong() {
-        eventBus.publish(PLAYER_SONG_UPDATE.name(), true);
+        songUpdates.onNext(true);
     }
 
     private record PlayState(List<JsonObject> playlist,

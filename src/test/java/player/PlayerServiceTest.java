@@ -1,10 +1,7 @@
 package player;
 
 import database.DatabaseService;
-import helper.ServiceHelper;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.ThreadingModel;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
@@ -35,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(VertxExtension.class)
-public class PlayerVerticleTest {
+public class PlayerServiceTest {
 
     private PlayerService playerService;
     private Path tempDbPath;
@@ -62,15 +59,8 @@ public class PlayerVerticleTest {
         final JsonObject config = new JsonObject().put(DATABASE_CONFIG, tempDbPath.toString());
 
         final DatabaseService databaseService = DatabaseService.create(vertx, config);
-        vertx.deployVerticle(new PlayerVerticle(databaseService, playlistService, audioPlayer),
-                             new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                    .setWorkerPoolName("Player")
-                                                    .setConfig(config))
-             .onSuccess(__ -> {
-                 playerService = ServiceHelper.createServiceProxy(vertx, PlayerVerticle.class, PlayerService.class);
-                 context.completeNow();
-             })
-             .onFailure(context::failNow);
+        playerService = PlayerService.create(databaseService, playlistService, audioPlayer);
+        context.completeNow();
     }
 
     @AfterEach

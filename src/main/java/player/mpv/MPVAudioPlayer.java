@@ -1,6 +1,7 @@
 package player.mpv;
 
 import io.vertx.core.Future;
+import io.vertx.core.WorkerExecutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import player.base.AudioPlayer;
@@ -17,61 +18,65 @@ public final class MPVAudioPlayer implements AudioPlayer {
     private static final Logger LOGGER = LogManager.getLogger(MPVAudioPlayer.class);
 
     private final MPVInstance mpv;
+    private final WorkerExecutor executor;
     private volatile boolean running = true;
     private Thread monitorThread;
 
-    public MPVAudioPlayer(final MPVInstance mpv) {
+    public MPVAudioPlayer(final MPVInstance mpv, final WorkerExecutor executor) {
         this.mpv = mpv;
+        this.executor = executor;
     }
 
     @Override
     public Future<Integer> play(final String songPath) {
-        try {
-            return Future.succeededFuture(playSongFromPath(songPath));
-        } catch (Exception e) {
-            return Future.failedFuture(e);
-        }
+        return executor.executeBlocking(() -> playSongFromPath(songPath));
     }
 
     @Override
     public Future<Integer> pause() {
-        final String pauseProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "pause");
-        if (pauseProperty == null) {
-            return Future.failedFuture("Failed to get pause status.");
-        }
+        return executor.executeBlocking(() -> {
+            final String pauseProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "pause");
+            if (pauseProperty == null) {
+                throw new IllegalStateException("Failed to get pause status.");
+            }
 
-        final var pauseStatus = pauseProperty.equals("yes") ? "no" : "yes";
-        final int error = mpv.instance().mpv_set_property_string(mpv.handle(), "pause", pauseStatus);
-        if (error != 0) {
-            return Future.failedFuture("Failed to pause: " + MPVError.getError(error));
-        }
-        return Future.succeededFuture(error);
+            final var pauseStatus = pauseProperty.equals("yes") ? "no" : "yes";
+            final int error = mpv.instance().mpv_set_property_string(mpv.handle(), "pause", pauseStatus);
+            if (error != 0) {
+                throw new IllegalStateException("Failed to pause: " + MPVError.getError(error));
+            }
+            return error;
+        });
     }
 
     @Override
     public Future<Integer> stop() {
-        final int error = mpv.instance().mpv_command(mpv.handle(), new String[]{"stop"});
-        if (error != 0) {
-            return Future.failedFuture("Failed to clear queue: " + MPVError.getError(error));
-        }
-        return Future.succeededFuture(error);
+        return executor.executeBlocking(() -> {
+            final int error = mpv.instance().mpv_command(mpv.handle(), new String[]{"stop"});
+            if (error != 0) {
+                throw new IllegalStateException("Failed to clear queue: " + MPVError.getError(error));
+            }
+            return error;
+        });
     }
 
     @Override
     public Future<PlaybackStatus> playbackStatus() {
-        final String pauseProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "pause");
-        if (pauseProperty == null) {
-            return Future.failedFuture("Failed to get pause status.");
-        }
-        final boolean isPlaying = pauseProperty.equals("no");
+        return executor.executeBlocking(() -> {
+            final String pauseProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "pause");
+            if (pauseProperty == null) {
+                throw new IllegalStateException("Failed to get pause status.");
+            }
+            final boolean isPlaying = pauseProperty.equals("no");
 
-        final String playbackTimeProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "playback-time");
-        if (playbackTimeProperty == null) {
-            return Future.failedFuture("Fail to get playback time");
-        }
+            final String playbackTimeProperty = mpv.instance().mpv_get_property_string(mpv.handle(), "playback-time");
+            if (playbackTimeProperty == null) {
+                throw new IllegalStateException("Fail to get playback time");
+            }
 
-        final double playbackTime = Double.parseDouble(playbackTimeProperty);
-        return Future.succeededFuture(new PlaybackStatus(isPlaying, (int) playbackTime));
+            final double playbackTime = Double.parseDouble(playbackTimeProperty);
+            return new PlaybackStatus(isPlaying, (int) playbackTime);
+        });
     }
 
     @Override
@@ -104,7 +109,14 @@ public final class MPVAudioPlayer implements AudioPlayer {
     }
 
     @Override
-    public void close() {
+    public Future<Void> close() {
+        return executor.executeBlocking(() -> {
+            shutdown();
+            return null;
+        });
+    }
+
+    private void shutdown() {
         running = false;
         try {
             if (monitorThread != null) {

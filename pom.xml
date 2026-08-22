@@ -73,9 +73,6 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <annotationProcessors>
-                        <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
-                    </annotationProcessors>
                 </configuration>
             </plugin>
             <plugin>
@@ -309,16 +306,6 @@
             <artifactId>graphql-java-extended-scalars</artifactId>
             <version>24.0</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-service-proxy</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-codegen</artifactId>
-            <classifier>processor</classifier>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>

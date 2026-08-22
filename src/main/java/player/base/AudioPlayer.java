@@ -16,5 +16,5 @@ public interface AudioPlayer {
 
     void startMonitor(Supplier<Optional<String>> nextSong, Runnable changeSong);
 
-    void close();
+    Future<Void> close();
 }

@@ -15,7 +15,8 @@ import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import player.PlayerVerticle;
+import player.PlayerService;
+import player.base.AudioPlayerFactory;
 import playlists.PlaylistService;
 import server.WebServerVerticle;
 
@@ -35,8 +36,9 @@ public final class MainVerticle extends VerticleBase {
     private static final Logger LOGGER = LogManager.getLogger(MainVerticle.class);
 
     private DatabaseService databaseService;
+    private PlayerService playerService;
 
-    public static void main(final String[] args) {
+    static void main(final String[] args) {
         final Vertx vertx = Vertx.vertx(new VertxOptions().setPreferNativeTransport(true));
         vertx.exceptionHandler(throwable -> LOGGER.fatal("Unhandled exception", throwable));
         vertx.deployVerticle(new MainVerticle())
@@ -55,13 +57,10 @@ public final class MainVerticle extends VerticleBase {
                 .compose(config -> {
                     databaseService = DatabaseService.create(vertx, config);
                     final PlaylistService playlistService = PlaylistService.create(vertx, databaseService);
+                    playerService = PlayerService.create(databaseService, playlistService, AudioPlayerFactory.create(vertx, config));
                     return databaseService.initialization()
                                           .compose(__ -> playlistService.validatePlaylists())
-                                          .compose(__ -> Future.all(deployEventLoopVertical(new WebServerVerticle(databaseService, playlistService), config),
-                                                                    deployVerticle(new PlayerVerticle(databaseService, playlistService),
-                                                                                   new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
-                                                                                                          .setWorkerPoolName("Player")
-                                                                                                          .setConfig(config)),
+                                          .compose(__ -> Future.all(deployEventLoopVertical(new WebServerVerticle(databaseService, playlistService, playerService), config),
                                                                     deployVerticle(new AudioDataCollectorVerticle(databaseService),
                                                                                    new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER)
                                                                                                           .setWorkerPoolName("Collector")
@@ -81,6 +80,9 @@ public final class MainVerticle extends VerticleBase {
     @Override
     public Future<Void> stop() {
         final List<Future<?>> futures = new ArrayList<>();
+        if (playerService != null) {
+            futures.add(playerService.stop());
+        }
         if (databaseService != null) {
             futures.add(databaseService.close());
         }

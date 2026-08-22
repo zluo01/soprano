@@ -3,7 +3,6 @@ package server;
 import config.ServerConfig;
 import database.DatabaseService;
 import graphql.GraphQL;
-import helper.ServiceHelper;
 import images.StaticImageHandler;
 import io.vertx.core.Future;
 import io.vertx.core.VerticleBase;
@@ -19,7 +18,6 @@ import io.vertx.ext.web.handler.graphql.ws.GraphQLWSHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import player.PlayerService;
-import player.PlayerVerticle;
 import playlists.PlaylistService;
 
 import static config.ServerConfig.enableGraphQLDebug;
@@ -32,18 +30,20 @@ public final class WebServerVerticle extends VerticleBase {
 
     private final DatabaseService databaseService;
     private final PlaylistService playlistService;
-    private PlayerService playerService;
+    private final PlayerService playerService;
     private Router router;
 
-    public WebServerVerticle(final DatabaseService databaseService, final PlaylistService playlistService) {
+    public WebServerVerticle(final DatabaseService databaseService,
+                             final PlaylistService playlistService,
+                             final PlayerService playerService) {
         this.databaseService = databaseService;
         this.playlistService = playlistService;
+        this.playerService = playerService;
     }
 
     @Override
     public Future<?> start() {
-        return initConfig().compose(this::setupServices)
-                           .compose(this::setupRoutes)
+        return initConfig().compose(this::setupRoutes)
                            .compose(this::startServer);
     }
 
@@ -52,13 +52,8 @@ public final class WebServerVerticle extends VerticleBase {
                     .map(o -> new StartupContext(o.toString()));
     }
 
-    private Future<StartupContext> setupServices(final StartupContext startup) {
-        playerService = ServiceHelper.createServiceProxy(vertx, PlayerVerticle.class, PlayerService.class);
-        router = Router.router(vertx);
-        return Future.succeededFuture(startup);
-    }
-
     private Future<StartupContext> setupRoutes(final StartupContext startup) {
+        router = Router.router(vertx);
         final boolean enableWebUI = isWebUiEnabled(config());
         final boolean enableDebugConsole = enableGraphQLDebug(config());
 

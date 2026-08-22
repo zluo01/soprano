@@ -1,7 +1,5 @@
 package server;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import database.DatabaseService;
 import graphql.GraphQL;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
@@ -30,15 +28,18 @@ import player.PlayerService;
 import playlists.PlaylistService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static enums.WorkerAction.DATABASE_UPDATE;
 import static enums.WorkerAction.SCAN_DIRECTORY;
 import static enums.WorkerAction.UPDATE_DIRECTORY;
 
 final class GraphQLInitializer {
-    private static final Cache<String, PreparsedDocumentEntry> QUERY_CACHE = Caffeine.newBuilder().maximumSize(1000).build();
+    // this will only work as an adhoc populated lookup map during runtime without any need to eviction
+    // hence, a simply concurrentHashmap serves the need.
+    private static final Map<String, PreparsedDocumentEntry> QUERY_CACHE = new ConcurrentHashMap<>(64);
 
     private GraphQLInitializer() {
     }
@@ -48,10 +49,9 @@ final class GraphQLInitializer {
                                 final PlaylistService playlistService,
                                 final PlayerService playerService,
                                 final EventBus eventBus) {
-        final PreparsedDocumentProvider preparsedCache = (executionInput, computeFunction) -> {
-            Function<String, PreparsedDocumentEntry> mapCompute = key -> computeFunction.apply(executionInput);
-            return CompletableFuture.completedFuture(QUERY_CACHE.get(executionInput.getQuery(), mapCompute));
-        };
+        final PreparsedDocumentProvider preparsedCache = (executionInput, computeFunction) ->
+                CompletableFuture.completedFuture(QUERY_CACHE.computeIfAbsent(executionInput.getQuery(),
+                                                                              _ -> computeFunction.apply(executionInput)));
 
         final TypeDefinitionRegistry registry = new SchemaParser().parse(schema);
         final RuntimeWiring wiring = createWiring(databaseService, playlistService, playerService, eventBus);

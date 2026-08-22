@@ -23,6 +23,7 @@
 set -euo pipefail
 
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+. "$NATIVE_DIR/image/build.sh"
 
 CXX_RUNTIME_LIB=-lc++
 
@@ -61,7 +62,6 @@ build_libass
 build_libplacebo
 build_ffmpeg
 build_mpv
-build_libwebp
 
 # -------------------------------------------------------------------- output
 
@@ -88,20 +88,6 @@ log "Dependency check passed: only macOS system libraries required."
 
 run_load_check "$DEST"
 
-# ---------------------------------------------------- libwebp bundle output
+# ------------------------------------------------------ image bundle output
 
-WEBP_DEST="$OUT/libwebp"
-cc -dynamiclib -o "$WEBP_DEST" \
-    -Wl,-all_load "$PREFIX/lib/libwebp.a" "$PREFIX/lib/libsharpyuv.a" -lm
-strip -x "$WEBP_DEST"
-
-log "Bundled library: $WEBP_DEST ($(du -h "$WEBP_DEST" | cut -f1))"
-WEBP_UNEXPECTED="$(otool -L "$WEBP_DEST" | tail -n +2 | awk '{print $1}' \
-    | grep -v "libwebp" \
-    | grep -Ev '^(/usr/lib/|/System/Library/)' || true)"
-if [ -n "$WEBP_UNEXPECTED" ]; then
-    echo "ERROR: unexpected dynamic dependencies in libwebp bundle:"
-    echo "$WEBP_UNEXPECTED"
-    exit 1
-fi
-run_webp_load_check "$WEBP_DEST"
+build_libimage mac

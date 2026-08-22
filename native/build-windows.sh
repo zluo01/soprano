@@ -25,6 +25,7 @@
 set -euo pipefail
 
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+. "$NATIVE_DIR/image/build.sh"
 
 CXX_RUNTIME_LIB=-lstdc++
 CROSS_PREFIX=x86_64-w64-mingw32-
@@ -79,7 +80,6 @@ build_libass
 build_libplacebo
 build_ffmpeg
 build_mpv
-build_libwebp
 
 # -------------------------------------------------------------------- output
 
@@ -102,22 +102,6 @@ if [ -n "$UNEXPECTED" ]; then
 fi
 log "Dependency check passed: only Windows system DLLs imported."
 
-# ---------------------------------------------------- libwebp bundle output
+# ------------------------------------------------------ image bundle output
 
-WEBP_DEST="$OUT/libwebp"
-# mingw appends .exe to extensionless output names; link with a .dll name
-# and rename to the fixed resource name afterwards.
-"${CROSS_PREFIX}gcc" -shared -static -o "$WORK/libwebp.dll" \
-    -Wl,--whole-archive "$PREFIX/lib/libwebp.a" "$PREFIX/lib/libsharpyuv.a" -Wl,--no-whole-archive
-"${CROSS_PREFIX}strip" --strip-unneeded "$WORK/libwebp.dll"
-mv "$WORK/libwebp.dll" "$WEBP_DEST"
-
-log "Bundled library: $WEBP_DEST ($(du -h "$WEBP_DEST" | cut -f1))"
-WEBP_UNEXPECTED="$("${CROSS_PREFIX}objdump" -p "$WEBP_DEST" | grep "DLL Name" \
-    | grep -Ei "libwinpthread|libgcc|libstdc|libssp" || true)"
-if [ -n "$WEBP_UNEXPECTED" ]; then
-    echo "ERROR: non-system DLL dependencies in libwebp bundle:"
-    echo "$WEBP_UNEXPECTED"
-    exit 1
-fi
-log "NOTE: run the jar on a Windows machine to fully verify these libraries."
+build_libimage windows

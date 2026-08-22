@@ -276,24 +276,6 @@ build_ffmpeg() {
     fi
 }
 
-# Static libwebp for the bundled WebP encoder (cover art optimization).
-# Only the encoding core is needed; every optional feature and tool is off.
-# The per-OS scripts link libwebp.a + libsharpyuv.a into one shared library.
-build_libwebp() {
-    if ! done_stamp libwebp; then
-        fetch "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-$LIBWEBP_VERSION.tar.gz" "$LIBWEBP_SHA256"
-        log "Building libwebp"
-        ( cd "$SRC/libwebp-$LIBWEBP_VERSION" \
-          && ./configure --prefix="$PREFIX" --enable-static --disable-shared --with-pic \
-                 ${LIBWEBP_EXTRA_CONF:-} \
-                 --disable-libwebpdemux --disable-libwebpmux --disable-libwebpdecoder \
-                 --disable-png --disable-jpeg --disable-tiff --disable-gif --disable-wic \
-                 --disable-sdl --disable-gl >/dev/null \
-          && make -j"$JOBS" >/dev/null && make install >/dev/null )
-        mark_done libwebp
-    fi
-}
-
 # libmpv only (no cplayer); the audio output comes from MPV_OS_ARGS.
 build_mpv() {
     if ! done_stamp mpv; then
@@ -314,26 +296,6 @@ build_mpv() {
 }
 
 # ------------------------------------------------------------------ checks
-
-# dlopen the built libwebp bundle and encode a tiny image — verifies the
-# encoder works end to end. (Host-run platforms only.)
-run_webp_load_check() { # $1 = library path
-    python3 - "$1" <<'EOF'
-import ctypes, sys
-lib = ctypes.CDLL(sys.argv[1])
-lib.WebPGetEncoderVersion.restype = ctypes.c_int
-v = lib.WebPGetEncoderVersion()
-print(f"libwebp encoder version {v >> 16}.{(v >> 8) & 0xFF}.{v & 0xFF}")
-lib.WebPEncodeRGBA.restype = ctypes.c_size_t
-lib.WebPEncodeRGBA.argtypes = [ctypes.c_char_p, ctypes.c_int, ctypes.c_int,
-                               ctypes.c_int, ctypes.c_float, ctypes.POINTER(ctypes.c_void_p)]
-out = ctypes.c_void_p()
-size = lib.WebPEncodeRGBA(b"\xff\x00\x00\xff" * 4, 2, 2, 8, 75.0, ctypes.byref(out))
-assert size > 0, "WebPEncodeRGBA failed"
-lib.WebPFree(out)
-EOF
-    log "libwebp load check passed: encoder produces output."
-}
 
 # dlopen the built library and bring up an mpv instance — verifies the
 # trimmed build is functionally coherent, not merely linkable. (Host-run

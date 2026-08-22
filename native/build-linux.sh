@@ -20,6 +20,7 @@
 set -euo pipefail
 
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+. "$NATIVE_DIR/image/build.sh"
 
 CXX_RUNTIME_LIB=-lstdc++
 MPV_OS_ARGS=(-Dalsa=enabled -Diconv=enabled)
@@ -54,7 +55,6 @@ build_libass
 build_libplacebo
 build_ffmpeg
 build_mpv
-build_libwebp
 
 # -------------------------------------------------------------------- output
 
@@ -84,19 +84,6 @@ log "Dependency check passed: only baseline system libraries required."
 
 run_load_check "$DEST"
 
-# ---------------------------------------------------- libwebp bundle output
+# ------------------------------------------------------ image bundle output
 
-WEBP_DEST="$OUT/libwebp"
-gcc -shared -o "$WEBP_DEST" \
-    -Wl,--whole-archive "$PREFIX/lib/libwebp.a" "$PREFIX/lib/libsharpyuv.a" -Wl,--no-whole-archive \
-    -lm -lpthread
-strip --strip-unneeded "$WEBP_DEST"
-
-log "Bundled library: $WEBP_DEST ($(du -h "$WEBP_DEST" | cut -f1))"
-WEBP_UNEXPECTED="$(ldd "$WEBP_DEST" | awk '{print $1}' | grep -Ev "$ALLOWED" || true)"
-if [ -n "$WEBP_UNEXPECTED" ]; then
-    echo "ERROR: unexpected dynamic dependencies in libwebp bundle:"
-    echo "$WEBP_UNEXPECTED"
-    exit 1
-fi
-run_webp_load_check "$WEBP_DEST"
+build_libimage linux

@@ -4,9 +4,7 @@ import config.ServerConfig;
 import database.DatabaseService;
 import io.vertx.core.Future;
 import io.vertx.core.VerticleBase;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.file.FileSystem;
 import models.AlbumData;
 import models.SongData;
 import org.apache.logging.log4j.LogManager;
@@ -21,12 +19,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static collector.AlbumScannerHelper.parseTag;
 import static collector.AlbumScannerHelper.retrieveSongPaths;
@@ -52,7 +50,6 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
 
     private final DatabaseService databaseService;
 
-    private FileSystem fileSystem;
     private EventBus eventBus;
 
     public AudioDataCollectorVerticle(final DatabaseService databaseService) {
@@ -61,7 +58,6 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
 
     @Override
     public Future<?> start() {
-        fileSystem = vertx.fileSystem();
         eventBus = vertx.eventBus();
 
         eventBus.consumer(UPDATE_DIRECTORY.name(), __ -> scanDirectory(musicDirectory(config()), true));
@@ -178,7 +174,7 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
 
         for (final String path : songPaths) {
             try {
-                LOGGER.info("Parsing song: {}", path);
+                LOGGER.debug("Parsing song: {}", path);
                 final SongPayload songPayload = parseTag(path);
 
                 final SongData song = songPayload.song();
@@ -241,14 +237,12 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
             final int sourceDimension = coverSourceDimension(config());
             final List<Integer> variantDimensions = coverVariants(config());
 
-            final String filePath = Path.of(ServerConfig.COVER_PATH)
-                                        .resolve(albumId + ".png")
-                                        .toString();
+            final String coverPath = Path.of(ServerConfig.COVER_PATH)
+                                         .resolve(String.valueOf(albumId))
+                                         .toString();
 
-            fileSystem.writeFileBlocking(filePath, Buffer.buffer(artwork.getBinaryData()));
-            if (optimize(filePath, sourceDimension, variantDimensions)) {
-                fileSystem.deleteBlocking(filePath);
-                LOGGER.info("Successfully optimized image {}", filePath);
+            if (optimize(artwork.getBinaryData(), coverPath, sourceDimension, variantDimensions)) {
+                LOGGER.info("Successfully optimized image {}", coverPath);
             }
         } catch (Exception e) {
             LOGGER.error("Fail to optimize image", e);

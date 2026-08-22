@@ -8,8 +8,9 @@ import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -34,24 +35,24 @@ public final class ImageOptimizer {
         }
     }
 
-    public static boolean optimize(final String filePath, final int sourceDimension, final List<Integer> variantDimensions) {
-        try {
-            final BufferedImage source = ImageIO.read(new File(filePath));
+    public static boolean optimize(final byte[] imageBuffers, final String coverPath, final int sourceDimension, final List<Integer> variantDimensions) {
+        try (InputStream stream = new ByteArrayInputStream(imageBuffers)) {
+            final BufferedImage source = ImageIO.read(stream);
             if (source == null) {
-                LOGGER.error("Unsupported image format: {}", filePath);
+                LOGGER.error("Unsupported image format: {}", coverPath);
                 return false;
             }
 
             // normalize source image
-            writeWebp(source, sourceDimension, filePath.replace(".png", ".webp"));
+            writeWebp(source, sourceDimension, coverPath + ".webp");
 
             // create sub variant
             for (final int dimension : variantDimensions) {
-                writeWebp(source, dimension, filePath.replace(".png", String.format("_%1$dx%1$d.webp", dimension)));
+                writeWebp(source, dimension, String.format("%s_%2$dx%2$d.webp", coverPath, dimension));
             }
             return true;
         } catch (IOException | RuntimeException e) {
-            LOGGER.error("Fail to optimize image {}", filePath, e);
+            LOGGER.error("Fail to optimize image {}", coverPath, e);
         }
         return false;
     }

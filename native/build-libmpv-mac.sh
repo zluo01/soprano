@@ -23,7 +23,9 @@ set -euo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 CXX_RUNTIME_LIB=-lc++
-MPV_OS_ARGS="-Dcoreaudio=enabled -Diconv=enabled"
+# iconv is only used for subtitle charset conversion — not needed for audio,
+# and macOS keeps it in a separate libiconv that meson fails to resolve here.
+MPV_OS_ARGS="-Dcoreaudio=enabled -Diconv=disabled"
 LIBASS_EXTRA_CONF="--disable-coretext"
 
 # Keep the binary runnable on older macOS versions regardless of build host.

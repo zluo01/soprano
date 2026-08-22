@@ -101,7 +101,8 @@
                 <executions>
                     <execution>
                         <id>copy-to-webroot</id>
-                        <phase>process-resources</phase>
+                        <!-- must run after the frontend build -->
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>

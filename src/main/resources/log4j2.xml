@@ -5,12 +5,21 @@
             <PatternLayout
                     pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n"/>
         </Console>
+        <Console name="LoggerNameConsole" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %c{1.} - %msg%n"/>
+        </Console>
     </Appenders>
     <Loggers>
         <Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>
 
-        <Logger name="org.jaudiotagger" level="ERROR" additivity="false"/>
+        <Logger name="org.jaudiotagger" level="ERROR" additivity="false">
+            <AppenderRef ref="LoggerNameConsole"/>
+        </Logger>
+
+        <!-- routine "Skipping chunk" chatter; real failures throw and are logged by soprano -->
+        <Logger name="org.jaudiotagger.audio.wav" level="OFF" additivity="false"/>
     </Loggers>
 </Configuration>

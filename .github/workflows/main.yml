@@ -80,3 +80,4 @@ jobs:
         with:
           name: soprano-${{ matrix.platform }}
           path: target/soprano-main.jar
+          retention-days: 1

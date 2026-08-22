@@ -22,7 +22,7 @@ set -euo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 CXX_RUNTIME_LIB=-lstdc++
-MPV_OS_ARGS="-Dalsa=enabled -Diconv=enabled"
+MPV_OS_ARGS=(-Dalsa=enabled -Diconv=enabled)
 # --exclude-libs keeps the statically linked FFmpeg/libass symbols private to
 # libmpv.so so they cannot clash with other native libraries in the JVM.
 MPV_LDFLAGS="-Wl,--exclude-libs,ALL"

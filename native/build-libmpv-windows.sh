@@ -30,7 +30,7 @@ CXX_RUNTIME_LIB=-lstdc++
 CROSS_PREFIX=x86_64-w64-mingw32-
 # WASAPI only; mingw has no iconv. -static folds the mingw runtime into the
 # DLL so no libwinpthread/libgcc/libstdc++ DLLs are needed at runtime.
-MPV_OS_ARGS="-Dwasapi=enabled -Diconv=disabled"
+MPV_OS_ARGS=(-Dwasapi=enabled -Diconv=disabled)
 MPV_LDFLAGS="-static"
 FFMPEG_TARGET_ARGS="--enable-cross-compile --target-os=mingw32 --arch=x86_64 --cross-prefix=$CROSS_PREFIX"
 LIBASS_EXTRA_CONF="--host=x86_64-w64-mingw32 --disable-directwrite"

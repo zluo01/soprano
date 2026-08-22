@@ -4,7 +4,8 @@
 #
 # Platform knobs read by the stages (set before calling them):
 #   CXX_RUNTIME_LIB    C++ runtime harfbuzz needs (-lstdc++, or -lc++ on mac)
-#   MPV_OS_ARGS        audio output etc. meson args for the mpv stage
+#   MPV_OS_ARGS        audio output etc. meson args for the mpv stage; a bash
+#                      array, so one arg may contain spaces (mac swift-flags)
 #   MPV_LDFLAGS        extra link flags for the mpv stage (optional)
 #   MPV_PC_LIBDIR      pkg-config path for the mpv stage (optional; defaults
 #                      to the isolated prefix)
@@ -302,7 +303,7 @@ build_mpv() {
                  -Ddefault_library=shared --prefer-static \
                  -Dauto_features=disabled ${MESON_CROSS_ARGS:-} \
                  -Dlibmpv=true -Dcplayer=false -Dgl=disabled -Dlua=disabled \
-                 ${MPV_OS_ARGS} \
+                 "${MPV_OS_ARGS[@]}" \
           && ninja -C build -j"$JOBS" install )
         mark_done mpv
     fi

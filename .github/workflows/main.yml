@@ -39,7 +39,7 @@ jobs:
             platform: win32-x86-64
             script: build-libmpv-windows.sh
             packages: build-essential ninja-build pkg-config git curl python3-venv gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
-          - runner: macos-14
+          - runner: macos-26
             platform: darwin-aarch64
             script: build-libmpv-mac.sh
     runs-on: ${{ matrix.runner }}

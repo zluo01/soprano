@@ -12,8 +12,10 @@
 # meson, ninja, pkgconf and (on Intel) nasm are bootstrapped automatically —
 # no Homebrew needed.
 #
-# STATUS: written to mirror the verified Linux build but not yet exercised on
-# a Mac — expect to iterate on the first run.
+# NOTE: libwebp's shipped configure prints two harmless errors on macOS
+# ("-a: command not found" from a broken line continuation in its AVX2 guard,
+# and a GNU-only "sed -i" call whose substitution only matters for Windows
+# DLL builds). Both are upstream bugs with no effect on the produced library.
 #
 # Output: native/out/resources/libmpv — the jar is built for ONE platform:
 # run this script on the deployment target's architecture before mvn package.
@@ -23,13 +25,21 @@ set -euo pipefail
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 CXX_RUNTIME_LIB=-lc++
-# iconv is only used for subtitle charset conversion — not needed for audio,
-# and macOS keeps it in a separate libiconv that meson fails to resolve here.
-MPV_OS_ARGS="-Dcoreaudio=enabled -Diconv=disabled"
-LIBASS_EXTRA_CONF="--disable-coretext"
 
-# Keep the binary runnable on older macOS versions regardless of build host.
+# Compatibility floor, not a version choice: 11.0 covers every arm64 Mac,
+# and the build host's newer SDK does not raise it.
 export MACOSX_DEPLOYMENT_TARGET=11.0
+
+# coreaudio needs cocoa (undefined cfstr_* symbols without it), and cocoa
+# needs the swift bridge. iconv: not needed for audio-only, and meson can't
+# resolve macOS's libiconv. swiftc ignores MACOSX_DEPLOYMENT_TARGET, hence
+# the explicit -target.
+MPV_OS_ARGS=(
+    -Dcoreaudio=enabled -Dcocoa=enabled -Dswift-build=enabled
+    -Diconv=disabled
+    "-Dswift-flags=-target $(uname -m)-apple-macos$MACOSX_DEPLOYMENT_TARGET"
+)
+LIBASS_EXTRA_CONF="--disable-coretext"
 
 require_tools "xcode-select --install   (Xcode Command Line Tools)" \
     cc c++ make git curl python3

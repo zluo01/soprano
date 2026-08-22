@@ -11,6 +11,6 @@
             <AppenderRef ref="Console"/>
         </Root>
 
-        <Logger name="org.jaudiotagger" level="OFF" additivity="false"/>
+        <Logger name="org.jaudiotagger" level="ERROR" additivity="false"/>
     </Loggers>
 </Configuration>

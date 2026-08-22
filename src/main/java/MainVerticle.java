@@ -22,19 +22,19 @@ import server.WebServerVerticle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 import static config.ServerConfig.verifyAndSetupConfig;
 
 public final class MainVerticle extends VerticleBase {
+
+    static {
+        // wire java logger to log4j
+        System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
+    }
+
     private static final Logger LOGGER = LogManager.getLogger(MainVerticle.class);
 
     private DatabaseService databaseService;
-
-    static {
-        // disable the annoying jaudiotagger logs
-        java.util.logging.LogManager.getLogManager().getLogger("").setLevel(Level.OFF);
-    }
 
     public static void main(final String[] args) {
         final Vertx vertx = Vertx.vertx(new VertxOptions().setPreferNativeTransport(true));

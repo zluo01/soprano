@@ -1,5 +1,5 @@
 # Pinned versions and tarball checksums for the bundled libmpv build, shared
-# by every build-libmpv-<os>.sh script. Bump here, then rerun the script(s) —
+# by every build-<os>.sh script. Bump here, then rerun the script(s) —
 # stamps are fingerprinted to this file, so any change triggers a clean
 # rebuild.
 #

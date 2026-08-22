@@ -28,20 +28,20 @@ jobs:
         include:
           - runner: ubuntu-22.04
             platform: linux-x86-64
-            script: build-libmpv-linux.sh
+            script: build-linux.sh
             packages: build-essential ninja-build pkg-config git curl python3-venv libasound2-dev
           - runner: ubuntu-22.04-arm
             platform: linux-aarch64
-            script: build-libmpv-linux.sh
+            script: build-linux.sh
             packages: build-essential ninja-build pkg-config git curl python3-venv libasound2-dev
           # Windows is cross-compiled from Linux with mingw-w64.
           - runner: ubuntu-22.04
             platform: win32-x86-64
-            script: build-libmpv-windows.sh
+            script: build-windows.sh
             packages: build-essential ninja-build pkg-config git curl python3-venv gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
           - runner: macos-26
             platform: darwin-aarch64
-            script: build-libmpv-mac.sh
+            script: build-mac.sh
     runs-on: ${{ matrix.runner }}
     needs: [ build ]
     if: github.ref == 'refs/heads/main'

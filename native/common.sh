@@ -1,4 +1,4 @@
-# Shared machinery for the build-libmpv-<os>.sh scripts. Not runnable on its
+# Shared machinery for the build-<os>.sh scripts. Not runnable on its
 # own — each entry script sets the platform knobs, then calls the stage
 # functions below in order.
 #

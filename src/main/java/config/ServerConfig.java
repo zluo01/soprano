@@ -132,13 +132,20 @@ public final class ServerConfig {
     }
 
     private static Path getConfigDataPath() {
-        if (isWindows()) {
+        final String osName = System.getProperty("os.name").toLowerCase();
+
+        if (osName.contains("windows")) {
             return Path.of(System.getenv("APPDATA"), "soprano");
         }
-        return Path.of(System.getProperty("user.home"), ".config", "soprano");
-    }
 
-    private static boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().contains("windows");
+        if (osName.contains("mac") || osName.contains("darwin")) {
+            return Path.of(System.getProperty("user.home"), "Library", "Application Support", "soprano");
+        }
+
+        final String xdgDataHome = System.getenv("XDG_DATA_HOME");
+        if (xdgDataHome != null && !xdgDataHome.isEmpty()) {
+            return Path.of(xdgDataHome, "soprano");
+        }
+        return Path.of(System.getProperty("user.home"), ".local", "share", "soprano");
     }
 }

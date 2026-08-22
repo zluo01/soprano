@@ -100,11 +100,11 @@ public final class MainVerticle extends VerticleBase {
     private Future<Void> validateSetup() {
         final FileSystem fileSystem = vertx.fileSystem();
         return Future.all(
-                fileSystem.exists(ServerConfig.CONFIG_FILE_PATH).compose(exist -> {
+                fileSystem.exists(ServerConfig.BASE_CONFIG_PATH.toString()).compose(exist -> {
                     if (exist) {
                         return Future.succeededFuture();
                     }
-                    return Future.failedFuture("Cannot find config file: " + ServerConfig.CONFIG_FILE_PATH);
+                    return fileSystem.mkdir(ServerConfig.BASE_CONFIG_PATH.toString());
                 }),
                 fileSystem.exists(ServerConfig.COVER_PATH).compose(exist -> {
                     if (exist) {
@@ -117,6 +117,12 @@ public final class MainVerticle extends VerticleBase {
                         return Future.succeededFuture();
                     }
                     return fileSystem.mkdir(ServerConfig.PLAYLIST_PATH);
+                }),
+                fileSystem.exists(ServerConfig.CONFIG_FILE_PATH).compose(exist -> {
+                    if (exist) {
+                        return Future.succeededFuture();
+                    }
+                    return Future.failedFuture("Cannot find config file: " + ServerConfig.CONFIG_FILE_PATH);
                 })).compose(__ -> Future.succeededFuture());
     }
 

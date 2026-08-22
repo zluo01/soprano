@@ -26,7 +26,7 @@ public final class ServerConfig {
 
     public static final String DATABASE_CONFIG = "DATABASE_CONFIG";
 
-    private static final Path BASE_CONFIG_PATH = getConfigDataPath();
+    public static final Path BASE_CONFIG_PATH = getConfigDataPath();
 
     public static final String CONFIG_FILE_PATH = BASE_CONFIG_PATH.resolve("soprano.properties").toString();
 

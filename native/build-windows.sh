@@ -30,7 +30,9 @@ CXX_RUNTIME_LIB=-lstdc++
 CROSS_PREFIX=x86_64-w64-mingw32-
 # WASAPI only; mingw has no iconv. -static folds the mingw runtime into the
 # DLL so no libwinpthread/libgcc/libstdc++ DLLs are needed at runtime.
-MPV_OS_ARGS=(-Dwasapi=enabled -Diconv=disabled)
+# win32-threads must be enabled explicitly (auto_features turns it off, and
+# mpv's win32 timer code conflicts with the pthreads fallback).
+MPV_OS_ARGS=(-Dwasapi=enabled -Diconv=disabled -Dwin32-threads=enabled)
 MPV_LDFLAGS="-static"
 FFMPEG_TARGET_ARGS="--enable-cross-compile --target-os=mingw32 --arch=x86_64 --cross-prefix=$CROSS_PREFIX"
 LIBASS_EXTRA_CONF="--host=x86_64-w64-mingw32 --disable-directwrite"
@@ -42,6 +44,11 @@ require_tools "sudo dnf install mingw64-gcc mingw64-gcc-c++ make ninja-build pkg
 init_dirs
 setup_env
 
+# Autotools prefers a host- prefixedx86_64-w64-mingw32-pkg-config when one
+# exists (Fedora ships one that rewrites our prefix paths into the mingw
+# sysroot). Pin the plain pkg-config; PKG_CONFIG_LIBDIR already isolates it.
+export PKG_CONFIG=pkg-config
+
 CROSS_FILE="$WORK/mingw64-cross.ini"
 cat > "$CROSS_FILE" <<EOF
 [binaries]
@@ -50,6 +57,7 @@ cpp = '${CROSS_PREFIX}g++'
 ar = '${CROSS_PREFIX}ar'
 strip = '${CROSS_PREFIX}strip'
 windres = '${CROSS_PREFIX}windres'
+dlltool = '${CROSS_PREFIX}dlltool'
 pkg-config = 'pkg-config'
 
 [host_machine]
@@ -97,9 +105,12 @@ log "Dependency check passed: only Windows system DLLs imported."
 # ---------------------------------------------------- libwebp bundle output
 
 WEBP_DEST="$OUT/libwebp"
-"${CROSS_PREFIX}gcc" -shared -static -o "$WEBP_DEST" \
+# mingw appends .exe to extensionless output names; link with a .dll name
+# and rename to the fixed resource name afterwards.
+"${CROSS_PREFIX}gcc" -shared -static -o "$WORK/libwebp.dll" \
     -Wl,--whole-archive "$PREFIX/lib/libwebp.a" "$PREFIX/lib/libsharpyuv.a" -Wl,--no-whole-archive
-"${CROSS_PREFIX}strip" --strip-unneeded "$WEBP_DEST"
+"${CROSS_PREFIX}strip" --strip-unneeded "$WORK/libwebp.dll"
+mv "$WORK/libwebp.dll" "$WEBP_DEST"
 
 log "Bundled library: $WEBP_DEST ($(du -h "$WEBP_DEST" | cut -f1))"
 WEBP_UNEXPECTED="$("${CROSS_PREFIX}objdump" -p "$WEBP_DEST" | grep "DLL Name" \

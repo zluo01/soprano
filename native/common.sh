@@ -17,6 +17,10 @@
 # NOTE: the repository path must not contain spaces (ffmpeg's configure and
 # several upstream build systems cannot cope with them).
 
+# NOTE: the work directory holds the build state of ONE target. When
+# switching targets locally (e.g. linux → windows cross build), remove
+# native/work first; each CI runner is fresh so this never applies there.
+
 NATIVE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORK="$NATIVE_DIR/work"
 TOOLS="$WORK/tools"
@@ -40,11 +44,11 @@ done_stamp() { [ -f "$STAMPS/$1.done" ]; }
 mark_done() { touch "$STAMPS/$1.done"; }
 
 init_dirs() {
-    # A fresh stamp set (new version pins) starts from a clean prefix so no
-    # artifacts from a previous version set can leak into the new build.
+    # A fresh stamp set (new version pins) starts from clean sources and a
+    # clean prefix so nothing from a previous version set can leak in.
     if [ ! -d "$STAMPS" ]; then
-        rm -rf "$PREFIX"
-        rm -rf "$WORK"/stamps-* "$WORK"/stamps
+        rm -rf "$PREFIX" "$SRC"
+        rm -rf "$WORK"/stamps-*
     fi
     mkdir -p "$WORK" "$TOOLS" "$PREFIX/lib/pkgconfig" "$PREFIX/include" \
              "$SRC" "$STAMPS" "$OUT"

@@ -41,7 +41,7 @@ public final class MainVerticle extends VerticleBase {
         vertx.exceptionHandler(throwable -> LOGGER.fatal("Unhandled exception", throwable));
         vertx.deployVerticle(new MainVerticle())
              .onFailure(error -> {
-                 LOGGER.fatal(error);
+                 LOGGER.fatal("Startup Error", error);
                  vertx.close();
              });
     }

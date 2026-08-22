@@ -1,5 +1,5 @@
 [Unit]
-Description=Mesa Server
+Description=Soprano Server
 
 # modified based on need. To see all active target systemctl list-units --type target --state active
 After=sound.target network.target remote-fs.target

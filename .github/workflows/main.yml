@@ -34,8 +34,7 @@ jobs:
             platform: linux-aarch64
             script: build-linux.sh
             packages: build-essential ninja-build pkg-config git curl python3-venv libasound2-dev
-          # Windows is cross-compiled from Linux with mingw-w64.
-          - runner: ubuntu-22.04
+          - runner: ubuntu-latest
             platform: win32-x86-64
             script: build-windows.sh
             packages: build-essential ninja-build pkg-config git curl python3-venv gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64

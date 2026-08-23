@@ -15,6 +15,7 @@ import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.jul.Log4jBridgeHandler;
 import player.PlayerService;
 import player.base.AudioPlayerFactory;
 import playlists.PlaylistService;
@@ -30,7 +31,9 @@ public final class MainVerticle extends VerticleBase {
 
     static {
         // wire java logger to log4j
-        System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
+        // need to use JUL handler instead of java.util.logging.manager property
+        // for runtime adapting for native support.
+        Log4jBridgeHandler.install(true, null, true);
     }
 
     private static final Logger LOGGER = LogManager.getLogger(MainVerticle.class);

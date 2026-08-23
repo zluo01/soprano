@@ -20,6 +20,7 @@
 set -euo pipefail
 
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+. "$NATIVE_DIR/mpv/build.sh"
 . "$NATIVE_DIR/image/build.sh"
 
 CXX_RUNTIME_LIB=-lstdc++
@@ -39,6 +40,9 @@ fi
 # mpv itself additionally needs the system pkg-config paths to find ALSA.
 MPV_PC_LIBDIR="$PREFIX/lib/pkgconfig:$(pkg-config --variable pc_path pkg-config)"
 
+# Baseline system libraries allowed as dynamic dependencies of the bundles.
+ALLOWED='linux-vdso|ld-linux|libc\.so|libm\.so|libpthread\.so|libdl\.so|librt\.so|libasound\.so|libstdc\+\+\.so|libgcc_s\.so'
+
 init_dirs
 setup_env
 
@@ -47,43 +51,7 @@ if [ "$(uname -m)" = x86_64 ]; then
     build_nasm
 fi
 
-build_zlib
-build_freetype
-build_fribidi
-build_harfbuzz
-build_libass
-build_libplacebo
-build_ffmpeg
-build_mpv
+# ------------------------------------------------------------------ bundles
 
-# -------------------------------------------------------------------- output
-
-DEST="$OUT/libmpv"
-cp "$PREFIX/lib/libmpv.so" "$DEST"
-strip --strip-unneeded "$DEST"
-
-log "Bundled library: $DEST ($(du -h "$DEST" | cut -f1))"
-log "Dynamic dependencies:"
-ldd "$DEST"
-
-UNRESOLVED="$(ldd -r "$DEST" 2>&1 | grep -i "undefined symbol" || true)"
-if [ -n "$UNRESOLVED" ]; then
-    echo "ERROR: unresolved symbols in $DEST:"
-    echo "$UNRESOLVED" | head -20
-    exit 1
-fi
-
-ALLOWED='linux-vdso|ld-linux|libc\.so|libm\.so|libpthread\.so|libdl\.so|librt\.so|libasound\.so|libstdc\+\+\.so|libgcc_s\.so'
-UNEXPECTED="$(ldd "$DEST" | awk '{print $1}' | grep -Ev "$ALLOWED" || true)"
-if [ -n "$UNEXPECTED" ]; then
-    echo "ERROR: unexpected dynamic dependencies (not baseline system libs):"
-    echo "$UNEXPECTED"
-    exit 1
-fi
-log "Dependency check passed: only baseline system libraries required."
-
-run_load_check "$DEST"
-
-# ------------------------------------------------------ image bundle output
-
+build_libmpv linux
 build_libimage linux

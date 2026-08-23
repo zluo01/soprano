@@ -25,6 +25,7 @@
 set -euo pipefail
 
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+. "$NATIVE_DIR/mpv/build.sh"
 . "$NATIVE_DIR/image/build.sh"
 
 CXX_RUNTIME_LIB=-lstdc++
@@ -72,36 +73,8 @@ MESON_CROSS_ARGS="--cross-file $CROSS_FILE"
 bootstrap_meson
 build_nasm
 
-build_zlib
-build_freetype
-build_fribidi
-build_harfbuzz
-build_libass
-build_libplacebo
-build_ffmpeg
-build_mpv
+# ------------------------------------------------------------------ bundles
 
-# -------------------------------------------------------------------- output
-
-DEST="$OUT/libmpv"
-cp "$PREFIX"/bin/libmpv-*.dll "$DEST"
-"${CROSS_PREFIX}strip" --strip-unneeded "$DEST"
-
-log "Bundled library: $DEST ($(du -h "$DEST" | cut -f1))"
-log "Imported DLLs:"
-"${CROSS_PREFIX}objdump" -p "$DEST" | grep "DLL Name" || true
-
-# Windows system DLLs are always present; what must NOT appear are mingw
-# runtime or dependency DLLs — those mean static linking silently failed.
-UNEXPECTED="$("${CROSS_PREFIX}objdump" -p "$DEST" | grep "DLL Name" \
-    | grep -Ei "libwinpthread|libgcc|libstdc|libssp|zlib|libav|libass|libplacebo|libmpv" || true)"
-if [ -n "$UNEXPECTED" ]; then
-    echo "ERROR: non-system DLL dependencies (static linking failed):"
-    echo "$UNEXPECTED"
-    exit 1
-fi
-log "Dependency check passed: only Windows system DLLs imported."
-
-# ------------------------------------------------------ image bundle output
-
+build_libmpv windows
 build_libimage windows
+log "NOTE: run the jar on a Windows machine to fully verify these libraries."

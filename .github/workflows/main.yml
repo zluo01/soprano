@@ -59,7 +59,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: native/out
-          key: native-${{ matrix.platform }}-${{ hashFiles('native/versions.sh', 'native/common.sh', format('native/{0}', matrix.script)) }}
+          key: native-${{ matrix.platform }}-${{ hashFiles('native/versions.sh', 'native/common.sh', 'native/mpv/**', 'native/image/**', format('native/{0}', matrix.script)) }}
 
       - name: Install native build prerequisites
         if: steps.native-cache.outputs.cache-hit != 'true' && runner.os == 'Linux'

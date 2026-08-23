@@ -23,6 +23,7 @@
 set -euo pipefail
 
 . "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+. "$NATIVE_DIR/mpv/build.sh"
 . "$NATIVE_DIR/image/build.sh"
 
 CXX_RUNTIME_LIB=-lc++
@@ -54,40 +55,7 @@ if [ "$(uname -m)" = x86_64 ]; then
     build_nasm
 fi
 
-build_zlib
-build_freetype
-build_fribidi
-build_harfbuzz
-build_libass
-build_libplacebo
-build_ffmpeg
-build_mpv
+# ------------------------------------------------------------------ bundles
 
-# -------------------------------------------------------------------- output
-
-DEST="$OUT/libmpv"
-cp "$PREFIX/lib/libmpv.dylib" "$DEST"
-strip -x "$DEST"
-
-log "Bundled library: $DEST ($(du -h "$DEST" | cut -f1))"
-log "Dynamic dependencies:"
-otool -L "$DEST"
-
-# Everything under /usr/lib or /System/Library is part of macOS itself. The
-# first entry otool prints for a dylib is its own install name — not a
-# dependency — so it is filtered out.
-UNEXPECTED="$(otool -L "$DEST" | tail -n +2 | awk '{print $1}' \
-    | grep -v "libmpv" \
-    | grep -Ev '^(/usr/lib/|/System/Library/)' || true)"
-if [ -n "$UNEXPECTED" ]; then
-    echo "ERROR: unexpected dynamic dependencies (not macOS system libraries):"
-    echo "$UNEXPECTED"
-    exit 1
-fi
-log "Dependency check passed: only macOS system libraries required."
-
-run_load_check "$DEST"
-
-# ------------------------------------------------------ image bundle output
-
+build_libmpv mac
 build_libimage mac

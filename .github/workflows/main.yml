@@ -96,6 +96,7 @@ jobs:
       - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
+          version: "25"
           java-version: '25'
           distribution: 'graalvm-community'
           cache: maven
@@ -105,7 +106,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Download native libraries
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: native-libs-${{ matrix.platform }}
           path: native/out/resources

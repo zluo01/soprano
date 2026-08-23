@@ -246,4 +246,87 @@ class PlaylistServiceImplTest {
                        }))
                        .onFailure(context::failNow);
     }
+
+    @Test
+    void playlistSongsIgnoresCommentLines(Vertx vertx, VertxTestContext context) throws IOException {
+        final String name = uniqueName();
+        writePlaylistFile(name, "#EXTM3U\n#EXTINF:213,Some Song\n/music/a.flac\n# a plain comment\n/music/b.flac");
+
+        when(databaseService.songsFromPath(any()))
+                .thenAnswer(invocation -> {
+                    final Collection<String> paths = invocation.getArgument(0);
+                    final List<JsonObject> songs = paths.stream()
+                                                        .map(p -> JsonObject.of("path", p))
+                                                        .toList();
+                    return Future.succeededFuture(songs);
+                });
+
+        playlistService.playlistSongs(name)
+                       .onSuccess(result -> context.verify(() -> {
+                           assertEquals(2, result.size());
+                           assertEquals("/music/a.flac", result.get(0).getString("path"));
+                           assertEquals("/music/b.flac", result.get(1).getString("path"));
+                           context.completeNow();
+                       }))
+                       .onFailure(context::failNow);
+    }
+
+    @Test
+    void validatePlaylistsFlagsMissingSongs(Vertx vertx, VertxTestContext context) throws IOException {
+        final String name = uniqueName();
+        writePlaylistFile(name, "/music/a.flac\n/music/missing.flac\n/music/b.flac");
+
+        when(databaseService.songsFromPath(any()))
+                .thenReturn(Future.succeededFuture(List.of(JsonObject.of("path", "/music/a.flac"),
+                                                           JsonObject.of("path", "/music/b.flac"))));
+
+        playlistService.validatePlaylists()
+                       .onSuccess(__ -> context.verify(() -> {
+                           final Path original = Path.of(playlistService.resolvePlaylistFilePath(name));
+                           final Path reviewed = Path.of(original + ".bak");
+                           assertFalse(Files.exists(original));
+                           assertTrue(Files.exists(reviewed));
+                           assertEquals("/music/a.flac\n# MISSING: /music/missing.flac\n/music/b.flac",
+                                        Files.readString(reviewed));
+                           context.completeNow();
+                       }))
+                       .onFailure(context::failNow);
+    }
+
+    @Test
+    void validatePlaylistsKeepsValidPlaylist(Vertx vertx, VertxTestContext context) throws IOException {
+        final String name = uniqueName();
+        writePlaylistFile(name, "/music/a.flac\n/music/b.flac");
+
+        when(databaseService.songsFromPath(any()))
+                .thenReturn(Future.succeededFuture(List.of(JsonObject.of("path", "/music/a.flac"),
+                                                           JsonObject.of("path", "/music/b.flac"))));
+
+        playlistService.validatePlaylists()
+                       .onSuccess(__ -> context.verify(() -> {
+                           final Path original = Path.of(playlistService.resolvePlaylistFilePath(name));
+                           assertTrue(Files.exists(original));
+                           assertFalse(Files.exists(Path.of(original + ".bak")));
+                           context.completeNow();
+                       }))
+                       .onFailure(context::failNow);
+    }
+
+    @Test
+    void validatePlaylistsIgnoresCommentLines(Vertx vertx, VertxTestContext context) throws IOException {
+        final String name = uniqueName();
+        writePlaylistFile(name, "#EXTM3U\n# MISSING: /music/gone.flac\n/music/a.flac");
+
+        when(databaseService.songsFromPath(any()))
+                .thenReturn(Future.succeededFuture(List.of(JsonObject.of("path", "/music/a.flac"))));
+
+        playlistService.validatePlaylists()
+                       .onSuccess(__ -> context.verify(() -> {
+                           final Path original = Path.of(playlistService.resolvePlaylistFilePath(name));
+                           assertTrue(Files.exists(original));
+                           assertFalse(Files.exists(Path.of(original + ".bak")));
+                           context.completeNow();
+                       }))
+                       .onFailure(context::failNow);
+    }
 }

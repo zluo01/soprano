@@ -62,10 +62,12 @@ public class PlaylistServiceImpl implements PlaylistService {
     private Future<Void> verifyPlaylist(final String path) {
         return fileSystem.readFile(path)
                          .compose(content -> {
-                             final var songPaths = Arrays.stream(content.toString(StandardCharsets.UTF_8)
-                                                                        .trim()
-                                                                        .split("\n"))
-                                                         .filter(s -> !Strings.isBlank(s.trim()))
+                             final String[] lines = content.toString(StandardCharsets.UTF_8)
+                                                           .trim()
+                                                           .split("\n");
+                             final var songPaths = Arrays.stream(lines)
+                                                         .map(String::trim)
+                                                         .filter(s -> !Strings.isBlank(s) && !s.startsWith("#"))
                                                          .collect(Collectors.toSet());
                              if (!songPaths.isEmpty()) {
                                  return databaseService.songsFromPath(songPaths)
@@ -78,7 +80,13 @@ public class PlaylistServiceImpl implements PlaylistService {
                                                                final var missing = new HashSet<>(songPaths);
                                                                missing.removeAll(databaseSongPaths);
                                                                LOGGER.warn("Missing song in database {}", missing);
-                                                               return fileSystem.move(path, path + ".bak");
+
+                                                               // comment out the dead entries
+                                                               final String reviewed = Arrays.stream(lines)
+                                                                                             .map(line -> missing.contains(line.trim()) ? "# MISSING: " + line : line)
+                                                                                             .collect(Collectors.joining("\n"));
+                                                               return fileSystem.writeFile(path + ".bak", Buffer.buffer(reviewed))
+                                                                                .compose(__ -> fileSystem.delete(path));
                                                            }
                                                            return Future.succeededFuture();
                                                        });
@@ -116,7 +124,7 @@ public class PlaylistServiceImpl implements PlaylistService {
                               final List<String> songPaths = Arrays.stream(content.toString(StandardCharsets.UTF_8)
                                                                                   .trim()
                                                                                   .split("\n"))
-                                                                   .filter(s -> !Strings.isBlank(s))
+                                                                   .filter(s -> !Strings.isBlank(s) && !s.trim().startsWith("#"))
                                                                    .toList();
                               final int size = songPaths.size();
                               if (!songPaths.isEmpty()) {
@@ -153,7 +161,7 @@ public class PlaylistServiceImpl implements PlaylistService {
                              final String[] songPaths = Arrays.stream(content.toString(StandardCharsets.UTF_8)
                                                                              .trim()
                                                                              .split("\n"))
-                                                              .filter(s -> !Strings.isBlank(s))
+                                                              .filter(s -> !Strings.isBlank(s) && !s.trim().startsWith("#"))
                                                               .toArray(String[]::new);
                              if (songPaths.length == 0) {
                                  return Future.succeededFuture(List.of());

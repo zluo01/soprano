@@ -22,7 +22,7 @@ jobs:
       - name: Build with Maven and Run unit Test
         run: mvn --batch-mode --update-snapshots verify -e -q
 
-  package:
+  native-libs:
     strategy:
       matrix:
         include:
@@ -47,13 +47,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up JDK 25
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'corretto'
-          cache: maven
-
       - name: Restore bundled native libraries
         id: native-cache
         uses: actions/cache@v6
@@ -71,12 +64,58 @@ jobs:
         if: steps.native-cache.outputs.cache-hit != 'true'
         run: ./native/${{ matrix.script }}
 
+      - name: Upload native libraries
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-libs-${{ matrix.platform }}
+          path: native/out/resources
+          retention-days: 1
+
+  bundle:
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-22.04
+            platform: linux-x86-64
+            artifact: target/soprano
+          - runner: ubuntu-22.04-arm
+            platform: linux-aarch64
+            artifact: target/soprano
+          - runner: windows-latest
+            platform: win32-x86-64
+            artifact: target/soprano.exe
+          - runner: macos-26
+            platform: darwin-aarch64
+            artifact: target/soprano
+    runs-on: ${{ matrix.runner }}
+    needs: [ build, native-libs ]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '25'
+          distribution: 'graalvm-community'
+          cache: maven
+
+      - name: Set up MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Download native libraries
+        uses: actions/download-artifact@v7
+        with:
+          name: native-libs-${{ matrix.platform }}
+          path: native/out/resources
+
       - name: bundle
-        run: mvn package -DskipTests -q
+        run: mvn -Pnative package -DskipTests -q
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
           name: soprano-${{ matrix.platform }}
-          path: target/soprano-main.jar
+          path: ${{ matrix.artifact }}
           retention-days: 1

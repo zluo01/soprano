@@ -39,13 +39,6 @@ import static enums.WorkerAction.UPDATE_DIRECTORY;
 public final class AudioDataCollectorVerticle extends VerticleBase {
     private static final Logger LOGGER = LogManager.getLogger(AudioDataCollectorVerticle.class);
 
-    private static final ExecutorService IMAGE_OPTIMIZATION_EXECUTOR =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
-                                         Thread.ofPlatform()
-                                               .name("image-optimization-", 0)
-                                               .daemon(true)
-                                               .factory());
-
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     private final DatabaseService databaseService;
@@ -65,19 +58,6 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
         eventBus.consumer(SCAN_DIRECTORY.name(), __ -> scanDirectory(musicDirectory(config()), false));
 
         return Future.succeededFuture();
-    }
-
-    @Override
-    public Future<?> stop() throws Exception {
-        IMAGE_OPTIMIZATION_EXECUTOR.shutdown();
-        try {
-            if (!IMAGE_OPTIMIZATION_EXECUTOR.awaitTermination(30, TimeUnit.MINUTES)) {
-                IMAGE_OPTIMIZATION_EXECUTOR.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            IMAGE_OPTIMIZATION_EXECUTOR.shutdownNow();
-        }
-        return super.stop();
     }
 
     private void scanDirectory(final String root, final boolean update) {
@@ -215,20 +195,22 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
             return;
         }
 
-        final var futures = coverMap.entrySet()
-                                    .stream()
-                                    .map(entry -> CompletableFuture.runAsync(
-                                            () -> optimizeImage(entry.getKey(), entry.getValue()),
-                                            IMAGE_OPTIMIZATION_EXECUTOR))
-                                    .toList();
-        try {
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(30, TimeUnit.MINUTES);
-            LOGGER.info("Image optimization completed.");
-        } catch (TimeoutException e) {
-            LOGGER.error("Image optimization timed out after 30 minutes", e);
-            futures.forEach(f -> f.cancel(true));
-        } catch (Exception e) {
-            LOGGER.error("Error happens during optimizing images", e);
+        try (ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
+            final var futures = coverMap.entrySet()
+                                        .stream()
+                                        .map(entry -> CompletableFuture.runAsync(
+                                                () -> optimizeImage(entry.getKey(), entry.getValue()),
+                                                executor))
+                                        .toList();
+            try {
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(30, TimeUnit.MINUTES);
+                LOGGER.info("Image optimization completed.");
+            } catch (TimeoutException e) {
+                LOGGER.error("Image optimization timed out after 30 minutes", e);
+                futures.forEach(f -> f.cancel(true));
+            } catch (Exception e) {
+                LOGGER.error("Error happens during optimizing images", e);
+            }
         }
     }
 

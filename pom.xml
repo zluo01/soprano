@@ -395,6 +395,7 @@
                                     <buildArgs>
                                         <!-- default max heap baked into the binary; overridable at runtime with -Xmx -->
                                         <buildArg>-R:MaxHeapSize=512m</buildArg>
+                                        <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
                                     </buildArgs>
                                 </configuration>
                             </execution>

@@ -242,7 +242,7 @@ public final class AudioDataCollectorVerticle extends VerticleBase {
                                          .toString();
 
             if (optimize(artwork.getBinaryData(), coverPath, sourceDimension, variantDimensions)) {
-                LOGGER.info("Successfully optimized image {}", coverPath);
+                LOGGER.debug("Successfully optimized image {}", coverPath);
             }
         } catch (Exception e) {
             LOGGER.error("Fail to optimize image", e);

@@ -126,4 +126,9 @@ build_libimage() { # $1 = linux|mac|windows
             exit 1
             ;;
     esac
+
+    # stored gzipped in the resource dir; extracted through GZIPInputStream at
+    # runtime (BundledLibrary). -n keeps the output byte-stable across rebuilds.
+    gzip -9 -n -f "$dest"
+    log "Compressed bundle: $dest.gz ($(du -h "$dest.gz" | cut -f1))"
 }

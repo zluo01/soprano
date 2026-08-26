@@ -17,7 +17,7 @@
 # and a GNU-only "sed -i" call whose substitution only matters for Windows
 # DLL builds). Both are upstream bugs with no effect on the produced library.
 #
-# Output: native/out/resources/libmpv — the jar is built for ONE platform:
+# Output: native/out/resources/libmpv.gz — the jar is built for ONE platform:
 # run this script on the deployment target's architecture before mvn package.
 
 set -euo pipefail

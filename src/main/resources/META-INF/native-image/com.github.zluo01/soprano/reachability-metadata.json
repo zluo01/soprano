@@ -217,8 +217,8 @@
     ]
   },
   "resources": [
-    {"glob": "libmpv"},
-    {"glob": "libimage"},
+    {"glob": "libmpv.gz"},
+    {"glob": "libimage.gz"},
     {"glob": "queries/*.sql"},
     {"glob": "schemas/*.graphql"},
     {"glob": "webroot/**"},

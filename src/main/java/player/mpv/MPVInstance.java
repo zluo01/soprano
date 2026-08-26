@@ -85,7 +85,7 @@ public record MPVInstance(MPV instance, MemorySegment handle) {
 
     private static MPV loadLibMpv() {
         try {
-            final Path lib = BundledLibrary.extract("/libmpv");
+            final Path lib = BundledLibrary.extract("/libmpv.gz");
             LOGGER.info("Loading bundled libmpv from {}", lib);
             return new MPV(lib);
         } catch (final IOException e) {

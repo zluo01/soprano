@@ -14,7 +14,7 @@
 # The result inherits the build host's glibc baseline — build on a machine no
 # newer (glibc-wise) than the deployment target.
 #
-# Output: native/out/resources/libmpv — the jar is built for ONE platform:
+# Output: native/out/resources/libmpv.gz — the jar is built for ONE platform:
 # run this script on (or for) the deployment target right before mvn package.
 
 set -euo pipefail

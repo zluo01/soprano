@@ -22,7 +22,7 @@ public final class ImageOptimizer {
 
         private static ImageCodec load() {
             try {
-                return new ImageCodec(BundledLibrary.extract("/libimage"));
+                return new ImageCodec(BundledLibrary.extract("/libimage.gz"));
             } catch (final IOException e) {
                 throw new IllegalStateException("Fail to load bundled libimage.", e);
             }

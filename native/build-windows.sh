@@ -18,7 +18,7 @@
 # expect to iterate on the first run. The produced DLL must be verified on a
 # Windows machine (run the jar); run_load_check cannot execute it on Linux.
 #
-# Output: native/out/resources/libmpv — the jar is built for ONE platform:
+# Output: native/out/resources/libmpv.gz — the jar is built for ONE platform:
 # this overwrites any previously built library, so package the Windows jar
 # right after running this script.
 

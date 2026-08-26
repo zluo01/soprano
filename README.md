@@ -1,7 +1,5 @@
 # Soprano
 
-**Your personal music library, ready to play from any screen.**
-
 Soprano turns the music collection on your computer into a clean, easy-to-use listening experience. Point it at your music folder, and it organizes your songs, albums, artists, genres, and cover art for you. Open the web app from a phone, tablet, or desktop to explore your collection and control playback—no separate client app required.
 
 ### What you can do

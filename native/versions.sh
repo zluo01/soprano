@@ -15,7 +15,7 @@ NASM_VERSION=3.02
 NASM_SHA256=87336eba53b4acfe917424ab5d500d2b0054d9f5148d35c2273ccf2cfb712f0d
 
 # renovate: datasource=github-tags depName=pkgconf/pkgconf extractVersion=^pkgconf-(?<version>.+)$
-PKGCONF_VERSION=2.3.0
+PKGCONF_VERSION=2.5.1
 PKGCONF_SHA256=3a9080ac51d03615e7c1910a0a2a8df08424892b5f13b0628a204d3fcce0ea8b
 
 # renovate: datasource=github-releases depName=madler/zlib extractVersion=^v(?<version>.+)$
@@ -31,7 +31,7 @@ FRIBIDI_VERSION=1.0.16
 FRIBIDI_SHA256=1b1cde5b235d40479e91be2f0e88a309e3214c8ab470ec8a2744d82a5a9ea05c
 
 # renovate: datasource=github-releases depName=harfbuzz/harfbuzz
-HARFBUZZ_VERSION=14.3.1
+HARFBUZZ_VERSION=14.4.0
 HARFBUZZ_SHA256=9dae9538aae2ffdf70cec31f2c27bf68e2aaeeae3112688467697d5faf6194f7
 
 # renovate: datasource=github-releases depName=libass/libass

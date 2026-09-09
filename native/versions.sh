@@ -15,7 +15,7 @@ NASM_VERSION=3.02
 NASM_SHA256=87336eba53b4acfe917424ab5d500d2b0054d9f5148d35c2273ccf2cfb712f0d
 
 # renovate: datasource=github-tags depName=pkgconf/pkgconf extractVersion=^pkgconf-(?<version>.+)$
-PKGCONF_VERSION=2.3.0
+PKGCONF_VERSION=3.0.7
 PKGCONF_SHA256=3a9080ac51d03615e7c1910a0a2a8df08424892b5f13b0628a204d3fcce0ea8b
 
 # renovate: datasource=github-releases depName=madler/zlib extractVersion=^v(?<version>.+)$
@@ -42,7 +42,7 @@ LIBASS_SHA256=2dca25c0e0c837ddf00b52011b3f82cac1e4ddd3ad018227806b0c2288864acc
 LIBPLACEBO_VERSION=7.360.1
 
 # renovate: datasource=github-tags depName=FFmpeg/FFmpeg versioning=semver-coerced extractVersion=^n(?<version>.+)$
-FFMPEG_VERSION=8.1.2
+FFMPEG_VERSION=9.0.1
 FFMPEG_SHA256=464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c
 
 # renovate: datasource=github-releases depName=mpv-player/mpv extractVersion=^v(?<version>.+)$

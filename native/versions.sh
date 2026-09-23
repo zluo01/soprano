@@ -15,7 +15,7 @@ NASM_VERSION=3.02
 NASM_SHA256=87336eba53b4acfe917424ab5d500d2b0054d9f5148d35c2273ccf2cfb712f0d
 
 # renovate: datasource=github-tags depName=pkgconf/pkgconf extractVersion=^pkgconf-(?<version>.+)$
-PKGCONF_VERSION=2.3.0
+PKGCONF_VERSION=2.5.1
 PKGCONF_SHA256=3a9080ac51d03615e7c1910a0a2a8df08424892b5f13b0628a204d3fcce0ea8b
 
 # renovate: datasource=github-releases depName=madler/zlib extractVersion=^v(?<version>.+)$
@@ -27,11 +27,11 @@ FREETYPE_TAG=VER-2-14-3
 FREETYPE_SHA256=36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f
 
 # renovate: datasource=github-releases depName=fribidi/fribidi extractVersion=^v(?<version>.+)$
-FRIBIDI_VERSION=1.0.16
+FRIBIDI_VERSION=1.0.17
 FRIBIDI_SHA256=1b1cde5b235d40479e91be2f0e88a309e3214c8ab470ec8a2744d82a5a9ea05c
 
 # renovate: datasource=github-releases depName=harfbuzz/harfbuzz
-HARFBUZZ_VERSION=14.3.1
+HARFBUZZ_VERSION=14.5.0
 HARFBUZZ_SHA256=9dae9538aae2ffdf70cec31f2c27bf68e2aaeeae3112688467697d5faf6194f7
 
 # renovate: datasource=github-releases depName=libass/libass
@@ -42,7 +42,7 @@ LIBASS_SHA256=2dca25c0e0c837ddf00b52011b3f82cac1e4ddd3ad018227806b0c2288864acc
 LIBPLACEBO_VERSION=7.360.1
 
 # renovate: datasource=github-tags depName=FFmpeg/FFmpeg versioning=semver-coerced extractVersion=^n(?<version>.+)$
-FFMPEG_VERSION=8.1.2
+FFMPEG_VERSION=8.1.3
 FFMPEG_SHA256=464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c
 
 # renovate: datasource=github-releases depName=mpv-player/mpv extractVersion=^v(?<version>.+)$
@@ -54,4 +54,4 @@ LIBWEBP_VERSION=1.6.0
 LIBWEBP_SHA256=e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564
 
 # renovate: datasource=pypi depName=meson
-MESON_VERSION=1.12.0
+MESON_VERSION=1.12.1
